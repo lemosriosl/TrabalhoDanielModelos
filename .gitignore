@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Ferramentas e sistema
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Temporarios locais
+tmp/
+*.log
+
+# Dados gerados (manter apenas arquivos de orientacao)
+data/interim/**
+!data/interim/.gitkeep
+data/processed/**
+!data/processed/.gitkeep
+
+# Resultados reproduziveis
+results/predictions/**
+!results/predictions/.gitkeep
+results/residuals/**
+!results/residuals/.gitkeep
+results/feature_importance/**
+!results/feature_importance/.gitkeep
+
+# Saidas finais geradas
+report/html/**
+!report/html/.gitkeep
+report/pdf/**
+!report/pdf/.gitkeep
+entrega/*.zip
+

@@ -1,0 +1,51 @@
+projeto:
+  grupo: null
+  integrantes: []
+  modelo_especializacao: null
+  semente: 42
+
+validacao:
+  estrategia: walk_forward
+  horizonte: null
+  tamanho_janela_inicial: null
+  passo: 1
+  janela: expansiva
+  metrica_principal: MAE
+
+bases:
+  - id: base_01
+    nome: null
+    arquivo: null
+    alvo: null
+    coluna_tempo: null
+    frequencia: null
+    periodo_sazonal: null
+  - id: base_02
+    nome: null
+    arquivo: null
+    alvo: null
+    coluna_tempo: null
+    frequencia: null
+    periodo_sazonal: null
+  - id: base_03
+    nome: null
+    arquivo: null
+    alvo: null
+    coluna_tempo: null
+    frequencia: null
+    periodo_sazonal: null
+  - id: base_04
+    nome: null
+    arquivo: null
+    alvo: null
+    coluna_tempo: null
+    frequencia: null
+    periodo_sazonal: null
+  - id: base_05
+    nome: null
+    arquivo: null
+    alvo: null
+    coluna_tempo: null
+    frequencia: null
+    periodo_sazonal: null
+
