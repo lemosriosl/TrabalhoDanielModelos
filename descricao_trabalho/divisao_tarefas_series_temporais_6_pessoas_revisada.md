@@ -491,7 +491,7 @@ Apresenta:
 
 # 9. Distribuição de todas as tarefas do enunciado
 
-| Atividade | P1 | P2 | P3 | P4 | P5 | P6 |
+| Atividade | P1 (Bastos) | P2 (Frossard) | P3 (Ruan) | P4 (Levy) | P5 (Giovanne)  | P6 (Mayumi) |
 |---|---:|---:|---:|---:|---:|---:|
 | Documentação Base 1 | ● |  |  | revisão |  |  |
 | Documentação Base 2 | ● |  |  | revisão |  |  |
