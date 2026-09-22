@@ -1,4 +1,5 @@
 data,integrante,demanda_realizada,entrega_ou_evidencia,carga_de_trabalho,complexidade,status
 2026-09-21,Codex (agente),Merge da master na main preservando os arquivos da main e removendo data/,Commit de merge e verificacao de bases/ e pytest,baixa,baixa,Concluido
 2026-09-22,Codex (agente),Atualizar ficha e EDA da base 5 para grupo5_new.csv,trabalho/bases/grupo5/base_grupo5.md e eda_preparacao_base_5_ouro.ipynb; tests/unit/test_grupo5_preparacao.py,media,media,Concluido
+2026-09-22,Codex (agente),Criar documentacao e dicionario de externas da Base 5 no formato da Base 4,trabalho/bases/grupo5/documentacao_base5.md e dicionario_variaveis_externas_base5.md,baixa,baixa,Concluido
 
