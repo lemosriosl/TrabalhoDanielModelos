@@ -13,4 +13,7 @@ Preencher antes do inicio da modelagem. Nao deixar agentes de IA assumirem estas
 - [ ] Tamanho da janela inicial e uso de janela expansiva ou deslizante.
 - [ ] Formula exata da forca da sazonalidade apresentada em sala.
 - [ ] Estrategia e orcamento de busca de hiperparametros.
+- [ ] Base 5: confirmar fonte, calendario e disponibilidade temporal de `IS_HOLIDAY` no `grupo5_new.csv`.
+- [ ] Base 5: confirmar origem e finalidade de `TARGET_UP`; o arquivo codifica como 0 comparacoes com cotacao ausente.
+- [ ] Base 5: confirmar unidade, moeda e fornecedor de `VALUE`.
 

@@ -1,125 +1,48 @@
-# Base 5 — Preços diários do ouro: detalhamento técnico
+# Base 5 — preços diários do ouro (`grupo5_new.csv`)
 
-## 1. Identificação da base
+## Identificação e proveniência
 
-| Campo | Descrição |
-|---|---|
-| Nome de trabalho | Preços diários do ouro |
-| Arquivo | `gold.daily.prices.csv` |
-| Repositório de acesso | [dengyishuo/quantitative-finance](https://github.com/dengyishuo/quantitative-finance/blob/master/gold.daily.prices.csv) |
-| Tipo de dado | Série temporal financeira univariada |
-| Frequência observada | Diária de calendário de mercado; não há cotação em parte dos fins de semana e feriados |
-| Período observado no arquivo referenciado | 1968-04-01 a 2014-04-10 |
-| Tamanho aproximado | 12.010 linhas, incluindo cabeçalho |
-| Colunas | `DATE` e `VALUE` |
-| Configuração experimental | 80% treino / 20% teste, corte cronológico; `random_state = 42` apenas em etapas estocásticas auxiliares |
+Esta ficha descreve **`trabalho/bases/grupo5/grupo5_new.csv`**, a versão usada no EDA. O arquivo anterior, `grupo5_old.csv`, permanece apenas para comparação. Ambos têm as mesmas 12.009 datas e os mesmos valores de `VALUE`; o novo arquivo troca o separador por `;` e acrescenta duas colunas. SHA-256 do novo arquivo: `8446b3f07b6834625e9e82b58955ea8ef906d67c23d34ee05440602349e02947`.
 
-## 2. O que a base representa
+O histórico de `DATE` e `VALUE` corresponde ao arquivo [gold.daily.prices.csv](https://github.com/dengyishuo/quantitative-finance/blob/master/gold.daily.prices.csv) citado na versão anterior desta ficha. A origem, regra de construção e data de geração de `IS_HOLIDAY` e `TARGET_UP` **não estão documentadas no CSV**. A unidade, moeda e fornecedor da cotação também não constam do arquivo. Até confirmação, `VALUE` significa valor de preço na unidade de origem, sem afirmar USD/onça troy.
 
-A base registra uma única cotação diária do ouro ao longo de aproximadamente 46 anos. Cada linha representa uma data e seu respectivo valor de preço. O arquivo é útil como uma série histórica financeira longa, com ciclos econômicos distintos, períodos de alta e baixa volatilidade e mudanças estruturais relevantes.
+| Propriedade observada | Valor |
+|---|---:|
+| Separador e cabeçalho | `;` e `DATE;VALUE;IS_HOLIDAY;TARGET_UP` |
+| Período | 1968-04-01 a 2014-04-10 |
+| Linhas / datas únicas | 12.009 / 12.009 |
+| Frequência de linhas | Segunda a sexta, com algumas cotações ausentes |
+| `VALUE` ausente | 368 (3,06%) |
+| `VALUE` observado | 11.641 |
+| `IS_HOLIDAY = 1` | 297 (inclui 180 linhas com preço observado) |
+| `TARGET_UP = 1` | 5.629 |
 
-Ela é uma base **univariada**: não oferece, no arquivo original, variáveis macroeconômicas, volume, abertura/máxima/mínima/fechamento nem metadados que expliquem diretamente cada variação diária. Por isso, serve bem para estabelecer um *benchmark* de previsão a partir do próprio histórico de preços, mas requer fontes adicionais se o objetivo for atribuir causalidade ou construir uma previsão multivariada.
+## Dicionário das colunas
 
-> A coluna `VALUE` não traz unidade, moeda nem fornecedor explicitamente documentados dentro do arquivo. Embora os valores sejam compatíveis com uma cotação de ouro em dólar por onça troy, essa unidade não deve ser assumida como fato no relatório até que a proveniência original seja confirmada. Trate-a inicialmente como **índice/valor de preço na unidade de origem**.
-
-## 3. Estrutura e dicionário mínimo
-
-| Variável original | Tipo esperado | Papel | Descrição | Problemas / tratamento inicial |
-|---|---|---|---|---|
-| `DATE` | data (`YYYY-MM-DD`) | Índice temporal | Dia da observação | Converter para `datetime`, ordenar crescente, verificar duplicidade e continuidade entre dias úteis. |
-| `VALUE` | numérico contínuo | Série-alvo bruta | Cotação/valor diário do ouro | Converter `.` para ausente (`NaN`) antes de transformar o tipo. Confirmar unidade e moeda antes de rotular a variável. |
-
-O arquivo é exibido no GitHub como texto com campos separados por espaços, ainda que tenha extensão `.csv`. A leitura deve aceitar separador por espaços em branco, por exemplo com `sep=r'\s+'`, e preservar `.` como valor ausente. Não assumir vírgula como delimitador.
-
-## 4. Qual pergunta o modelo deve responder?
-
-Antes de modelar, escolher **uma** definição de previsão. Recomenda-se começar pela primeira.
-
-| Opção | Alvo no instante `t` | Uso | Observação |
-|---|---|---|---|
-| Preço do próximo pregão | `VALUE(t+1)` | Previsão direta de nível | Fácil de comunicar, mas sofre com não estacionaridade. |
-| Retorno simples | `VALUE(t+1) / VALUE(t) - 1` | Decisão/direção e análise financeira | Escala comparável no tempo; exige preços válidos consecutivos. |
-| Retorno logarítmico | `ln(VALUE(t+1)) - ln(VALUE(t))` | Modelagem estatística | Alternativa preferida se `VALUE > 0`; soma ao longo do tempo. |
-| Direção do movimento | `1[VALUE(t+1) > VALUE(t)]` | Classificação | Complementar, não substitui uma métrica de erro do retorno. |
-
-**Recomendação inicial:** usar `retorno_log_1d` como alvo principal de modelagem e manter `VALUE(t+1)` como saída de negócio derivada. A série em nível possui tendência e mudanças de patamar que tornam a avaliação de um modelo aparentemente boa, mas pouco informativa, quando comparada apenas pelo erro absoluto.
-
-## 5. Preparação dos dados
-
-### 5.1 Leitura e validações
-
-1. Carregar o arquivo com separador por espaços e declarar `.` como nulo.
-2. Converter `DATE` para data e `VALUE` para número.
-3. Ordenar por `DATE` e garantir que cada data apareça no máximo uma vez.
-4. Criar um relatório com: primeira/última data, linhas, nulos em `VALUE`, datas repetidas e intervalos entre observações.
-5. Não preencher automaticamente fins de semana, feriados ou dias de cotação ausente. Eles não equivalem a preço zero e podem não ser dias de pregão.
-6. Para criar retornos, usar somente pares consecutivos com valores observados; documentar a regra adotada para lacunas internas.
-
-### 5.2 Transformações recomendadas
-
-| Campo derivado | Fórmula / regra | Finalidade |
+| Coluna | Tipo no arquivo | Interpretação verificada e uso |
 |---|---|---|
-| `log_price_t` | `ln(VALUE_t)` | Reduz escala e ajuda a interpretar variações relativas. |
-| `return_1d_t` | `ln(VALUE_t) - ln(VALUE_{t-1})` | Alvo ou atributo de curto prazo. |
-| `lag_return_k` | `return_1d_(t-k)` | Captura dependência temporal sem vazamento. |
-| `ma_k` | média móvel de `VALUE` até `t-1` | Tendência local; nunca incluir `t+1`. |
-| `vol_k` | desvio-padrão móvel de retornos até `t-1` | Regime de volatilidade. |
-| `dow` / `month` | dia da semana / mês da data | Calendário; usar codificação cíclica quando apropriado. |
-| `gap_days` | diferença em dias desde a última observação | Distingue uma lacuna normal de pregão de outra ausência. |
+| `DATE` | `YYYY-MM-DD` | Data da linha. Converter para data, ordenar e verificar duplicatas. |
+| `VALUE` | número ou vazio | Preço observado; vazio significa cotação ausente, nunca zero. É a única série numérica de preço. |
+| `IS_HOLIDAY` | 0/1 | Indicador de feriado fornecido. Não equivale a ausência de cotação: há linhas marcadas como feriado com preço e linhas sem preço não marcadas. Calendário e momento de disponibilidade precisam ser confirmados antes de seu uso como feature. |
+| `TARGET_UP` | 0/1 | Rótulo já calculado no arquivo. A auditoria mostra que equivale a `1` quando `VALUE` da **próxima linha do CSV** é maior que o da linha atual; caso contrário, inclusive quando um dos preços está ausente, vale `0`. É informação futura e nunca deve entrar em `X`. |
 
-Todos os cálculos móveis e defasagens devem ser obtidos apenas a partir de informações disponíveis em ou antes de `t`. A maneira segura de implementar médias móveis e volatilidade é aplicar `shift(1)` antes da janela móvel.
+## Regra de preparação
 
-## 6. Separação temporal e validação
+1. Ler exclusivamente `grupo5_new.csv` com `sep=';'`, sem baixar outra versão por fallback. Registrar o SHA-256 e verificar esquema, ordem, datas, duplicatas, valores não positivos, nulos e contagens dos indicadores.
+2. Manter `IS_HOLIDAY` e `TARGET_UP` na auditoria da fonte. Não imputar `VALUE` e não criar cotações em fins de semana ou feriados. Remover linhas sem preço apenas da tabela de modelagem.
+3. A preparação exploratória atual preserva a previsão do **próximo preço observado**, que já era a definição no notebook antigo. Isso pode pular uma ou mais linhas sem cotação. Registrar a data prevista e o intervalo em dias. O horizonte comum do experimento ainda depende da decisão do grupo.
+4. Criar os alvos `target_price_t_plus_1` e `target_log_return_t_plus_1` a partir dos preços observados. Se houver estudo de direção, derivar `target_up_next_observed` desses mesmos pares válidos. Não usar `TARGET_UP` da fonte como rótulo equivalente: a regra dele é a próxima **linha**, mesmo se estiver sem cotação.
+5. Usar apenas informações disponíveis na origem `t` nas features: preço atual, retornos passados, lags, médias e volatilidades móveis defasadas, calendário conhecido e intervalo desde a última cotação. `IS_HOLIDAY` fica fora de `X` enquanto sua definição e disponibilidade não forem confirmadas. `TARGET_UP` também fica fora de `X`.
 
-O corte de 80%/20% deve ocorrer **após** a limpeza e a ordenação, sem `shuffle`:
+## EDA e validação
 
-```text
-1968-04-01 ──────────────── 80% treino ────────────────|──── 20% teste ──── 2014-04-10
-                                                      corte
-```
+O notebook `eda_preparacao_base_5_ouro.ipynb` mostra qualidade da fonte, série de preços, retornos, distribuição, volatilidade móvel dos **retornos** e resumo anual. O corte cronológico 80%/20% que ele apresenta é **exploratório**; não fixa as origens, o horizonte nem o teste final comum aos quatro modelos. Não há embaralhamento nem ajuste de imputação ou escala em toda a série. O walk-forward final, seleção de hiperparâmetros e MAE fora da amostra seguem `config/projeto.yaml` quando esses campos forem aprovados e preenchidos.
 
-- O período de teste deve ser o trecho final, preservando uma situação de previsão futura.
-- Dentro do treino, usar validação expansiva (*walk-forward*): treinar até uma data, validar no bloco seguinte, avançar a janela e repetir.
-- Ajustar imputadores, escaladores, seleção de atributos e hiperparâmetros somente no treino de cada dobra.
-- `random_state = 42` é pertinente para modelos aleatórios, como *Random Forest* ou *XGBoost*, e para otimização estocástica. Não é pertinente à escolha do corte temporal.
+Para preço, persistência (`previsão = preço em t`) é um baseline. Para retorno, retorno zero é outro. SARIMAX, Holt-Winters, Random Forest e o modelo de especialização devem ser avaliados nas mesmas origens e observações de teste; seus hiperparâmetros devem ficar fixos durante o teste final. A comparação entre bases de escalas diferentes usa vitórias e posição média, não a média bruta dos MAEs.
 
-## 7. Modelos e baselines
+## Pendências
 
-O valor de um modelo só pode ser demonstrado contra baselines temporais simples.
-
-| Categoria | Sugestão | Papel |
-|---|---|---|
-| Baseline 1 | Persistência: `previsão(t+1) = VALUE(t)` | Referência obrigatória para previsão de preço. |
-| Baseline 2 | Retorno nulo: `previsão do retorno = 0` | Referência obrigatória para retorno. |
-| Estatístico | Naïve com *drift*, ARIMA/SARIMAX | Capta autocorrelação e tendência de forma interpretável. |
-| Volatilidade | GARCH sobre retornos | Indicado para prever variância/risco, não necessariamente a média do retorno. |
-| Machine learning | Regressão regularizada, árvore *boosted* com lags | Usar apenas atributos passados e validação temporal. |
-| Multivariado | SARIMAX, regressão ou *boosting* com variáveis externas | Só após montar o dicionário e garantir disponibilidade temporal das fontes. |
-
-## 8. Métricas e critérios de avaliação
-
-| Alvo | Métricas recomendadas | Interpretação |
-|---|---|---|
-| Preço em nível | MAE, RMSE, MAPE/sMAPE com cautela | Erro na unidade do preço; comparar diretamente ao baseline de persistência. |
-| Retorno | MAE, RMSE, correlação de Pearson/Spearman | Mede proximidade das variações; retornos próximos de zero tornam MAPE inadequado. |
-| Direção | Acurácia, *balanced accuracy*, matriz de confusão | Usar em conjunto com retorno; uma alta acurácia pode não representar valor econômico. |
-| Risco | Erro da volatilidade prevista, cobertura de intervalos | Avalia incerteza e não apenas previsão pontual. |
-
-Além das métricas agregadas, apresentar erros por janelas temporais, especialmente em períodos de forte variação. Reportar intervalo de confiança ou distribuição dos erros quando possível.
-
-## 9. Riscos metodológicos e limitações
-
-- **Proveniência incompleta:** o repositório hospeda o arquivo, mas o próprio arquivo não declara fornecedor, unidade, moeda ou método de formação da cotação. Confirmar esses itens ou registrar formalmente a limitação.
-- **Dados antigos:** a série termina em 2014 na versão referenciada, portanto não representa condições recentes do mercado. Não é apropriada para inferir desempenho atual sem uma atualização de fonte.
-- **Ausências codificadas como `.`:** não tratá-las como zero; avaliar se são feriados, fins de semana ou falhas de registro.
-- **Não estacionaridade e quebras estruturais:** décadas de dados incluem mudanças de regime. Um único modelo global pode ter desempenho desigual entre subperíodos.
-- **Risco de vazamento:** a normalização global, a interpolação usando valores futuros e janelas móveis não defasadas tornam a avaliação inválida.
-- **Uso financeiro:** desempenho preditivo histórico não é recomendação de investimento. Um experimento que inclua regra de negociação deve considerar custos, *slippage*, liquidez e risco.
-
-## 10. Produtos esperados da análise
-
-1. Arquivo tratado com `DATE`, `VALUE`, marcação de ausência e atributos derivados.
-2. Relatório de qualidade e proveniência, incluindo a unidade confirmada ou a limitação correspondente.
-3. Visualizações: preço, log-preço, retornos, volatilidade móvel, nulos/lacunas e cortes temporais.
-4. Tabela de comparação entre baselines e modelos, avaliada exclusivamente no período de teste final.
-5. Conclusão com escopo claro: o que o modelo prevê, para qual horizonte e sob quais limitações.
+- Confirmar a fonte, o calendário e a data de disponibilidade de `IS_HOLIDAY`.
+- Confirmar a origem e o propósito de `TARGET_UP`; a regra observada não equivale ao alvo de próximo preço **observado** quando há lacuna.
+- Confirmar unidade, moeda e fornecedor de `VALUE`.
+- Aprovar alvo, variáveis externas, horizonte, origens e teste final em `config/projeto.yaml` antes da comparação de modelos.
