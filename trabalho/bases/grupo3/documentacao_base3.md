@@ -1,150 +1,69 @@
-# Base 3 - Series financeiras diarias
+# Base 3 — Qualidade do ar em Pequim (estação Aotizhongxin)
 
+## Identificação
 
-## 1. Identificacao da base
-
-
-| Campo | Descricao |
+| Item | Registro |
 |---|---|
-| Nome no projeto | Grupo 3 |
-| Arquivos | `grupo3/data.csv` e `grupo3/test.csv` |
-| Tipo observado | Series temporais financeiras com OHLCV |
-| Frequencia observada | Diaria de mercado, com ausencia de fins de semana e feriados |
-| Periodo observado | 2018-07-02 a 2020-06-30 |
-| Quantidade em cada arquivo | 503 linhas e 7 colunas, incluindo o cabecalho |
-| Coluna temporal | `Date` |
-| Colunas numericas | `Open`, `High`, `Low`, `Close`, `Adj Close`, `Volume` |
+| Responsável | P2 — Pedro Henrique Gomes Frossard |
+| Fonte | [UCI Machine Learning Repository — Beijing Multi-Site Air-Quality Data](https://archive.ics.uci.edu/dataset/501/beijingmultisiteairqualitydata) |
+| Autoria/citação | Chen, S. (2017), DOI: 10.24432/C5RK5G |
+| Licença | CC BY 4.0 |
+| Data desta auditoria | 2026-09-22 |
+| Arquivo | `PRSA_Data_Aotizhongxin_20130301-20170228.csv` |
+| SHA-256 | `a94fbcfc71708b6ffdc033360163d91efb7f675e496f6b5860929aa96b96351b` |
+| Cobertura no arquivo | 2013-03-01 00:00 a 2017-02-28 23:00 |
+| Observações | 35.064 |
+| Granularidade | Horária |
+| Colunas temporais | `year`, `month`, `day`, `hour` (compor `datetime`) |
+| Variável-alvo | `PM2.5` |
+| Unidade do alvo | µg/m³ |
+| Estação | Aotizhongxin (uma das 12 estações do conjunto completo, que soma 420.768 linhas) |
+| Divisão solicitada | A definir pelo grupo, preservando a ordem temporal |
+| `random_state` solicitado | A definir pelo grupo (aplicável somente a componentes estocásticos; não embaralhar a série) |
 
+Este é o dataset originalmente referenciado no dicionário mestre do projeto para o Grupo 3 (qualidade do ar em Pequim), substituindo o par `data.csv`/`test.csv` de séries financeiras usado anteriormente por engano. O arquivo traz dados horários de poluentes atmosféricos e variáveis meteorológicas da estação Aotizhongxin, com dados meteorológicos casados com a estação do China Meteorological Administration mais próxima.
 
-> **Ressalva de proveniencia:** o dicionario de variaveis do projeto descreve o Grupo 3 como qualidade do ar em Pequim, mas os arquivos presentes no repositorio contem series financeiras com colunas OHLCV. A origem, o ativo e a funcao de `data.csv` versus `test.csv` precisam ser confirmados com o grupo antes da versao final do relatorio.
+## Dicionário das variáveis da base
 
+| Coluna | Tipo no arquivo | Unidade | Descrição | Papel e uso temporal |
+|---|---|---|---|---|
+| `No` | inteiro | — | Índice sequencial da linha (1 a 35.064). | Não usar como feature; serve só de conferência de ordenação. |
+| `year`, `month`, `day`, `hour` | inteiros | — | Componentes da data/hora da medição. | Combinar em `datetime`; chave temporal. |
+| `PM2.5` | numérico contínuo | µg/m³ | Concentração de material particulado fino. | **Alvo** da previsão. |
+| `PM10` | numérico contínuo | µg/m³ | Concentração de material particulado grosso. | Covariável de poluição, medida no mesmo instante do alvo — ver dicionário de variáveis externas. |
+| `SO2` | numérico contínuo | µg/m³ | Concentração de dióxido de enxofre. | Idem. |
+| `NO2` | numérico contínuo | µg/m³ | Concentração de dióxido de nitrogênio. | Idem. |
+| `CO` | numérico contínuo | µg/m³ | Concentração de monóxido de carbono. | Idem. |
+| `O3` | numérico contínuo | µg/m³ | Concentração de ozônio. | Idem. |
+| `TEMP` | numérico contínuo | °C | Temperatura do ar. | Covariável meteorológica, medida no mesmo instante do alvo. |
+| `PRES` | numérico contínuo | hPa | Pressão atmosférica. | Idem. |
+| `DEWP` | numérico contínuo | °C | Temperatura do ponto de orvalho. | Idem. |
+| `RAIN` | numérico contínuo | mm | Precipitação na hora. | Idem; zero é valor válido (sem chuva). |
+| `wd` | categórica | — | Direção do vento (16 pontos cardeais, ex. `NNW`). | Idem; variável circular. |
+| `WSPM` | numérico contínuo | m/s | Velocidade do vento. | Idem. |
+| `station` | categórica | — | Nome da estação de monitoramento. | Constante (`Aotizhongxin`); não é feature útil neste arquivo — só relevante se outras estações forem combinadas. |
 
-## 2. Estrutura dos arquivos
+## Qualidade e preparação
 
+| Verificação | Resultado | Decisão |
+|---|---|---|
+| Valores ausentes | `PM2.5`: 925; `PM10`: 718; `SO2`: 935; `NO2`: 1.023; `CO`: 1.776; `O3`: 1.719; `TEMP`/`PRES`/`DEWP`/`RAIN`: 20 cada; `wd`: 81; `WSPM`: 14. Nenhum ausente em `year`/`month`/`day`/`hour`. | Definir e documentar estratégia de imputação/remoção por coluna antes da modelagem; não preencher `PM2.5` (alvo) com valor futuro. |
+| Linhas duplicadas | 0 linhas exatamente duplicadas. | — |
+| Cobertura horária | Grade completa: 35.064 horas esperadas entre o início e o fim, 35.064 linhas presentes, nenhuma hora faltando na grade (as ausências são de valores nas colunas, não de linhas). | Não é necessário reindexar para preencher lacunas de calendário; tratar apenas os `NaN` internos. |
+| Ordenação | Crescente por `year`/`month`/`day`/`hour`. | Preservar a ordenação; converter para `datetime` único. |
+| Atípicos do alvo | 1.624 observações de `PM2.5` fora de 1,5 IQR (limite inferior negativo, superior 252,0 µg/m³), de 34.139 valores não nulos. | Não remover automaticamente: picos de poluição são o próprio fenômeno de interesse; investigar antes de qualquer corte. |
 
-Os dois arquivos possuem a mesma estrutura e o mesmo periodo:
+## Disponibilidade temporal e prevenção de vazamento
 
+`PM10`, `SO2`, `NO2`, `CO`, `O3`, `TEMP`, `PRES`, `DEWP`, `RAIN`, `wd` e `WSPM` são medidos no mesmo instante que `PM2.5`; nenhuma pode ser usada contemporânea ao próprio `t` que está sendo previsto — apenas defasadas, ou substituídas por previsão/observação disponível na origem quando `t+h` for o horizonte. Os componentes `year`/`month`/`day`/`hour` e atributos de calendário derivados são conhecidos antecipadamente. Ver o dicionário de variáveis externas atualizado para o detalhamento por variável.
 
-| Arquivo | Inicio | Fim | Linhas | Interpretacao atual |
-|---|---:|---:|---:|---|
-| `data.csv` | 2018-07-02 | 2020-06-30 | 503 | Serie financeira 1; ativo nao identificado no arquivo |
-| `test.csv` | 2018-07-02 | 2020-06-30 | 503 | Serie financeira 2 ou arquivo de teste com periodo sobreposto |
+## Horizonte e sazonalidade
 
+- Horizonte ainda não definido pelo grupo; registrar em `config/projeto.yaml` antes da modelagem.
+- Sazonalidades candidatas: diária (24 horas) e anual (poluição varia por estação do ano, com invernos historicamente mais poluídos em Pequim); confirmar força por STL e validação temporal, não assumir a priori.
 
-Os primeiros e ultimos valores indicam que os arquivos nao representam uma divisao cronologica treino/teste convencional: ambos comecam e terminam nas mesmas datas, mas apresentam valores diferentes. Portanto, nao se deve concatenar os arquivos nem tratar `test.csv` como o teste final sem confirmar a especificacao original.
+## Referências
 
-
-## 3. Dicionario das variaveis
-
-
-| Variavel | Tipo | Papel | Descricao |
-|---|---|---|---|
-| `Date` | Data | Indice temporal | Data de negociacao |
-| `Open` | Numerica | Atributo financeiro | Preco de abertura |
-| `High` | Numerica | Atributo financeiro | Maior preco observado no dia |
-| `Low` | Numerica | Atributo financeiro | Menor preco observado no dia |
-| `Close` | Numerica | Alvo recomendado | Preco de fechamento |
-| `Adj Close` | Numerica | Alternativa de alvo | Fechamento ajustado por eventos corporativos, conforme a fonte |
-| `Volume` | Numerica | Atributo financeiro | Volume negociado |
-
-
-Para o Holt-Winters, recomenda-se definir previamente uma unica serie-alvo. A escolha mais simples e reprodutivel e `Close`. Se o grupo decidir usar `Adj Close`, essa escolha deve ser aplicada de forma consistente em todas as execucoes e registrada no protocolo.
-
-
-## 4. Qualidade dos dados
-
-
-As verificacoes realizadas nos arquivos atuais encontraram:
-
-
-- Nenhum valor ausente nas sete colunas.
-- Nenhuma data duplicada em cada arquivo.
-- Datas ordenadas de forma crescente.
-- Intervalos de 1 dia entre observacoes consecutivas em dias de negociacao.
-- Intervalos de 3 e 4 dias associados principalmente a fins de semana prolongados e feriados.
-- Nenhuma observacao artificial deve ser criada para fins de semana ou feriados.
-
-
-Estatisticas observadas:
-
-
-### `data.csv`
-
-
-| Coluna | Media | Minimo | Maximo |
-|---|---:|---:|---:|
-| `Open` | 229.3914 | 143.9800 | 365.0000 |
-| `High` | 232.1461 | 145.7200 | 372.3800 |
-| `Low` | 227.0625 | 142.0000 | 362.2700 |
-| `Close` | 229.7924 | 142.1900 | 366.5300 |
-| `Adj Close` | 227.3090 | 139.3763 | 366.5300 |
-| `Volume` | 33,545,809.74 | 11,362,000 | 106,721,200 |
-
-
-### `test.csv`
-
-
-| Coluna | Media | Minimo | Maximo |
-|---|---:|---:|---:|
-| `Open` | 33.9698 | 22.1100 | 46.7400 |
-| `High` | 34.5601 | 23.4900 | 46.9000 |
-| `Low` | 33.3461 | 20.0000 | 44.6100 |
-| `Close` | 33.9480 | 22.0000 | 46.6500 |
-| `Adj Close` | 33.9480 | 22.0000 | 46.6500 |
-| `Volume` | 19,609,709.54 | 4,290,500 | 122,752,800 |
-
-
-Os valores de preco, isoladamente, nao permitem identificar com seguranca o ativo ou a unidade. A documentacao final deve incluir a fonte original, o ticker e a regra usada para separar os dois arquivos.
-
-
-## 5. Preparacao recomendada
-
-
-1. Ler `Date` como data e ordenar crescentemente.
-2. Verificar duplicidades, nulos e tipos numericos.
-3. Definir `Close` ou `Adj Close` como alvo antes de qualquer modelagem.
-4. Manter apenas uma observacao por dia de negociacao.
-5. Nao preencher fins de semana ou feriados.
-6. Fazer o corte treino/teste por ordem temporal, sem `shuffle`, caso a avaliacao seja feita dentro de uma mesma serie.
-7. Se `data.csv` e `test.csv` forem ativos diferentes, analisar cada um como uma serie separada, e nao como treino e teste da mesma serie.
-8. Registrar a decisao sobre `Volume` e as demais colunas: elas podem ser usadas por modelos multivariados, mas nao entram no Holt-Winters univariado.
-
-
-## 6. Implicacoes para Holt-Winters
-
-
-O Holt-Winters deve receber somente a serie-alvo escolhida. Para esta base, testar:
-
-
-- Sem tendencia e com tendencia aditiva.
-- Tendencia amortecida e nao amortecida.
-- Sem sazonalidade e com periodos sazonais justificados pela frequencia diaria de mercado.
-- Sazonalidade aditiva quando a escala da variacao for aproximadamente constante.
-- Sazonalidade multiplicativa somente se todos os valores forem positivos e a variacao crescer proporcionalmente ao nivel.
-
-
-Como a base e diaria e possui lacunas normais de calendario, o periodo sazonal deve ser interpretado em dias de negociacao, nao simplesmente em dias corridos. Periodos candidatos comuns, como 5 dias uteis ou aproximadamente 21 dias uteis, devem ser comparados por validacao temporal e nao escolhidos apenas por inspeccao.
-
-
-## 7. Riscos e limitacoes
-
-
-- A proveniencia dos arquivos nao esta descrita no proprio CSV.
-- O ativo financeiro e a unidade dos precos nao estao identificados.
-- `data.csv` e `test.csv` possuem datas sobrepostas e podem representar ativos diferentes.
-- Precos financeiros possuem mudancas de regime e podem nao apresentar sazonalidade estavel.
-- O desempenho historico nao deve ser interpretado como recomendacao financeira.
-- Usar `High`, `Low`, `Close` ou `Volume` do mesmo dia para prever o proprio fechamento pode causar vazamento; esses valores so podem ser usados quando estiverem disponiveis no instante da previsao.
-
-
-## 8. Checklist antes da entrega
-
-
-- [ ] Confirmar fonte, ativo e ticker de cada arquivo.
-- [ ] Confirmar se `test.csv` e outro ativo ou um teste sobreposto.
-- [ ] Definir oficialmente `Close` ou `Adj Close` como alvo.
-- [ ] Registrar corte, horizonte e folds walk-forward.
-- [ ] Comparar Holt-Winters com o baseline definido pelo grupo.
-- [ ] Manter parametros e MAE separados para cada serie analisada.
-- [ ] Atualizar esta documentacao depois da confirmacao da proveniencia.
-
+- Chen, S. (2017). *Beijing Multi-Site Air Quality* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5RK5G
+- Zhang, S., Guo, B., Dong, A., He, J., Xu, Z., Chen, S. X. (2017). Cautionary Tales on Air-Quality Improvement in Beijing. *Proceedings of the Royal Society A*, 473(2205).
+- UCI Machine Learning Repository. Licença CC BY 4.0. Consulta em 2026-09-22.
