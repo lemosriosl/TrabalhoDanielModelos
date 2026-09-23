@@ -7,7 +7,7 @@
 | Campo | Descricao |
 |---|---|
 | Nome no projeto | Grupo 4 |
-| Arquivo | `bases/bases_oficiais/grupo4.csv` |
+| Arquivo | `trabalho/bases/grupo4/grupo4.csv` |
 | Fonte/conjunto reconhecido | Serie meteorologica de Jena, conhecida como Jena Climate |
 | Tipo de dado | Serie temporal meteorologica multivariada |
 | Frequencia nominal | 10 minutos |
