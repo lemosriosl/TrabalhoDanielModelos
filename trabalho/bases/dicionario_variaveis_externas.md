@@ -4,6 +4,10 @@
 
 Este Markdown é o **catálogo de variáveis exógenas** do projeto. Ele registra todo dado que não pertence à série-alvo original, mas que pode ajudar a explicar ou prever seu comportamento. Para cada variável, o dicionário deve indicar origem, definição, unidade, frequência, disponibilidade temporal, regra de transformação e riscos de uso.
 
+As colunas que já vêm no mesmo arquivo da série-alvo (`Open`, `High`, `Low`, `Volume`, clima e poluentes) são covariáveis internas da base, não variáveis externas no sentido estrito. Calendário e indicadores derivados do tempo também são variáveis derivadas. Os dicionários específicos registram essas variáveis porque elas ainda precisam de regras de disponibilidade e defasagem para evitar vazamento.
+
+Os detalhes auditados de cada base ficam nos documentos específicos. Esta página funciona como índice e registro consolidado de status; ela não substitui as fichas de fonte, qualidade e preparação.
+
 O objetivo é tornar os experimentos reproduzíveis e evitar *data leakage*: uma variável externa só pode entrar na previsão de `t+h` se seu valor for conhecido — ou puder ser previsto separadamente — no instante `t`.
 
 ## Regras de preenchimento
@@ -33,41 +37,37 @@ O objetivo é tornar os experimentos reproduzíveis e evitar *data leakage*: uma
 | Risco / limitação | Revisões, atraso de publicação, acesso restrito, quebras históricas e viés |
 | Status | Proposto, em validação, aprovado ou descartado |
 
-## Grupo 1 — Bitcoin (a preencher)
+## Grupo 1 — Bitcoin
 
 **Base-alvo:** histórico de preços do Bitcoin.
 
-| ID | Variável externa | Fonte | Frequência / disponibilidade | Chave de junção | Hipótese | Status |
-|---|---|---|---|---|---|---|
-| G1_001 |  |  |  |  |  | Proposto |
-| G1_002 |  |  |  |  |  | Proposto |
+**Ficha:** [dicionario_variaveis_externas_base1.md](grupo1/dicionario_variaveis_externas_base1.md).
 
-## Grupo 2 — Tráfego na I-94 (a preencher)
+**Status da auditoria:** aprovado conceitualmente; pendente confirmar a proveniência direta pela Bitget, data de download, unidade/metodologia de `Volume` e horário de disponibilidade de `Open`.
+
+## Grupo 2 — Tráfego na I-94
 
 **Base-alvo:** volume horário de tráfego.
 
-| ID | Variável externa | Fonte | Frequência / disponibilidade | Chave de junção | Hipótese | Status |
-|---|---|---|---|---|---|---|
-| G2_001 |  |  |  |  |  | Proposto |
-| G2_002 |  |  |  |  |  | Proposto |
+**Ficha:** [dicionario_variaveis_externas_base2.md](grupo2/dicionario_variaveis_externas_base2.md).
 
-## Grupo 3 — Qualidade do ar em Pequim (a preencher)
+**Status da auditoria:** aprovado conceitualmente; pendente deduplicar os 5.445 horários repetidos com regra versionada e confirmar o tratamento do fuso local e do horário de verão.
+
+## Grupo 3 — Qualidade do ar em Pequim
 
 **Base-alvo:** concentração horária de poluentes por estação.
 
-| ID | Variável externa | Fonte | Frequência / disponibilidade | Chave de junção | Hipótese | Status |
-|---|---|---|---|---|---|---|
-| G3_001 |  |  |  |  |  | Proposto |
-| G3_002 |  |  |  |  |  | Proposto |
+**Ficha:** [dicionario_variaveis_externas_base3.md](grupo3/dicionario_variaveis_externas_base3.md).
 
-## Grupo 4 — Clima em Jena (a preencher)
+**Status da auditoria:** aprovado conceitualmente; a grade horária está completa, mas os nulos das colunas devem ser tratados sem usar futuro, `No` deve ser excluído como índice e a imputação deve ser ajustada separadamente em cada dobra de treino.
 
-**Base-alvo:** temperatura ou outra variável meteorológica em frequência horária.
+## Grupo 4 — Clima em Jena
 
-| ID | Variável externa | Fonte | Frequência / disponibilidade | Chave de junção | Hipótese | Status |
-|---|---|---|---|---|---|---|
-| G4_001 |  |  |  |  |  | Proposto |
-| G4_002 |  |  |  |  |  | Proposto |
+**Base-alvo:** temperatura ou outra variável meteorológica em frequência nominal de 10 minutos.
+
+**Ficha:** [dicionario_variaveis_externas_base4.md](grupo4/dicionario_variaveis_externas_base4.md).
+
+**Status da auditoria:** aprovado conceitualmente, mas incompleto; pendente confirmar fonte/licença, converter `-9999.00` em ausente, resolver os 327 timestamps duplicados e as lacunas e confirmar a frequência final do modelo.
 
 ## Grupo 5 — Preços diários do ouro
 

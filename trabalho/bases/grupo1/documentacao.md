@@ -7,7 +7,7 @@
 | Responsável | P1 — Matheus Bastos Castilho |
 | Fonte indicada para a base | [Bitget — Bitcoin historical data](https://www.bitget.com/price/bitcoin/historical-data) |
 | Data desta auditoria | 2026-09-21 |
-| Arquivo congelado | `trabalho/bases/base_grupo1/grupo1.csv` |
+| Arquivo congelado | `trabalho/bases/grupo1/grupo1.csv` |
 | SHA-256 | `dcb86b9461168a1cc3f122a40d7aa6b53ac773a5703423320a2a90c3823c38f7` |
 | Cobertura no arquivo | 2017-01-01 a 2024-10-06 |
 | Observações | 2.836 |
