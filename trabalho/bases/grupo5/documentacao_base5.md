@@ -1,101 +1,139 @@
-# Base 5 — preços diários do ouro
+# Base 5 — ouro semanal
 
-## 1. Identificação da base
+## 1. Identificação e proveniência
 
-| Campo | Descrição |
+| Campo | Definição usada |
 |---|---|
-| Nome no projeto | Base 5 — preços diários do ouro |
-| Arquivo auditado | `trabalho/bases/grupo5/grupo5_new.csv` |
-| Versão anterior | `grupo5_old.csv`; mesmas datas e preços, sem as duas colunas adicionais |
-| Fonte histórica indicada na documentação anterior | [gold.daily.prices.csv](https://github.com/dengyishuo/quantitative-finance/blob/master/gold.daily.prices.csv); confirmar proveniência primária e licença |
-| Tipo de dado | Série temporal de preço com indicador de feriado e rótulo de direção fornecidos |
-| Frequência do arquivo | Uma linha por dia de segunda a sexta; cotações observadas são irregulares por ausências |
-| Período observado | 1968-04-01 a 2014-04-10 |
-| Quantidade | 12.009 linhas e 4 colunas |
-| Delimitador | Ponto e vírgula (`;`) |
-| SHA-256 | `8446b3f07b6834625e9e82b58955ea8ef906d67c23d34ee05440602349e02947` |
+| Arquivo local | `trabalho/bases/grupo5/grupo5_new.csv` |
+| SHA-256 | `38622fe40a18c3e94b89971488468f762353ed4234234e054f0439918cb5d1ac` |
+| Base adaptada | [TheoMGtech/pls-regration-comparation — grupo5](https://github.com/TheoMGtech/pls-regration-comparation/tree/develop/bases/grupo5) |
+| Tratamento informado | [TheoMGtech/pls-regration-comparation — grupo5-tratamento](https://github.com/TheoMGtech/pls-regration-comparation/tree/develop/bases/grupo5-tratamento) |
+| Série histórica indicada como oficial | [gold.daily.prices.csv](https://github.com/dengyishuo/quantitative-finance/blob/master/gold.daily.prices.csv) |
+| Período diário disponível | 1968-04-29 a 2014-04-09 |
+| Frequência do experimento | Semanal, regra `W-FRI` |
+| Preço semanal | Último preço disponível até o encerramento da semana |
+| Alvo | Retorno logarítmico da semana seguinte |
+| Divisão | 75% treino / 25% teste, cronológica |
+| Semente | 42 |
 
-O CSV não informa moeda, unidade do preço, fornecedor, calendário usado em `IS_HOLIDAY` nem processo de criação de `TARGET_UP`. A data de obtenção original desses dados também não está registrada no arquivo. Esses itens precisam de confirmação antes da entrega final. Os números abaixo são da auditoria local do arquivo fornecido.
+O CSV não declara fornecedor primário, unidade ou moeda do preço, nem a
+proveniência exata e o horário de publicação das taxas. O notebook assume que
+cada valor datado já estava disponível até o encerramento da respectiva semana.
 
-## 2. Dicionário das variáveis
+## 2. Estrutura e auditoria do novo CSV
 
-| Variável | Tipo | Unidade / significado verificável | Papel e cuidado |
-|---|---|---|---|
-| `DATE` | Data `YYYY-MM-DD` | Dia da linha | Chave temporal; validar ordem e unicidade. |
-| `VALUE` | Número decimal ou vazio | Valor de preço na unidade de origem, ainda não confirmada | Série de interesse; vazio é cotação ausente, não zero. |
-| `IS_HOLIDAY` | 0/1 | Marcador de feriado segundo calendário não documentado | Variável fornecida para auditoria; disponibilidade e calendário precisam de confirmação antes de entrar no modelo. |
-| `TARGET_UP` | 0/1 | `1` se `VALUE` da próxima **linha** é maior que `VALUE` atual; `0` nos demais casos, inclusive pares com nulo | Rótulo futuro, nunca feature. Não corresponde necessariamente à direção até a próxima cotação observada. |
+O arquivo atual usa vírgula, possui 9.864 linhas, 16 colunas, datas únicas e
+ordenadas, nenhum valor nulo e preços positivos. As colunas primitivas usadas
+na reconstrução são:
 
-Para a comparação de modelos do trabalho, o alvo definitivo ainda depende de decisão registrada em `config/projeto.yaml`. O notebook atual usa **retorno logarítmico até a próxima cotação observada** como alvo exploratório e também prepara preço futuro; isso não aprova, por si só, o horizonte do experimento final.
+- `DATE`: data da observação;
+- `GOLD_PRICE`: preço do ouro na unidade de origem;
+- `TREASURY_10Y`: taxa nominal de Treasury de 10 anos;
+- `FED_FUNDS_RATE`: taxa Fed Funds.
 
-## 3. Qualidade dos dados
+As demais colunas (`DAY_OF_WEEK`, `MONTH`, senos, cossenos, lags, janelas e
+`TARGET`) foram produzidas antes da entrega. Elas são auditadas, mas não entram
+no modelo. No arquivo atual, `TARGET` coincide com o preço da próxima linha em
+95,66% dos casos e `GOLD_LAG_1` coincide com o `shift(1)` da tabela em 95,68%.
+Isso indica que linhas foram removidas depois da criação dessas variáveis ou
+que elas usam outra grade temporal. Reutilizá-las misturaria definições.
 
-| Verificação | Resultado |
+## 3. Limpeza e preparação semanal
+
+O notebook `grupo5_RF.ipynb` preserva o CSV e executa por código:
+
+1. valida esquema, tipos, datas, duplicidades, ausências e hash;
+2. mantém somente as quatro colunas primitivas para reconstruir a base;
+3. cria uma grade semanal completa `W-FRI`;
+4. usa a última observação da semana quando disponível;
+5. nas semanas vazias, carrega somente o último estado já conhecido;
+6. registra cobertura, carregamento e idade da última cotação;
+7. cria retorno, alvo, lags e janelas sem consultar o futuro.
+
+A série possui 2.398 semanas, de 1968-05-03 a 2014-04-11. Há 254 semanas sem
+linha de origem; a maior idade da cotação na origem é 17 dias. A grade final é
+regular, sem lacunas. O carregamento para a frente representa o último estado
+conhecido e não usa observações posteriores.
+
+## 4. EDA, STL e estacionariedade
+
+O notebook apresenta preço, retorno, taxas, volatilidade, idade da cotação e
+distribuições. A STL usa `period=52` e `robust=True`. A força sazonal é
+`max(0, 1 - Var(resíduo) / Var(sazonalidade + resíduo))`; a força da tendência
+usa a fórmula análoga.
+
+| Diagnóstico | Resultado verificado |
 |---|---:|
-| Datas nulas / duplicadas | 0 / 0 |
-| Datas fora de ordem | 0 |
-| Valores de `VALUE` ausentes | 368 de 12.009 (3,06%) |
-| Cotações observadas | 11.641 |
-| Preços observados não positivos | 0 |
-| `IS_HOLIDAY = 1` | 297 |
-| `IS_HOLIDAY = 1` com preço observado | 180 |
-| `IS_HOLIDAY = 0` com preço ausente | 251 |
-| `TARGET_UP = 1` | 5.629 |
+| Força da sazonalidade | 0,0000 |
+| Força da tendência | 0,9794 |
+| ADF do log-preço no treino | p = 0,1128; não rejeita raiz unitária a 5% |
+| ADF do retorno semanal no treino | p < 0,001; rejeita raiz unitária |
 
-O calendário de linhas é regular de segunda a sexta: 9.607 intervalos de 1 dia e 2.401 de 3 dias entre linhas consecutivas. Entre **preços observados**, a distância chega a 6 dias, por causa de cotações ausentes. O indicador `IS_HOLIDAY` não é uma máscara de valores ausentes.
+ACF e PACF são calculadas sobre o retorno semanal do treino.
 
-Estatísticas de `VALUE`, excluindo os 368 nulos:
+## 5. Random Forest e otimização
 
-| Medida | Valor |
-|---|---:|
-| Média | 446,1900 |
-| Mediana | 363,7500 |
-| Desvio padrão | 382,4057 |
-| Mínimo | 34,7750 |
-| Máximo | 1.896,5000 |
+O conjunto modelável possui 2.344 origens. Depois do corte e da purga da
+fronteira são usadas 1.757 linhas de treino e 586 de teste, de 2003-01-17 a
+2014-04-04. As 49 features incluem estado atual, cobertura, taxas, variações,
+lags, janelas defasadas e calendário cíclico. Datas-alvo, preço futuro e todas
+as derivações entregues no CSV ficam fora de `X`.
 
-A regra observada de `TARGET_UP` foi conferida nas 12.009 linhas: `VALUE.shift(-1) > VALUE` reproduz todos os rótulos. Isso descreve o arquivo, sem confirmar por que a coluna foi criada. Um `0` com preço ausente não deve ser interpretado como queda.
+A busca usa `for` explícito, três dobras temporais com purga e 24 combinações:
 
-## 4. Preparação recomendada
+- `n_estimators`: 100 ou 250;
+- `max_depth`: 6, 12 ou ilimitada;
+- `min_samples_leaf`: 1 ou 3;
+- `max_features`: `sqrt` ou 0,7.
 
-1. Ler `grupo5_new.csv` com `sep=';'`; registrar caminho relativo, hash e versão. Não substituir automaticamente pelo CSV antigo ou por download remoto.
-2. Converter `DATE` para data e `VALUE` para número; validar ordenação, duplicidade, valores inválidos e domínio 0/1 dos indicadores.
-3. Preservar as linhas com `VALUE` ausente para auditoria. Não preencher com zero, interpolação que use o futuro ou calendário presumido.
-4. Para a preparação exploratória do notebook, manter só preços observados e registrar `target_date` e `target_gap_days`, pois o próximo preço observado pode não estar na linha seguinte.
-5. Derivar preço e retorno futuros apenas para `y`; retirar `TARGET_UP`, `target_date`, `target_gap_days` e qualquer outro alvo de `X`. Não usar `IS_HOLIDAY` como feature enquanto sua proveniência e disponibilidade forem desconhecidas.
-6. Calcular lags e janelas móveis apenas com o histórico disponível na origem. Ajustar imputação, escala e seleção de features somente no trecho de treino de cada dobra.
-7. Definir horizonte, origens, período de teste e frequência comparáveis para SARIMAX, Holt-Winters, Random Forest e modelo de especialização antes da avaliação final. Registrar essa decisão em `config/projeto.yaml` e, se estrutural, em `docs/adr/`.
+Melhores parâmetros: `n_estimators=250`, `max_depth=6`,
+`min_samples_leaf=3` e `max_features='sqrt'`. A busca levou 101,43 segundos.
+O walk-forward manteve os parâmetros fixos, reajustou a cada 26 semanas em 23
+blocos e levou 27,95 segundos nesta execução.
 
-## 5. Análise exploratória esperada
+## 6. Métricas fora da amostra
 
-- Série de preços e distribuição dos valores observados.
-- Retornos logarítmicos entre cotações e sua distribuição.
-- Volatilidade móvel calculada sobre retornos, com janela e defasagem explícitas.
-- Contagem de ausências por período, lacunas entre cotações e cruzamento de `IS_HOLIDAY` com `VALUE` ausente.
-- Resumo anual e inspeção de períodos extremos sem inferir causalidade.
-- ACF e STL somente depois de decidir como representar a frequência e as ausências; o período sazonal não pode ser presumido do calendário de linhas.
+| Modelo | MAE retorno | RMSE retorno | MedAE retorno | R² | Acurácia direcional | MAE preço |
+|---|---:|---:|---:|---:|---:|---:|
+| Random Forest | 0,021467 | 0,029660 | 0,016777 | -0,0947 | 0,4625 | 20,0356 |
+| Retorno zero / persistência | 0,020101 | 0,028434 | 0,016044 | -0,0061 | 0,1092* | 18,9520 |
 
-O notebook `eda_preparacao_base_5_ouro.ipynb` cobre a auditoria, os gráficos iniciais e a preparação exploratória. Seu corte cronológico 80%/20% **não é o protocolo final** enquanto os campos correspondentes do projeto estiverem pendentes.
+`*` A previsão zero só acerta o sinal quando o retorno observado também é
+zero; o valor é elevado pelas semanas sem nova cotação e não mede capacidade
+de prever alta ou queda.
 
-## 6. Implicações para Holt-Winters
+O Random Forest não superou a persistência. O notebook mantém as 586 previsões
+e resíduos individuais, com datas, valores reais, previstos, erros absolutos e
+quadráticos.
 
-Holt-Winters usa a série-alvo univariada; `IS_HOLIDAY` e outras exógenas não entram diretamente nesse modelo. Antes de ajustar o modelo, é preciso definir a série temporal efetivamente usada, a regra de tratamento das 368 ausências e um período sazonal coerente com a frequência aprovada. Tendência e sazonalidade aditiva podem ser avaliadas por walk-forward; uma componente multiplicativa só deve ser considerada se fizer sentido empírico e técnico para o alvo positivo escolhido. Os quatro modelos devem compartilhar origens, horizonte e teste.
+## 7. ACF residual e Ljung–Box
 
-## 7. Riscos e limitações
+| Lag | Estatística | p-valor | Rejeita ruído branco a 5% |
+|---:|---:|---:|---|
+| 1 | 1,6266 | 0,202175 | Não |
+| 4 | 11,1770 | 0,024645 | Sim |
+| 13 | 31,1506 | 0,003205 | Sim |
+| 26 | 54,6488 | 0,000840 | Sim |
 
-- A unidade, moeda, fornecedor e fonte primária do preço não estão comprovados no CSV.
-- O calendário de `IS_HOLIDAY` é desconhecido; há preços em dias marcados e ausências em dias não marcados.
-- `TARGET_UP` consulta a próxima linha e transforma pares com preço ausente em `0`. Usá-lo como feature causa vazamento; usá-lo como rótulo sem filtrar pares válidos mistura ausência com movimento de preço.
-- O alvo de próxima cotação observada tem intervalo variável de 1 a 6 dias neste arquivo; não equivale automaticamente a horizonte de um dia civil.
-- O arquivo termina em 2014 e não representa condições atuais de mercado.
-- Escala global, interpolação futura e ajuste de hiperparâmetros sobre o teste invalidam a avaliação.
+Há autocorrelação residual conjunta a partir do lag 4. O modelo ainda deixa
+dependência temporal sem explicar.
 
-## 8. Checklist antes da entrega
+## 8. Itens concluídos
 
-- [ ] Confirmar proveniência primária, licença, data de acesso, unidade e moeda de `VALUE`.
-- [ ] Confirmar calendário e disponibilidade temporal de `IS_HOLIDAY`.
-- [ ] Decidir se `TARGET_UP` tem algum uso válido; documentar a regra para pares ausentes.
-- [ ] Aprovar alvo, frequência, horizonte, origens, teste final e período sazonal no projeto.
-- [ ] Selecionar e obter ao menos duas variáveis externas com fontes e datas de disponibilidade verificáveis, se exigidas no experimento.
-- [ ] Produzir ACF/STL com tratamento de ausências documentado.
-- [ ] Avaliar os quatro modelos em walk-forward e registrar parâmetros, previsões, resíduos, MAE e tempo.
+- [x] Revisão da documentação e do dicionário externo.
+- [x] Limpeza e preparação semanal.
+- [x] Gráficos exploratórios.
+- [x] STL e força da sazonalidade.
+- [x] Random Forest e otimização por `for`.
+- [x] Registro de parâmetros, versões, hash e tempos.
+- [x] MAE e métricas complementares.
+- [x] Resíduos individuais, ACF e Ljung–Box.
+
+## 9. Limitações
+
+- Confirmar unidade, moeda, fornecedor, licença e data de obtenção do preço.
+- Confirmar fonte, convenção e horário de disponibilidade das duas taxas.
+- O preenchimento de semanas vazias cria retornos zero e deve ser considerado
+  na interpretação das métricas.
+- SARIMAX, Holt-Winters e o modelo de especialização devem usar exatamente as
+  mesmas origens, horizonte e teste para comparação final.
