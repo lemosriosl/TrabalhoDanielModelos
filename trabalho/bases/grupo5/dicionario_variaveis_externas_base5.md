@@ -1,40 +1,55 @@
-# Dicionário de variáveis externas — Base 5 (preços diários do ouro)
+# Dicionário de variáveis externas — Base 5 (ouro semanal)
 
-**Responsável pela auditoria documental:** Codex (agente). **Data:** 2026-09-22. **Arquivo-alvo:** `trabalho/bases/grupo5/grupo5_new.csv`, SHA-256 `8446b3f07b6834625e9e82b58955ea8ef906d67c23d34ee05440602349e02947`.
+**Arquivo-alvo:** `grupo5_new.csv`
 
-**Série de interesse:** `VALUE`, valor de preço na unidade de origem ainda não confirmada. O notebook usa o retorno até a próxima cotação observada apenas para exploração; alvo e horizonte finais dependem de aprovação no projeto. Chave de junção: `DATE` (`YYYY-MM-DD`), com uma linha por dia de segunda a sexta entre 1968-04-01 e 2014-04-10. Há 368 preços ausentes.
+**Série modelada:** último estado conhecido por semana (`W-FRI`)
 
-Uma exógena só pode prever o alvo em `t+h` se o valor usado já era conhecido **na origem `t`**. Datas de referência e datas de publicação são diferentes; para séries publicadas depois do período de referência, a junção deve respeitar a publicação real. Fuso e horário de fechamento precisam ser confrontados antes de tratar dois registros com a mesma data como simultaneamente disponíveis. Fonte, identificador, unidade, licença, cobertura histórica, revisão e data de acesso de cada série candidata ainda precisam ser registrados. Nenhuma das séries propostas abaixo está dentro de `grupo5_new.csv`.
+**Alvo:** retorno logarítmico da semana seguinte
 
-## Colunas relacionadas já presentes no arquivo
+**Período semanal:** 1968-05-03 a 2014-04-11
 
-| ID | Variável | Disponibilidade em `t` | Tratamento e risco | Status |
+## Variáveis externas presentes no arquivo
+
+| ID | Coluna | Interpretação | Disponibilidade adotada | Uso |
 |---|---|---|---|---|
-| G5_HOLIDAY_FLAG | `IS_HOLIDAY` | Não comprovada: o calendário e a regra de marcação não constam do CSV. | Não é proxy de cotação ausente: 180 linhas marcadas têm preço e 251 não marcadas não têm. Manter na auditoria; só usar após identificar calendário e demonstrar que seria conhecido na origem. | Pendente; fora de `X` |
-| G5_TARGET_LABEL | `TARGET_UP` | Depende do `VALUE` da próxima linha; indisponível na origem. | Rótulo futuro, **nunca exógena nem feature**. `0` inclui pares com preço ausente; não equivale à direção até a próxima cotação observada. | Excluído de `X` |
-| G5_CALENDAR | Dia da semana e mês derivados de `DATE` | Conhecidos antecipadamente. | Podem ser criados sem fonte adicional. A data prevista só deve ser usada se a origem já conhece o calendário e o horizonte; o notebook usa calendário da origem. Não substituem as duas exógenas externas pendentes. | Disponível como derivação |
+| G5_TREASURY_10Y | `TREASURY_10Y` | Taxa nominal de Treasury de 10 anos | Considerada conhecida na data da linha; em semana vazia permanece o último valor conhecido | Nível atual, variação semanal e lags 1, 4 e 13 |
+| G5_FED_FUNDS | `FED_FUNDS_RATE` | Taxa Fed Funds | Considerada conhecida na data da linha; em semana vazia permanece o último valor conhecido | Nível atual, variação semanal e lags 1, 4 e 13 |
 
-## Fontes externas candidatas, ainda não incorporadas
+A fonte primária, unidade, convenção, revisões e horário de publicação não
+estão declarados no CSV. A hipótese de disponibilidade deve ser confirmada
+antes de uma entrega que exija rastreabilidade econômica estrita.
 
-As hipóteses abaixo adaptam as propostas já registradas em `trabalho/bases/dicionario_variaveis_externas.md`. Os identificadores representam **candidatos**, não séries obtidas nem variáveis aprovadas. Sem fonte escolhida e checagem de cobertura para 1968–2014, nenhum deles entra na matriz de modelagem.
+## Demais colunas do arquivo
 
-| ID | Variável candidata | Disponibilidade na origem `t` | Chave e tratamento proposto | Hipótese e risco | Status |
-|---|---|---|---|---|---|
-| G5_USD_INDEX | Índice amplo do dólar, com identificação exata a definir | Fechamento de `t` somente se publicado antes da origem; caso contrário, usar último fechamento anterior disponível. | Junção temporal por data/hora de publicação; retorno ou variação calculado apenas até `t`. | Relação com a cotação do ouro pode variar por período; diferenças de fuso e horário podem causar vazamento. | Proposto; fonte pendente |
-| G5_REAL_RATE | Rendimento real de título com país e vencimento definidos | Última observação publicada até `t`; não presumir observação em todos os dias da série-alvo. | Junção pelo último valor efetivamente disponível; nível, variação e lags avaliados no treino. | Pode representar custo de oportunidade; cobertura, revisão e definição do título precisam ser verificadas. | Proposto; fonte pendente |
-| G5_NOMINAL_RATE | Rendimento nominal de título especificado | Mesmo critério de publicação e fechamento da taxa escolhida. | Chave temporal e identificação de vencimento; usar valor conhecido ou defasado. | Pode capturar ambiente de juros; diferenças de mercado e horário importam. | Proposto; fonte pendente |
-| G5_INFLATION | Índice de inflação mensal com país definido | Só após divulgação oficial de cada referência, nunca desde o primeiro dia do mês de competência. | Junção `as of` pela data/hora de divulgação; manter o último dado publicado e controlar revisões. | Frequência mensal e revisões podem gerar vazamento retrospectivo. | Proposto; fonte pendente |
-| G5_VIX | Índice de volatilidade com definição e cobertura verificadas | Fechamento apenas após publicação; usar observação anterior se necessário. | Junção temporal e variação defasada. | Proxy de risco; verificar início da série e cobertura para o período-alvo. | Proposto; fonte pendente |
-| G5_SP500 | Índice acionário amplo ou retorno associado | Fechamento conhecido até a origem; horários de negociação podem diferir. | Retorno calculado só com preços já publicados; junção pela disponibilidade. | Hipótese de apetite a risco, sem relação estável garantida. | Proposto; fonte pendente |
-| G5_OIL | Preço ou contrato de petróleo identificado | Cotação e horário de referência precisam anteceder a origem. | Definir contrato, rolagem e unidade; usar retorno ou variação histórica. | Proxy de commodities/atividade; mudanças de contrato e fuso exigem cuidado. | Proposto; fonte pendente |
-| G5_CENTRAL_BANK | Compras líquidas de ouro por bancos centrais | Valor conhecido apenas após divulgação do período, possivelmente com revisão. | Junção pela data de publicação e versão disponível naquela data; sem preencher retroativamente com revisão. | Baixa frequência e defasagem longa podem limitar utilidade para previsão diária. | Proposto; fonte pendente |
+| Grupo | Colunas | Decisão |
+|---|---|---|
+| Chave temporal | `DATE` | Usada para ordenar, agregar e controlar disponibilidade |
+| Série principal | `GOLD_PRICE` | Último valor conhecido na origem; base dos retornos e lags semanais |
+| Calendário entregue | `DAY_OF_WEEK`, `MONTH`, `DOW_SIN`, `DOW_COS`, `MONTH_SIN`, `MONTH_COS` | Excluído; calendário semanal é recalculado no notebook |
+| Lags diários entregues | `GOLD_LAG_1`, `GOLD_LAG_5`, `GOLD_LAG_20` | Excluídos; não correspondem integralmente aos shifts da tabela atual |
+| Janelas entregues | `GOLD_ROLLING_MEAN_5`, `GOLD_ROLLING_STD_5` | Excluídas; reconstruídas em frequência semanal e com defasagem explícita |
+| Alvo entregue | `TARGET` | Excluído de `X` e do alvo; coincide com a próxima linha em apenas 95,66% e representa horizonte diário incerto |
 
-## Critérios de aprovação de uma exógena
+## Disponibilidade e junção sem vazamento
 
-1. Registrar fonte primária, identificador exato, licença/termos, data de acesso, unidade, moeda, país, fuso e cobertura histórica. Registrar checksum da extração usada.
-2. Definir a origem da previsão e a data/hora de disponibilidade de cada observação. Se houver revisões, guardar ou reconstruir a versão conhecida à época; sem isso, restringir o uso.
-3. Demonstrar a junção sem acesso a valores posteriores à origem. Ausências e *forward fill* só podem usar a última observação já publicada.
-4. Avaliar cobertura e lacunas no trecho comum antes de escolher as pelo menos duas exógenas exigidas. Uma candidata com cobertura parcial não deve reduzir silenciosamente o teste ou mudar as origens de apenas um modelo.
-5. Ajustar escala, seleção, imputação e hiperparâmetros somente no passado de cada origem. Random Forest e modelo de especialização devem compartilhar as features compatíveis; SARIMAX usa exógenas somente quando disponíveis para a previsão. Holt-Winters permanece univariado.
+1. Para cada origem semanal, usar somente linhas com `DATE` até aquela origem.
+2. Em semana vazia, carregar o último valor conhecido e registrar a cobertura.
+3. Calcular diferenças, lags e janelas depois da agregação semanal.
+4. Ajustar seleção e hiperparâmetros apenas no treino e nas dobras temporais.
+5. Nunca usar `TARGET`, datas-alvo ou valores da semana seguinte como feature.
+6. Preservar as mesmas origens e features compatíveis no Random Forest e no
+   modelo de especialização.
 
-**Pendência central:** nenhuma série externa foi fornecida com `grupo5_new.csv`. As variáveis acima são propostas documentais; a escolha final e sua inclusão no experimento dependem de fonte, disponibilidade temporal e protocolo comum aprovados em `config/projeto.yaml`.
+## Variáveis candidatas ainda não incorporadas
+
+| ID | Variável | Regra mínima de disponibilidade | Status |
+|---|---|---|---|
+| G5_USD_INDEX | Índice amplo do dólar | Último fechamento publicado até a origem | Fonte pendente |
+| G5_REAL_RATE | Juro real com vencimento definido | Último valor publicado até a origem | Fonte pendente |
+| G5_INFLATION | Índice de inflação definido | Usar somente após a data de divulgação | Fonte pendente |
+| G5_VIX | Índice de volatilidade | Último fechamento conhecido na semana | Fonte pendente |
+| G5_SP500 | Índice acionário amplo | Último fechamento conhecido na semana | Fonte pendente |
+| G5_OIL | Petróleo com contrato e rolagem definidos | Último fechamento conhecido na semana | Fonte pendente |
+
+Para qualquer candidata, registrar fonte, identificador, unidade, moeda, fuso,
+licença, data de acesso, checksum e uma coluna `available_from`.
