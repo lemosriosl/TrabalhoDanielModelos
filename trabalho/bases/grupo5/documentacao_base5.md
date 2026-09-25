@@ -4,8 +4,8 @@
 
 | Campo | Definição usada |
 |---|---|
-| Arquivo local | `trabalho/bases/grupo5/grupo5_new.csv` |
-| SHA-256 | `38622fe40a18c3e94b89971488468f762353ed4234234e054f0439918cb5d1ac` |
+| Arquivo local | `trabalho/bases/grupo5/grupo5.csv` |
+| SHA-256 | `c852759b32f534918f76f9c3a31342228bf0bbc8a61fc5a26a63e61bf93ee64f` |
 | Base adaptada | [TheoMGtech/pls-regration-comparation — grupo5](https://github.com/TheoMGtech/pls-regration-comparation/tree/develop/bases/grupo5) |
 | Tratamento informado | [TheoMGtech/pls-regration-comparation — grupo5-tratamento](https://github.com/TheoMGtech/pls-regration-comparation/tree/develop/bases/grupo5-tratamento) |
 | Série histórica indicada como oficial | [gold.daily.prices.csv](https://github.com/dengyishuo/quantitative-finance/blob/master/gold.daily.prices.csv) |
@@ -65,7 +65,7 @@ usa a fórmula análoga.
 | Diagnóstico | Resultado verificado |
 |---|---:|
 | Força da sazonalidade | 0,0000 |
-| Força da tendência | 0,9794 |
+| Força da tendência | 0,9275 |
 | ADF do log-preço no treino | p = 0,1128; não rejeita raiz unitária a 5% |
 | ADF do retorno semanal no treino | p < 0,001; rejeita raiz unitária |
 
@@ -79,17 +79,25 @@ fronteira são usadas 1.757 linhas de treino e 586 de teste, de 2003-01-17 a
 lags, janelas defasadas e calendário cíclico. Datas-alvo, preço futuro e todas
 as derivações entregues no CSV ficam fora de `X`.
 
-A busca usa `for` explícito, três dobras temporais com purga e 24 combinações:
+A busca revisada usa `for` explícito, três dobras temporais com purga e nove
+configurações planejadas para investigar todos os hiperparâmetros exigidos:
 
 - `n_estimators`: 100 ou 250;
 - `max_depth`: 6, 12 ou ilimitada;
-- `min_samples_leaf`: 1 ou 3;
+- `min_samples_split`: 2, 5 ou 10;
+- `min_samples_leaf`: 1, 2 ou 3;
 - `max_features`: `sqrt` ou 0,7.
 
 Melhores parâmetros: `n_estimators=250`, `max_depth=6`,
-`min_samples_leaf=3` e `max_features='sqrt'`. A busca levou 101,43 segundos.
+`min_samples_split=2`, `min_samples_leaf=3` e `max_features='sqrt'`. A busca
+levou 24,44 segundos nesta execução.
 O walk-forward manteve os parâmetros fixos, reajustou a cada 26 semanas em 23
-blocos e levou 27,95 segundos nesta execução.
+blocos e levou 22,78 segundos nesta execução.
+
+O notebook agora registra também a importância nativa média e sua variação
+entre os 23 reajustes. As primeiras posições incluem retorno corrente,
+volatilidade e dispersão históricas, lags de retorno e defasagens da Fed Funds,
+permitindo separar contribuição autorregressiva, de risco e das taxas externas.
 
 ## 6. Métricas fora da amostra
 
@@ -105,6 +113,11 @@ de prever alta ou queda.
 O Random Forest não superou a persistência. O notebook mantém as 586 previsões
 e resíduos individuais, com datas, valores reais, previstos, erros absolutos e
 quadráticos.
+
+Como análise de sensibilidade, o notebook separa as 523 origens cuja semana-alvo
+possui nova cotação. Nesse recorte, o MAE de preço foi 21,9011 no Random Forest
+e 21,2349 na persistência; portanto, a conclusão de que o RF não supera o
+baseline não decorre apenas das semanas com preço carregado.
 
 ## 7. ACF residual e Ljung–Box
 
@@ -125,6 +138,7 @@ dependência temporal sem explicar.
 - [x] Gráficos exploratórios.
 - [x] STL e força da sazonalidade.
 - [x] Random Forest e otimização por `for`.
+- [x] Importância das features entre reajustes.
 - [x] Registro de parâmetros, versões, hash e tempos.
 - [x] MAE e métricas complementares.
 - [x] Resíduos individuais, ACF e Ljung–Box.

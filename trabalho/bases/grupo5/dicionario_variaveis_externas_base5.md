@@ -1,6 +1,6 @@
 # Dicionário de variáveis externas — Base 5 (ouro semanal)
 
-**Arquivo-alvo:** `grupo5_new.csv`
+**Arquivo-alvo:** `grupo5.csv`
 
 **Série modelada:** último estado conhecido por semana (`W-FRI`)
 
