@@ -10,12 +10,12 @@ def test_estrutura_minima_do_trabalho_existe():
         "config/projeto.yaml",
         "collaboration/demandas.csv",
         "docs/plano.md",
-        "bases/grupo1.csv",
-        "bases/grupo5.csv",
+        "trabalho/bases/grupo1/grupo1.csv",
+        "trabalho/bases/grupo5/grupo5.csv",
         "results/metrics",
         "report/html",
         "report/pdf",
-        "entrega",
+        "trabalho/entrega",
     ]
 
     for caminho in caminhos:

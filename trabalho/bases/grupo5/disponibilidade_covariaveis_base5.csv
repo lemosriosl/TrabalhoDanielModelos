@@ -1,0 +1,5 @@
+coluna,disponibilidade,atraso,feature,status,justificativa
+TREASURY_10Y,na_origem,0,treasury_10y_t,provisorio,Fonte/unidade/atraso pendentes.
+FED_FUNDS_RATE,na_origem,0,fed_funds_rate_t,provisorio,Fonte/unidade/atraso pendentes.
+TARGET,proibida,0,,excluido,Alvo diário inconsistente; fora de X.
+GOLD_LAG_1,proibida,0,,excluido,Derivação diária entregue; reconstruída semanalmente.

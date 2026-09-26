@@ -1,0 +1,34 @@
+feature,grupo,disponibilidade,descricao,status,nota
+level_t,alvo_na_origem,conhecido em t,Nível do alvo observado na origem.,aprovado,
+p (mbar)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+Tpot (K)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+Tdew (degC)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+rh (%)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+VPmax (mbar)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+VPact (mbar)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+VPdef (mbar)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+sh (g/kg)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+H2OC (mmol/mol)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+rho (g/m**3)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+wv (m/s)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+max. wv (m/s)_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+wd_sin_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+wd_cos_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+target_lag_1,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_2,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_6,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_12,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_144,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_1008,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_mean_6,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_std_6,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_mean_144,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_std_144,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_mean_1008,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_std_1008,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_hour_sin,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_hour_cos,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_dow_sin,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_dow_cos,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_month_sin,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_month_cos,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,

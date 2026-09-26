@@ -35,9 +35,12 @@ Auditoria estática dos cinco notebooks existentes. Os dados brutos e os noteboo
 
 ### Base 5
 
-- O notebook legado de EDA permanece incompatível com a fonte atual: espera `GOLD_PRICE`, `TREASURY_10Y` e `FED_FUNDS_RATE`.
-- A EDA canônica foi criada em `trabalho/bases/grupo5/graficos_exploratorios_base5.ipynb` usando `DATE` e `VALUE`; `TARGET_UP` e `IS_HOLIDAY` ficam fora dos gráficos da série.
-- A série semanal é regularizada apenas para ACF/STL; a interpolação da STL é identificada no título e não alimenta o treino.
+- O notebook canônico usa o arquivo atual `grupo5.csv` e somente as colunas
+  primitivas para reconstruir a série semanal.
+- A ACF usa retorno em grade semanal regular. Semanas vazias recebem apenas o
+  último estado conhecido, pela mesma função causal revisada da modelagem.
+- A STL explicita no título o carregamento causal e não usa interpolação
+  bidirecional.
 
 ## Ordem recomendada para a versão final
 
@@ -46,4 +49,30 @@ Auditoria estática dos cinco notebooks existentes. Os dados brutos e os noteboo
 
 ## Estado da padronização
 
-O estilo comum está em `src/series_temporais/reporting/graficos_exploratorios.py` e foi conectado aos notebooks de gráficos das Bases 1 a 4. A função `plotar_acf` rejeita séries com ausências e exige a unidade da defasagem. A Base 5 possui notebook exploratório compatível com o CSV atual. A execução visual completa ainda depende das dependências de notebook e dos artefatos preparados de cada base.
+O estilo comum está em
+`src/series_temporais/reporting/graficos_exploratorios.py`. A função
+`plotar_acf` rejeita séries com ausências e exige a unidade da defasagem.
+
+A implementação anterior não estava integralmente correta: a Base 5 apontava
+para `grupo5_new.csv`, que não existe no repositório, removia semanas ausentes
+antes da ACF e interpolava nos dois sentidos para a STL. Esses pontos foram
+corrigidos e possuem teste estático.
+
+Nas Bases 1 a 4 a padronização é parcial: os notebooks aplicam o estilo comum e
+usam a função de ACF, mas ainda possuem cores literais, funções locais de força
+e não salvam todas as figuras com `finalizar_figura`. Isso não cria leakage,
+mas impede considerar a padronização visual totalmente concluída. Os scripts
+citados no registro de demanda anterior também não estão presentes no
+repositório atual; portanto, a geração consolidada precisa ser restaurada em
+uma demanda específica antes da entrega.
+
+### Auditoria independente (2026-09-26)
+
+Confirmação: **a padronização gráfica não está implementada por completo**.
+
+- Base 5: conforme (`PALETA`, `finalizar_figura`, ACF sem nulos, STL causal,
+  `grupo5.csv`).
+- Bases 1–4: só parcial (`aplicar_estilo` + `plotar_acf`; sem PNGs
+  consolidados; cores/forças locais).
+- Pasta `docs/revisoes/graficos/` ainda sem artefatos versionados.
+- Detalhamento em `docs/revisoes/auditoria_features_leakage_e_graficos.md`.

@@ -1,0 +1,16 @@
+coluna,disponibilidade,atraso,feature,status,justificativa
+p (mbar),na_origem,0,p (mbar)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+Tpot (K),na_origem,0,Tpot (K)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+Tdew (degC),na_origem,0,Tdew (degC)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+rh (%),na_origem,0,rh (%)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+VPmax (mbar),na_origem,0,VPmax (mbar)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+VPact (mbar),na_origem,0,VPact (mbar)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+VPdef (mbar),na_origem,0,VPdef (mbar)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+sh (g/kg),na_origem,0,sh (g/kg)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+H2OC (mmol/mol),na_origem,0,H2OC (mmol/mol)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+rho (g/m**3),na_origem,0,rho (g/m**3)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+wv (m/s),na_origem,0,wv (m/s)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+max. wv (m/s),na_origem,0,max. wv (m/s)_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+wd_sin,na_origem,0,wd_sin_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+wd_cos,na_origem,0,wd_cos_t,em_validacao,Medição simultânea; entra em t para prever o intervalo seguinte.
+wd (deg),proibida,0,,excluido,Proibida no quadro modelável.

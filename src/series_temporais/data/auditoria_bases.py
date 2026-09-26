@@ -11,6 +11,7 @@ import hashlib
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 
@@ -143,10 +144,55 @@ def auditar_base4(path: Path) -> dict[str, Any]:
 
 
 def auditar_base5(path: Path) -> dict[str, Any]:
-    frame = pd.read_csv(path, sep=";")
+    frame = pd.read_csv(path)
+    if len(frame.columns) == 1:
+        frame = pd.read_csv(path, sep=";")
     result = _base_record("base_05", path, frame)
     date = pd.to_datetime(frame["DATE"], errors="coerce")
-    value = pd.to_numeric(frame["VALUE"], errors="coerce")
+    if "GOLD_PRICE" in frame:
+        value = pd.to_numeric(frame["GOLD_PRICE"], errors="coerce")
+        target = pd.to_numeric(frame["TARGET"], errors="coerce")
+        lag_1 = pd.to_numeric(frame["GOLD_LAG_1"], errors="coerce")
+        result.update(
+            esquema="ouro_com_taxas",
+            nulos_preco=int(value.isna().sum()),
+            colunas_primitivas=["DATE", "GOLD_PRICE", "TREASURY_10Y", "FED_FUNDS_RATE"],
+            target_entregue_igual_proxima_linha_fracao=float(
+                np.isclose(target.iloc[:-1], value.shift(-1).iloc[:-1], equal_nan=False).mean()
+            ),
+            lag_1_entregue_igual_shift_fracao=float(
+                np.isclose(lag_1.iloc[1:], value.shift(1).iloc[1:], equal_nan=False).mean()
+            ),
+        )
+    else:
+        value = pd.to_numeric(frame["VALUE"], errors="coerce")
+        expected_target = value.shift(-1).gt(value).fillna(False).astype(int)
+        result.update(
+            esquema="valor_com_alvo_binario",
+            nulos_value=int(value.isna().sum()),
+            dominios_invalidos={
+                c: sorted(set(frame[c].dropna().unique()) - {0, 1})
+                for c in ["IS_HOLIDAY", "TARGET_UP"]
+            },
+            is_holiday_counts={
+                str(k): int(v)
+                for k, v in frame["IS_HOLIDAY"].value_counts(dropna=False).items()
+            },
+            target_up_counts={
+                str(k): int(v)
+                for k, v in frame["TARGET_UP"].value_counts(dropna=False).items()
+            },
+            target_up_reproduz_proxima_linha=bool(
+                frame["TARGET_UP"].eq(expected_target).all()
+            ),
+            target_up_com_par_preco_valido=int(
+                (
+                    frame["TARGET_UP"].eq(1)
+                    & value.notna()
+                    & value.shift(-1).notna()
+                ).sum()
+            ),
+        )
     result.update(
         inicio=str(date.min().date()),
         fim=str(date.max().date()),
@@ -154,20 +200,7 @@ def auditar_base5(path: Path) -> dict[str, Any]:
         datas_duplicadas=int(date.duplicated().sum()),
         linhas_duplicadas=int(frame.duplicated().sum()),
         ordenada_original=bool(date.is_monotonic_increasing),
-        nulos_value=int(value.isna().sum()),
         valores_nao_positivos=int((value.dropna() <= 0).sum()),
-        dominios_invalidos={
-            c: sorted(set(frame[c].dropna().unique()) - {0, 1}) for c in ["IS_HOLIDAY", "TARGET_UP"]
-        },
-        is_holiday_counts={str(k): int(v) for k, v in frame["IS_HOLIDAY"].value_counts(dropna=False).items()},
-        target_up_counts={str(k): int(v) for k, v in frame["TARGET_UP"].value_counts(dropna=False).items()},
-    )
-    expected_target = (
-        value.shift(-1).gt(value).fillna(False).astype(int)
-    )
-    result["target_up_reproduz_proxima_linha"] = bool(frame["TARGET_UP"].eq(expected_target).all())
-    result["target_up_com_par_preco_valido"] = int(
-        (frame["TARGET_UP"].eq(1) & value.notna() & value.shift(-1).notna()).sum()
     )
     return result
 
