@@ -1,0 +1,19 @@
+{
+  "BIC": 32862.9707922364,
+  "convergiu": true,
+  "segundos_ajuste": 0.27589239994995296,
+  "segundos_walk_forward": 16.257822399958968,
+  "avisos": "",
+  "MAE": 698.1359572783041,
+  "base": "base1",
+  "inicio_teste": "2022-06-09 00:00:00",
+  "horizonte": 1,
+  "janela": "expansiva",
+  "exogenas": [
+    "Open_lag1",
+    "High_lag1",
+    "Low_lag1",
+    "Volume_lag1"
+  ],
+  "fonte_pipeline": "docs/Pipes de exemplo/atividade_sarimax.ipynb"
+}
