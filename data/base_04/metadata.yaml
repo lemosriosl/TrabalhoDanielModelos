@@ -1,6 +1,8 @@
 id: base_04
 raw_file: raw.csv
 prepared_file: prepared.csv
+train_file: train.csv
+test_file: test.csv
 target: null
 time_column: null
 frequency: null
