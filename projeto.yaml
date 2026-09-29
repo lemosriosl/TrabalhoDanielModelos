@@ -1,7 +1,7 @@
 projeto:
   grupo: null
   integrantes: []
-  modelo_especializacao: null
+  modelo_especializacao: xgboost
   semente: 42
 
 validacao:

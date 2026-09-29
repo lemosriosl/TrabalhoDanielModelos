@@ -5,6 +5,7 @@ matplotlib
 seaborn
 statsmodels
 scikit-learn
+xgboost
 pyyaml
 jupyter
 nbconvert
