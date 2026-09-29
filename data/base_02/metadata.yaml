@@ -1,0 +1,10 @@
+id: base_02
+raw_file: raw.csv
+prepared_file: prepared.csv
+target: null
+time_column: null
+frequency: null
+seasonal_period: null
+documentation: documentacao.md
+feature_catalog: catalogo_features_base2.csv
+external_availability: disponibilidade_covariaveis_base2.csv

@@ -1,0 +1,30 @@
+projeto:
+  grupo: null
+  integrantes: []
+  modelo_especializacao: null
+  semente: 42
+
+validacao:
+  estrategia: walk_forward
+  horizonte: null
+  tamanho_janela_inicial: null
+  passo: 1
+  janela: expansiva
+  metrica_principal: MAE
+
+modelos_comuns:
+  - sarimax
+  - holt_winters
+  - random_forest
+
+bases:
+  - id: base_01
+    metadata: data/base_01/metadata.yaml
+  - id: base_02
+    metadata: data/base_02/metadata.yaml
+  - id: base_03
+    metadata: data/base_03/metadata.yaml
+  - id: base_04
+    metadata: data/base_04/metadata.yaml
+  - id: base_05
+    metadata: data/base_05/metadata.yaml

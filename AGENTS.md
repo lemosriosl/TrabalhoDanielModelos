@@ -1,46 +1,31 @@
-# Trabalho de series temporais
+# Projeto de séries temporais
 
-O enunciado oficial esta em `docs/Documento atividade.pdf`. O plano executavel esta em `docs/plano.md`.
+## Leitura obrigatória antes de qualquer demanda
 
-## Processo obrigatorio
+1. `AGENTS.md` (este arquivo);
+2. `projeto.yaml`;
+3. `tarefas.csv`.
 
-- Antes de trabalhar, leia este arquivo, `config/projeto.yaml` e a regra aplicavel em `rules/`.
-- Consulte `collaboration/demandas.csv`; trabalhe em uma demanda por vez e identifique o responsavel.
-- Nao invente numero do grupo, integrantes, modelo de especializacao, bases, horizonte ou frequencia. Se estiverem pendentes, registre em `docs/decisoes_pendentes.md`.
-- Decisoes metodologicas estruturais devem ser registradas em `docs/adr/` antes de alterar o pipeline.
-- Use `collaboration/handoffs/` para transferir trabalho incompleto entre pessoas ou agentes.
-- Registre prompts de IA que influenciem codigo, metodologia ou interpretacao em `collaboration/prompts/`.
+Leia também `data/base_NN/metadata.yaml` ao trabalhar em uma base específica. Consulte `docs/atividade/n2_series_temporais.pdf` apenas para requisitos de entrega ou interpretação metodológica.
 
-## Dados e prevencao de vazamento
+## Regras essenciais
 
-- `data/raw/` e imutavel depois do congelamento. Nunca sobrescreva, limpe ou complete dados nessa pasta.
-- Transformacoes devem gerar artefatos em `data/interim/` ou `data/processed/`.
-- Ajuste de imputacao, escala, encoding, selecao de features e hiperparametros usa somente o passado disponivel em cada origem.
-- Variaveis externas futuras so podem ser usadas se forem conhecidas antecipadamente ou se representarem uma previsao disponivel na origem.
-- Lags e janelas moveis devem ser deslocados de forma a excluir o valor-alvo previsto.
+- Trabalhe em uma demanda por vez e registre responsável, evidência e status em `tarefas.csv`.
+- `data/base_NN/raw.csv` é congelado e imutável. Todo dado preparado deve ser reproduzível a partir dele.
+- Nunca use valores futuros observados como feature. Transformações, seleção de features e tuning usam somente o passado disponível em cada origem.
+- Os quatro modelos usam as mesmas origens, horizonte e observações de teste. O teste final é walk-forward, com hiperparâmetros já congelados.
+- Calcule MAE somente em previsões fora da amostra. Entre bases, compare vitórias e posição média; não faça média bruta de MAE.
+- Funções reutilizáveis ficam em `src/series_temporais/`; notebooks orquestram, documentam e interpretam.
+- Resultados em `results/` são gerados por código e não devem ser editados manualmente.
+- Toda nova lógica metodológica deve ter teste em `tests/`. Registre decisões estruturais em `docs/decisoes.md` antes da mudança.
 
-## Comparabilidade
+## Estrutura rápida
 
-- SARIMAX, Holt-Winters, Random Forest e o modelo de especializacao usam as mesmas origens, horizonte e teste por base.
-- Random Forest e o modelo de especializacao usam o mesmo conjunto de features quando compativeis.
-- MAE e calculado apenas sobre previsoes fora da amostra do walk-forward.
-- Nao calcular media direta de MAE entre bases de escalas diferentes; usar vitorias e posicao media.
-- Hiperparametros permanecem fixos durante o teste final.
+- `data/`: uma pasta autocontida por base.
+- `notebooks/`: exploração, preparação e modelos existentes.
+- `references/`: materiais de aula; não fazem parte do pipeline.
+- `docs/`: enunciado, decisões e referências.
+- `entrega/`: apenas artefatos finais gerados.
 
-## Codigo e resultados
-
-- Logica reutilizavel pertence a `src/series_temporais/`; notebooks devem orquestrar e explicar, nao duplicar funcoes extensas.
-- Use caminhos relativos a raiz e configuracao central em `config/projeto.yaml`.
-- Fixe sementes aleatorias e registre versoes, parametros, tempo, previsoes e residuos.
-- Todo codigo metodologico novo deve possuir teste adequado em `tests/`.
-- Nao editar manualmente arquivos consolidados em `results/` nem os relatorios finais.
-
-## Onde olhar
-
-- `agents/README.md`: divisao sugerida entre agentes de IA.
-- `rules/data.md`: congelamento, qualidade e disponibilidade temporal.
-- `rules/experiments.md`: protocolo experimental.
-- `rules/checks.md`: definicao de pronto.
-- `rules/handoff.md`: formato de transferencia de contexto.
-- `docs/adr/README.md`: como registrar decisoes.
+Campos ainda indefinidos em `projeto.yaml` não devem ser inventados: registre a pendência em `docs/decisoes.md`.
 

@@ -1,0 +1,2 @@
+data,responsavel,demanda,evidencia,carga_de_trabalho,complexidade,status
+2026-09-29,Codex (agente),Reorganizar o repositório para reduzir o contexto operacional e preservar rastreabilidade,AGENTS.md projeto.yaml tarefas.csv e migração versionada de dados notebooks documentos e referências,alta,media,Concluida
