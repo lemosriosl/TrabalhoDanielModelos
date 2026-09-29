@@ -1,4 +1,0 @@
-data,responsavel,demanda,evidencia,carga_de_trabalho,complexidade,status
-2026-09-29,Codex (agente),Reorganizar o repositório para reduzir o contexto operacional e preservar rastreabilidade,AGENTS.md projeto.yaml tarefas.csv e migração versionada de dados notebooks documentos e referências,alta,media,Concluida
-2026-09-29,Codex (agente),Auditar caminhos de entrada e saída dos notebooks após a reorganização,Inventário estático de leituras e gravações; 32 notebooks válidos como JSON; falhas de caminhos e imports identificadas,media,alta,Concluida
-2026-09-29,Codex (agente),Corrigir e reauditar caminhos e saídas dos notebooks,Resolvedor único de bases e nomes raw prepared train test; 32 notebooks válidos; imports e testes estruturais aprovados; preparação da Base 1 executada em memória,alta,alta,Concluida
