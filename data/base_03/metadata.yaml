@@ -3,10 +3,14 @@ raw_file: raw.csv
 prepared_file: prepared.csv
 train_file: train.csv
 test_file: test.csv
-target: null
-time_column: null
-frequency: null
+target: PM2.5
+time_column: datetime
+time_column_derivation: year_month_day_hour
+frequency: h
 seasonal_period: null
+seasonal_period_candidates: [24, 168]
+horizon_steps: 1
+train_ratio: 0.80
 documentation: documentacao_base3.md
 feature_catalog: catalogo_features_base3.csv
 external_availability: disponibilidade_covariaveis_base3.csv

@@ -27,3 +27,19 @@
 **Interpretação:** comparar o modelo com persistência e calcular Gain e Permutation Importance. Essas importâncias são descritivas e não demonstram causalidade. A comparação entre bases usa vitórias e skill relativo ao baseline, não média de MAEs em escalas diferentes.
 
 **Execução:** checkpoints de busca e resumos intermediários ficam no diretório temporário do sistema para permitir retomada sem versionar artefatos transitórios. A análise técnica consolidada está em `docs/modelo_xgboost.md`.
+
+## 2026-10-01 - Completar contrato de metadados e rastreio de tarefas
+
+**Decisão:** registrar em `projeto.yaml` e em cada `data/base_NN/metadata.yaml` os fatos já implementados nos notebooks: previsão de um passo à frente, frequência, coluna temporal, alvo, proporção cronológica de treino e períodos sazonais candidatos. O período sazonal final e o tamanho da janela inicial permanecem pendentes quando ainda não há uma decisão única, pois dependem da validação walk-forward.
+
+**Motivo:** os campos nulos impediam que o projeto fosse auditado sem abrir cada notebook. Preencher somente informações comprovadas centraliza o contrato metodológico, sem transformar candidatos de modelagem em parâmetros definitivos.
+
+**Efeito:** `tarefas.csv` passa a registrar demandas e evidências. Na Base 5, o alvo canônico é o retorno logarítmico da semana seguinte; os notebooks de SARIMAX e Holt-Winters ainda usam preço e devem ser alinhados antes da comparação final dos quatro modelos.
+
+## 2026-10-01 - Protocolo estrito de teste walk-forward
+
+**Decisão:** o teste final passa a produzir uma previsão de um passo por origem. Random Forest e XGBoost são reajustados em cada origem com parâmetros já congelados; Holt-Winters atualiza seu estado depois da observação revelada; SARIMAX é reestimado ou atualizado somente depois de cada previsão de um passo. Todo ajuste usa exclusivamente linhas cujo alvo já ocorreu até a origem.
+
+**Motivo:** previsões em bloco ou um único horizonte que cobre todo o teste não têm o mesmo horizonte de um passo e impedem comparação justa entre modelos.
+
+**Efeito:** a cadência de reajuste é comum (`1`), as previsões recebem um esquema comum de origem, alvo, valor real, previsão e corte de treino, e testes automatizados bloqueiam vazamento temporal.

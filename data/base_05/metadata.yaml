@@ -1,10 +1,14 @@
 id: base_05
 raw_file: raw.csv
 prepared_file: null
-target: null
-time_column: null
-frequency: null
+target: target_log_return_t_plus_1
+target_derivation: retorno_logaritmico_da_semana_seguinte_a_partir_de_GOLD_PRICE
+time_column: DATE
+frequency: W-FRI
 seasonal_period: null
+seasonal_period_candidates: [52]
+horizon_steps: 1
+train_ratio: 0.75
 documentation: documentacao_base5.md
 feature_catalog: catalogo_features_base5.csv
 external_availability: disponibilidade_covariaveis_base5.csv

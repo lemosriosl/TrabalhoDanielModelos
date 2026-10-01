@@ -12,7 +12,7 @@ def purged_time_series_splits(
     *,
     n_splits: int = 3,
 ) -> list[tuple[np.ndarray, np.ndarray]]:
-    """Cria dobras expansivas e remove do treino alvos que alcançam a validação."""
+    """Cria dobras expansivas e remove do treino alvos posteriores à validação."""
 
     origens = pd.Series(pd.to_datetime(origin_time, errors="raise")).reset_index(drop=True)
     alvos = pd.Series(pd.to_datetime(target_time, errors="raise")).reset_index(drop=True)
@@ -41,7 +41,7 @@ def purged_time_series_splits(
             fim = len(origens)
         validacao = np.arange(inicio, fim, dtype=int)
         primeira_origem = origens.iloc[inicio]
-        ajuste = np.flatnonzero((np.arange(len(origens)) < inicio) & (alvos < primeira_origem))
+        ajuste = np.flatnonzero((np.arange(len(origens)) < inicio) & (alvos <= primeira_origem))
         if len(ajuste) == 0 or len(validacao) == 0:
             raise ValueError("A purga produziu uma dobra vazia.")
         splits.append((ajuste, validacao))

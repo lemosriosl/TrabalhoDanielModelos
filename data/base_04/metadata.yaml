@@ -3,10 +3,13 @@ raw_file: raw.csv
 prepared_file: prepared.csv
 train_file: train.csv
 test_file: test.csv
-target: null
-time_column: null
-frequency: null
+target: T (degC)
+time_column: Date Time
+frequency: 10min
 seasonal_period: null
+seasonal_period_candidates: [144]
+horizon_steps: 1
+train_ratio: 0.80
 documentation: documentacao_base4.md
 feature_catalog: catalogo_features_base4.csv
 external_availability: disponibilidade_covariaveis_base4.csv

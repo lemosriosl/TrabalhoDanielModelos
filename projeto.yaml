@@ -6,8 +6,10 @@ projeto:
 
 validacao:
   estrategia: walk_forward
-  horizonte: null
+  horizonte: 1
+  unidade_horizonte: passo_da_frequencia_de_cada_base
   tamanho_janela_inicial: null
+  tamanho_janela_inicial_status: pendente_de_definicao_pelo_grupo
   passo: 1
   janela: expansiva
   metrica_principal: MAE
@@ -20,11 +22,16 @@ modelos_comuns:
 bases:
   - id: base_01
     metadata: data/base_01/metadata.yaml
+    proporcao_treino: 0.70
   - id: base_02
     metadata: data/base_02/metadata.yaml
+    proporcao_treino: 0.80
   - id: base_03
     metadata: data/base_03/metadata.yaml
+    proporcao_treino: 0.80
   - id: base_04
     metadata: data/base_04/metadata.yaml
+    proporcao_treino: 0.80
   - id: base_05
     metadata: data/base_05/metadata.yaml
+    proporcao_treino: 0.75
