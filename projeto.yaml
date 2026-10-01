@@ -8,8 +8,14 @@ validacao:
   estrategia: walk_forward
   horizonte: 1
   unidade_horizonte: passo_da_frequencia_de_cada_base
-  tamanho_janela_inicial: null
-  tamanho_janela_inicial_status: pendente_de_definicao_pelo_grupo
+  tamanho_janela_inicial: particao_completa_de_treino
+  tamanho_janela_inicial_status: definida
+  janela_minima_tuning_por_base:
+    base_01: 730
+    base_02: 336
+    base_03: 336
+    base_04: 288
+    base_05: 104
   passo: 1
   janela: expansiva
   metrica_principal: MAE
@@ -23,15 +29,20 @@ bases:
   - id: base_01
     metadata: data/base_01/metadata.yaml
     proporcao_treino: 0.70
+    unidade_janela_minima_tuning: dias
   - id: base_02
     metadata: data/base_02/metadata.yaml
     proporcao_treino: 0.80
+    unidade_janela_minima_tuning: horas
   - id: base_03
     metadata: data/base_03/metadata.yaml
     proporcao_treino: 0.80
+    unidade_janela_minima_tuning: horas
   - id: base_04
     metadata: data/base_04/metadata.yaml
     proporcao_treino: 0.80
+    unidade_janela_minima_tuning: observacoes_de_dez_minutos
   - id: base_05
     metadata: data/base_05/metadata.yaml
     proporcao_treino: 0.75
+    unidade_janela_minima_tuning: semanas

@@ -43,3 +43,11 @@
 **Motivo:** previsões em bloco ou um único horizonte que cobre todo o teste não têm o mesmo horizonte de um passo e impedem comparação justa entre modelos.
 
 **Efeito:** a cadência de reajuste é comum (`1`), as previsões recebem um esquema comum de origem, alvo, valor real, previsão e corte de treino, e testes automatizados bloqueiam vazamento temporal.
+
+## 2026-10-01 - Janela inicial do walk-forward
+
+**Decisão:** no teste final, a janela inicial é toda a partição cronológica de treino de cada base. No tuning, cada dobra precisa começar com a janela mínima específica da base: 730 dias (Base 1), 336 horas (Bases 2 e 3), 288 observações de dez minutos (Base 4) e 104 semanas (Base 5).
+
+**Motivo:** a janela inicial precisa acomodar simultaneamente lags, janelas móveis e pelo menos dois ciclos da maior sazonalidade candidata. Um único número absoluto não seria coerente entre frequências diária, horária, de dez minutos e semanal.
+
+**Efeito:** as dobras temporais passam a ter um limite inferior explícito; o histórico do teste final permanece expansivo e usa toda a informação disponível no corte de treino.
