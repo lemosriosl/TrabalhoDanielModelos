@@ -160,3 +160,18 @@ def construir_quadro_ouro(
     ]
     modelavel = quadro.dropna(subset=obrigatorias).reset_index(drop=True)
     return modelavel, features
+
+
+def selecionar_alvos_observados(quadro: pd.DataFrame) -> pd.DataFrame:
+    """Seleciona realizações cuja semana-alvo contém uma cotação nova.
+
+    O indicador serve somente para definir a disponibilidade do alvo. Ele não
+    deve ser usado como feature, pois descreve a semana futura da origem.
+    """
+
+    if "target_has_new_quote" not in quadro.columns:
+        raise KeyError("Coluna ausente: target_has_new_quote")
+    indicador = quadro["target_has_new_quote"]
+    if indicador.isna().any() or not indicador.isin([0, 1, False, True]).all():
+        raise ValueError("target_has_new_quote deve ser binário e não ausente.")
+    return quadro.loc[indicador.astype(bool)].reset_index(drop=True)

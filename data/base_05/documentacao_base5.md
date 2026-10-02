@@ -40,7 +40,8 @@ que elas usam outra grade temporal. Reutilizá-las misturaria definições.
 
 ## 3. Limpeza e preparação semanal
 
-O notebook `grupo5_RF.ipynb` preserva o CSV e executa por código:
+Os notebooks `base_05-grupo5_RF_retorno.ipynb` e
+`base_05-grupo5_RF_preco.ipynb` preservam o CSV e executam por código:
 
 1. valida esquema, tipos, datas, duplicidades, ausências e hash;
 2. mantém somente as quatro colunas primitivas para reconstruir a base;
@@ -74,10 +75,12 @@ ACF e PACF são calculadas sobre o retorno semanal do treino.
 ## 5. Random Forest e otimização
 
 O conjunto modelável possui 2.344 origens. Depois do corte e da purga da
-fronteira são usadas 1.757 linhas de treino e 586 de teste, de 2003-01-17 a
-2014-04-04. As 49 features incluem estado atual, cobertura, taxas, variações,
-lags, janelas defasadas e calendário cíclico. Datas-alvo, preço futuro e todas
-as derivações entregues no CSV ficam fora de `X`.
+fronteira, a grade contém 1.757 linhas de treino e 586 origens de teste, de
+2003-01-17 a 2014-04-04. Somente as 1.570 linhas de treino cuja semana-alvo
+possui cotação nova entram no tuning e no ajuste. As 49 features incluem estado
+atual, cobertura, taxas, variações, lags, janelas defasadas e calendário
+cíclico. Datas-alvo, preço futuro, `target_has_new_quote` e todas as derivações
+entregues no CSV ficam fora de `X`.
 
 A busca revisada usa `for` explícito, três dobras temporais com purga e nove
 configurações planejadas para investigar todos os hiperparâmetros exigidos:
@@ -88,14 +91,17 @@ configurações planejadas para investigar todos os hiperparâmetros exigidos:
 - `min_samples_leaf`: 1, 2 ou 3;
 - `max_features`: `sqrt` ou 0,7.
 
-Melhores parâmetros: `n_estimators=250`, `max_depth=6`,
+Melhores parâmetros para o RF de retorno: `n_estimators=250`, `max_depth=6`,
 `min_samples_split=2`, `min_samples_leaf=3` e `max_features='sqrt'`. A busca
-levou 24,44 segundos nesta execução.
-O walk-forward manteve os parâmetros fixos, reajustou a cada 26 semanas em 23
-blocos e levou 22,78 segundos nesta execução.
+levou 20,88 segundos nesta execução. O walk-forward manteve os parâmetros
+fixos e reajustou em cada uma das 586 origens, levando 477,07 segundos.
+
+Para o RF direto no preço, a busca selecionou `n_estimators=250`,
+`max_depth=6`, `min_samples_split=10`, `min_samples_leaf=3` e
+`max_features=0,7`. Seus 586 reajustes levaram 1.149,43 segundos.
 
 O notebook agora registra também a importância nativa média e sua variação
-entre os 23 reajustes. As primeiras posições incluem retorno corrente,
+entre os 586 reajustes. As primeiras posições incluem retorno corrente,
 volatilidade e dispersão históricas, lags de retorno e defasagens da Fed Funds,
 permitindo separar contribuição autorregressiva, de risco e das taxas externas.
 
@@ -103,30 +109,33 @@ permitindo separar contribuição autorregressiva, de risco e das taxas externas
 
 | Modelo | MAE retorno | RMSE retorno | MedAE retorno | R² | Acurácia direcional | MAE preço |
 |---|---:|---:|---:|---:|---:|---:|
-| Random Forest | 0,021467 | 0,029660 | 0,016777 | -0,0947 | 0,4625 | 20,0356 |
-| Retorno zero / persistência | 0,020101 | 0,028434 | 0,016044 | -0,0061 | 0,1092* | 18,9520 |
+| Random Forest | 0,022734 | 0,030708 | 0,018216 | -0,0480 | 0,4990 | 21,4431 |
+| Retorno zero / persistência | 0,022522 | 0,030098 | 0,018257 | -0,0068 | 0,0019* | 21,2349 |
 
 `*` A previsão zero só acerta o sinal quando o retorno observado também é
-zero; o valor é elevado pelas semanas sem nova cotação e não mede capacidade
-de prever alta ou queda.
+zero e não mede capacidade de prever alta ou queda.
 
-O Random Forest não superou a persistência. O notebook mantém as 586 previsões
-e resíduos individuais, com datas, valores reais, previstos, erros absolutos e
-quadráticos.
+O Random Forest de retorno não superou a persistência. A tabela usa como
+avaliação principal as 523 origens cuja semana-alvo possui cotação nova. A
+diferença de MAE de preço caiu para 0,2082, equivalente a skill de -0,98%.
 
-Como análise de sensibilidade, o notebook separa as 523 origens cuja semana-alvo
-possui nova cotação. Nesse recorte, o MAE de preço foi 21,9011 no Random Forest
-e 21,2349 na persistência; portanto, a conclusão de que o RF não supera o
-baseline não decorre apenas das semanas com preço carregado.
+No recorte de robustez com cotação tanto na origem quanto no alvo, são 469
+observações: o MAE de preço foi 20,3658 no RF e 20,1714 na persistência. Na
+grade completa, mantida apenas como sensibilidade, os valores foram 19,4274 e
+18,9520, respectivamente.
+
+O RF direto no preço também foi reajustado apenas com alvos observados e teve
+MAE de preço 29,2576 nas 523 observações, contra 21,2349 da persistência. Ele é
+mantido como benchmark, mas não é o Random Forest recomendado para a entrega.
 
 ## 7. ACF residual e Ljung–Box
 
 | Lag | Estatística | p-valor | Rejeita ruído branco a 5% |
 |---:|---:|---:|---|
-| 1 | 1,6266 | 0,202175 | Não |
-| 4 | 11,1770 | 0,024645 | Sim |
-| 13 | 31,1506 | 0,003205 | Sim |
-| 26 | 54,6488 | 0,000840 | Sim |
+| 1 | 0,8950 | 0,344135 | Não |
+| 4 | 19,2371 | 0,000706 | Sim |
+| 13 | 38,7564 | 0,000219 | Sim |
+| 26 | 55,6902 | 0,000619 | Sim |
 
 Há autocorrelação residual conjunta a partir do lag 4. O modelo ainda deixa
 dependência temporal sem explicar.
@@ -147,7 +156,8 @@ dependência temporal sem explicar.
 
 - Confirmar unidade, moeda, fornecedor, licença e data de obtenção do preço.
 - Confirmar fonte, convenção e horário de disponibilidade das duas taxas.
-- O preenchimento de semanas vazias cria retornos zero e deve ser considerado
-  na interpretação das métricas.
+- O preenchimento de semanas vazias cria retornos zero nas features históricas;
+  esses estados são identificados por indicadores de cobertura, mas não entram
+  como alvos de ajuste nem na métrica principal.
 - SARIMAX, Holt-Winters e o modelo de especialização devem usar exatamente as
   mesmas origens, horizonte e teste para comparação final.

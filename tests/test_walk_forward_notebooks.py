@@ -38,6 +38,18 @@ def test_random_forest_and_xgboost_refit_at_every_origin():
         ), name
 
 
+def test_base5_random_forests_fit_only_observed_targets_without_feature_leakage():
+    for name in (
+        "base_05-grupo5_RF_preco.ipynb",
+        "base_05-grupo5_RF_retorno.ipynb",
+    ):
+        source = _source(NOTEBOOKS / name)
+        assert "training_df = selecionar_alvos_observados(train_df)" in source, name
+        assert "history = selecionar_alvos_observados(history_all)" in source, name
+        assert "assert 'target_has_new_quote' not in feature_columns" in source, name
+        assert "assert history.target_has_new_quote.eq(1).all()" in source, name
+
+
 def test_sarimax_final_section_is_one_step_and_updates_state():
     for number in range(1, 6):
         notebook = json.loads(
