@@ -74,10 +74,12 @@ ACF e PACF são calculadas sobre o retorno semanal do treino.
 ## 5. Random Forest e otimização
 
 O conjunto modelável possui 2.344 origens. Depois do corte e da purga da
-fronteira são usadas 1.757 linhas de treino e 586 de teste, de 2003-01-17 a
-2014-04-04. As 49 features incluem estado atual, cobertura, taxas, variações,
-lags, janelas defasadas e calendário cíclico. Datas-alvo, preço futuro e todas
-as derivações entregues no CSV ficam fora de `X`.
+fronteira, a grade contém 1.757 linhas de treino e 586 origens de teste, de
+2003-01-17 a 2014-04-04. Somente as 1.570 linhas de treino cuja semana-alvo
+possui cotação nova entram no tuning e no ajuste. As 49 features incluem estado
+atual, cobertura, taxas, variações, lags, janelas defasadas e calendário
+cíclico. Datas-alvo, preço futuro, `target_has_new_quote` e todas as derivações
+entregues no CSV ficam fora de `X`.
 
 A busca revisada usa `for` explícito, três dobras temporais com purga e nove
 configurações planejadas para investigar todos os hiperparâmetros exigidos:
@@ -88,11 +90,10 @@ configurações planejadas para investigar todos os hiperparâmetros exigidos:
 - `min_samples_leaf`: 1, 2 ou 3;
 - `max_features`: `sqrt` ou 0,7.
 
-Melhores parâmetros: `n_estimators=250`, `max_depth=6`,
+Melhores parâmetros para o RF de retorno: `n_estimators=250`, `max_depth=6`,
 `min_samples_split=2`, `min_samples_leaf=3` e `max_features='sqrt'`. A busca
-levou 24,44 segundos nesta execução.
-O walk-forward manteve os parâmetros fixos, reajustou a cada 26 semanas em 23
-blocos e levou 22,78 segundos nesta execução.
+levou 11,03 segundos nesta execução. O walk-forward manteve os parâmetros
+fixos, reajustou a cada 26 semanas em 23 blocos e levou 12,19 segundos.
 
 O notebook agora registra também a importância nativa média e sua variação
 entre os 23 reajustes. As primeiras posições incluem retorno corrente,
@@ -103,30 +104,31 @@ permitindo separar contribuição autorregressiva, de risco e das taxas externas
 
 | Modelo | MAE retorno | RMSE retorno | MedAE retorno | R² | Acurácia direcional | MAE preço |
 |---|---:|---:|---:|---:|---:|---:|
-| Random Forest | 0,021467 | 0,029660 | 0,016777 | -0,0947 | 0,4625 | 20,0356 |
-| Retorno zero / persistência | 0,020101 | 0,028434 | 0,016044 | -0,0061 | 0,1092* | 18,9520 |
+| Random Forest | 0,023132 | 0,030884 | 0,018354 | -0,0601 | 0,5010 | 21,6735 |
+| Retorno zero / persistência | 0,022522 | 0,030098 | 0,018257 | -0,0068 | 0,0019* | 21,2349 |
 
 `*` A previsão zero só acerta o sinal quando o retorno observado também é
-zero; o valor é elevado pelas semanas sem nova cotação e não mede capacidade
-de prever alta ou queda.
+zero e não mede capacidade de prever alta ou queda.
 
-O Random Forest não superou a persistência. O notebook mantém as 586 previsões
-e resíduos individuais, com datas, valores reais, previstos, erros absolutos e
-quadráticos.
+O Random Forest de retorno não superou a persistência. A tabela usa como
+avaliação principal as 523 origens cuja semana-alvo possui cotação nova. O
+notebook mantém previsões para as 586 origens e apresenta a grade completa
+somente como sensibilidade; nesse recorte, o MAE de preço foi 19,7933 no RF e
+18,9520 na persistência.
 
-Como análise de sensibilidade, o notebook separa as 523 origens cuja semana-alvo
-possui nova cotação. Nesse recorte, o MAE de preço foi 21,9011 no Random Forest
-e 21,2349 na persistência; portanto, a conclusão de que o RF não supera o
-baseline não decorre apenas das semanas com preço carregado.
+O RF direto no preço também foi reajustado apenas com alvos observados e teve
+MAE de preço 59,7932 nas 523 observações, contra 21,2349 da persistência. Ele é
+mantido como alternativa documentada, mas seu desempenho é claramente pior
+que o RF de retorno.
 
 ## 7. ACF residual e Ljung–Box
 
 | Lag | Estatística | p-valor | Rejeita ruído branco a 5% |
 |---:|---:|---:|---|
-| 1 | 1,6266 | 0,202175 | Não |
-| 4 | 11,1770 | 0,024645 | Sim |
-| 13 | 31,1506 | 0,003205 | Sim |
-| 26 | 54,6488 | 0,000840 | Sim |
+| 1 | 0,8220 | 0,364583 | Não |
+| 4 | 16,5438 | 0,002370 | Sim |
+| 13 | 36,8079 | 0,000444 | Sim |
+| 26 | 52,1312 | 0,001735 | Sim |
 
 Há autocorrelação residual conjunta a partir do lag 4. O modelo ainda deixa
 dependência temporal sem explicar.
@@ -147,7 +149,8 @@ dependência temporal sem explicar.
 
 - Confirmar unidade, moeda, fornecedor, licença e data de obtenção do preço.
 - Confirmar fonte, convenção e horário de disponibilidade das duas taxas.
-- O preenchimento de semanas vazias cria retornos zero e deve ser considerado
-  na interpretação das métricas.
+- O preenchimento de semanas vazias cria retornos zero nas features históricas;
+  esses estados são identificados por indicadores de cobertura, mas não entram
+  como alvos de ajuste nem na métrica principal.
 - SARIMAX, Holt-Winters e o modelo de especialização devem usar exatamente as
   mesmas origens, horizonte e teste para comparação final.
