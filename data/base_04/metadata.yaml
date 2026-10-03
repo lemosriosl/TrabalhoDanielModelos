@@ -9,6 +9,7 @@ frequency: 10min
 seasonal_period: null
 seasonal_period_candidates: [144]
 horizon_steps: 1
+random_state: 42
 train_ratio: 0.80
 documentation: documentacao_base4.md
 feature_catalog: catalogo_features_base4.csv

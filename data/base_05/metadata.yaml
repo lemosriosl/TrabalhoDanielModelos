@@ -8,6 +8,7 @@ frequency: W-FRI
 seasonal_period: null
 seasonal_period_candidates: [52]
 horizon_steps: 1
+random_state: 42
 train_ratio: 0.75
 documentation: documentacao_base5.md
 feature_catalog: catalogo_features_base5.csv

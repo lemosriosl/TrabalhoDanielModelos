@@ -1,8 +1,0 @@
-id,demanda,responsavel,status,evidencia,atualizado_em
-T-001,Completar contrato de metadados e criar o controle de tarefas,Codex,concluida,"projeto.yaml e os cinco metadata.yaml preenchidos a partir dos notebooks; decisão registrada em docs/decisoes.md",2026-10-01
-T-002,Definir integrantes e identificação do grupo,Grupo,pendente,"projeto.yaml não contém evidência para preencher estes campos",2026-10-01
-T-003,Definir janela inicial da validação walk-forward,Codex,concluida,"Teste final inicia com toda a partição de treino; mínimos de tuning por base registrados em projeto.yaml e docs/decisoes.md",2026-10-01
-T-004,Alinhar o alvo da Base 5 entre SARIMAX, Holt-Winters, Random Forest e XGBoost,Matheus Bastos Castilho,concluida,"Alvo target_log_return_t_plus_1; grade W-FRI completa no treino e na métrica principal; 586 origens idênticas; cinco notebooks executados sem erro; revisão independente atendida; 30 testes aprovados",2026-10-03
-T-005,Auditar consistência do walk-forward nos notebooks,Codex,concluida,"RF/XGBoost: purga e reajuste periódico causal; Holt-Winters: atualização sequencial causal; SARIMAX: previsão estática de todo o teste, incompatível com o protocolo walk-forward",2026-10-01
-T-006,Produzir material de entrega sobre walk-forward,Codex,concluida,"entrega/conceito_walk_forward.md criado com conceito, procedimento, regras de comparação e fontes",2026-10-01
-T-007,Implementar protocolo estrito de walk-forward,Codex,concluida,"Módulo reutilizável, 11 notebooks RF/XGBoost e 5 SARIMAX atualizados; 18 testes passam, JSON dos notebooks é válido e as seções SARIMAX compilam",2026-10-01

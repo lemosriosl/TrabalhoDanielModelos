@@ -18,8 +18,8 @@
 | Variável-alvo | `PM2.5` |
 | Unidade do alvo | µg/m³ |
 | Estação | Aotizhongxin (uma das 12 estações do conjunto completo, que soma 420.768 linhas) |
-| Divisão solicitada | A definir pelo grupo, preservando a ordem temporal |
-| `random_state` solicitado | A definir pelo grupo (aplicável somente a componentes estocásticos; não embaralhar a série) |
+| Divisão | 80% treino / 20% teste, preservando a ordem temporal |
+| `random_state` | 42, semente comum do projeto; não embaralhar a série |
 
 Este é o dataset originalmente referenciado no dicionário mestre do projeto para o Grupo 3 (qualidade do ar em Pequim), substituindo o par `data.csv`/`test.csv` de séries financeiras usado anteriormente por engano. O arquivo traz dados horários de poluentes atmosféricos e variáveis meteorológicas da estação Aotizhongxin, com dados meteorológicos casados com a estação do China Meteorological Administration mais próxima.
 
@@ -59,7 +59,7 @@ Este é o dataset originalmente referenciado no dicionário mestre do projeto pa
 
 ## Horizonte e sazonalidade
 
-- Horizonte ainda não definido pelo grupo; registrar em `config/projeto.yaml` antes da modelagem.
+- Horizonte definido: uma hora à frente (`t+1`), conforme `projeto.yaml` e `metadata.yaml`.
 - Sazonalidades candidatas: diária (24 horas) e anual (poluição varia por estação do ano, com invernos historicamente mais poluídos em Pequim); confirmar força por STL e validação temporal, não assumir a priori.
 
 ## Referências

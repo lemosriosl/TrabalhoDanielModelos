@@ -1,6 +1,12 @@
 projeto:
-  grupo: null
-  integrantes: []
+  grupo: 3H
+  integrantes:
+    - Matheus Bastos Castilho
+    - Mayumi Shimizu
+    - Levy
+    - Pedro Gomes Frossard
+    - Ruan Lourenço
+    - Giovane Torquato
   modelo_especializacao: xgboost
   semente: 42
 

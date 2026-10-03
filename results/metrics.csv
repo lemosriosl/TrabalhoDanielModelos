@@ -1,1 +1,1 @@
-base_id,modelo,mae,posicao,origens_avaliadas
+base_id,modelo,alvo,frequencia,horizonte_passos,origens_avaliadas,mae,mape,posicao_base,vencedor,tempo_execucao_segundos,hiperparametros,features_exogenas,notebook,commit,gerado_em

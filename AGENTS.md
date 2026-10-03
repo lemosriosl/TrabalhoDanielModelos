@@ -3,14 +3,13 @@
 ## Leitura obrigatória antes de qualquer demanda
 
 1. `AGENTS.md` (este arquivo);
-2. `projeto.yaml`;
-3. `tarefas.csv`.
+2. `projeto.yaml`.
 
 Leia também `data/base_NN/metadata.yaml` ao trabalhar em uma base específica. Consulte `docs/atividade/n2_series_temporais.pdf` apenas para requisitos de entrega ou interpretação metodológica.
 
 ## Regras essenciais
 
-- Trabalhe em uma demanda por vez e registre responsável, evidência e status em `tarefas.csv`.
+- Trabalhe em uma demanda por vez e registre as decisões metodológicas relevantes em `docs/decisoes.md`.
 - `data/base_NN/raw.csv` é congelado e imutável. Todo dado preparado deve ser reproduzível a partir dele.
 - Nunca use valores futuros observados como feature. Transformações, seleção de features e tuning usam somente o passado disponível em cada origem.
 - Os quatro modelos usam as mesmas origens, horizonte e observações de teste. O teste final é walk-forward, com hiperparâmetros já congelados.
@@ -27,5 +26,5 @@ Leia também `data/base_NN/metadata.yaml` ao trabalhar em uma base específica. 
 - `docs/`: enunciado, decisões e referências.
 - `entrega/`: apenas artefatos finais gerados.
 
-Campos ainda indefinidos em `projeto.yaml` não devem ser inventados: registre a pendência em `docs/decisoes.md`.
+Campos ainda indefinidos em `projeto.yaml` não devem ser inventados: registre a pendência em `docs/decisoes.md`. A planilha operacional de demandas é mantida fora do repositório pelo grupo.
 

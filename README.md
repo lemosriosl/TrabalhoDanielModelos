@@ -2,7 +2,7 @@
 
 Projeto para comparar SARIMAX, Holt-Winters, Random Forest e o modelo de especialização em cinco bases comuns.
 
-Comece por [`AGENTS.md`](AGENTS.md). Ele aponta os três arquivos mínimos de contexto e as regras que protegem a comparabilidade e evitam vazamento temporal.
+Comece por [`AGENTS.md`](AGENTS.md). Ele aponta os arquivos mínimos de contexto e as regras que protegem a comparabilidade e evitam vazamento temporal.
 
 ## Pastas
 

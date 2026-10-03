@@ -1,6 +1,6 @@
 # Handoff entre pessoas e agentes
 
-Crie `collaboration/handoffs/AAAA-MM-DD-responsavel-topico.md` com as secoes abaixo.
+Quando necessário, crie `docs/handoffs/AAAA-MM-DD-responsavel-topico.md` com as secoes abaixo.
 
 ## Onde parei
 

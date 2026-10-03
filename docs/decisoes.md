@@ -2,7 +2,7 @@
 
 ## 2026-09-29 - Estrutura enxuta do repositório
 
-**Decisão:** reduzir o contexto obrigatório a `AGENTS.md`, `projeto.yaml` e `tarefas.csv`; organizar cada base em `data/base_NN/`; centralizar notebooks em `notebooks/`; separar referências e entrega.
+**Decisão:** reduzir o contexto obrigatório a `AGENTS.md` e `projeto.yaml`; organizar cada base em `data/base_NN/`; centralizar notebooks em `notebooks/`; separar referências e entrega.
 
 **Motivo:** o enunciado exige rastreabilidade, prevenção de vazamento e reprodução dos resultados, mas agentes e integrantes não devem precisar navegar por uma hierarquia extensa antes de trabalhar.
 
@@ -28,17 +28,17 @@
 
 **Execução:** checkpoints de busca e resumos intermediários ficam no diretório temporário do sistema para permitir retomada sem versionar artefatos transitórios. A análise técnica consolidada está em `docs/modelo_xgboost.md`.
 
-## 2026-10-01 - Completar contrato de metadados e rastreio de tarefas
+## 2026-10-01 - Completar contrato de metadados
 
 **Decisão:** registrar em `projeto.yaml` e em cada `data/base_NN/metadata.yaml` os fatos já implementados nos notebooks: previsão de um passo à frente, frequência, coluna temporal, alvo, proporção cronológica de treino e períodos sazonais candidatos. O período sazonal final e o tamanho da janela inicial permanecem pendentes quando ainda não há uma decisão única, pois dependem da validação walk-forward.
 
 **Motivo:** os campos nulos impediam que o projeto fosse auditado sem abrir cada notebook. Preencher somente informações comprovadas centraliza o contrato metodológico, sem transformar candidatos de modelagem em parâmetros definitivos.
 
-**Efeito:** `tarefas.csv` passa a registrar demandas e evidências. Na Base 5, o alvo canônico é o retorno logarítmico da semana seguinte; o alinhamento dos quatro modelos foi concluído na decisão específica registrada abaixo.
+**Efeito:** os metadados passam a registrar o contrato reproduzível de cada base. Na Base 5, o alvo canônico é o retorno logarítmico da semana seguinte; o alinhamento dos quatro modelos foi concluído na decisão específica registrada abaixo.
 
 ## 2026-10-01 - Protocolo estrito de teste walk-forward
 
-**Decisão:** o teste final passa a produzir uma previsão de um passo por origem. Random Forest e XGBoost são reajustados em cada origem com parâmetros já congelados; Holt-Winters atualiza seu estado depois da observação revelada; SARIMAX é reestimado ou atualizado somente depois de cada previsão de um passo. Todo ajuste usa exclusivamente linhas cujo alvo já ocorreu até a origem.
+**Decisão:** o teste final passa a produzir uma previsão de um passo por origem. Random Forest e XGBoost são reajustados em cada origem com parâmetros já congelados; Holt-Winters atualiza seu estado depois da observação revelada; SARIMAX é reestimado em cada origem, também com hiperparâmetros congelados. Todo ajuste usa exclusivamente linhas cujo alvo já ocorreu até a origem.
 
 **Motivo:** previsões em bloco ou um único horizonte que cobre todo o teste não têm o mesmo horizonte de um passo e impedem comparação justa entre modelos.
 
@@ -61,3 +61,29 @@
 **Motivo:** SARIMAX e Holt-Winters avaliavam preço em nível, enquanto Random Forest de retorno e XGBoost avaliavam retorno. A divergência impedia comparar MAE, origens e resíduos sob um único protocolo.
 
 **Efeito:** `preparar_modelagem_ouro` centraliza a grade semanal, o alvo, as 49 features e o corte compartilhado. O notebook `RF_preco` permanece somente como análise auxiliar e não participa do ranking final dos quatro modelos.
+
+## 2026-10-03 - Identificação do grupo, semente e controle de demandas
+
+**Decisão:** registrar a turma 3H e os seis integrantes em `projeto.yaml`, adotar a semente 42 em todas as bases e manter a planilha operacional de demandas fora do repositório.
+
+**Motivo:** uma única semente elimina divergências entre modelos estocásticos, enquanto o controle de tarefas não faz parte dos artefatos técnicos versionados.
+
+**Efeito:** `tarefas.csv` deixa de ser requisito estrutural. O repositório preserva decisões metodológicas em `docs/decisoes.md`, resultados reproduzíveis em `results/` e handoffs excepcionais em `docs/handoffs/`.
+
+**Integrantes:** Matheus Bastos Castilho, Mayumi Shimizu, Levy, Pedro Gomes Frossard, Ruan Lourenço e Giovane Torquato.
+
+## 2026-10-03 - Execução e rastreabilidade das buscas SARIMAX
+
+**Decisão:** os cinco notebooks SARIMAX mantêm como padrão a busca completa de `s=0` a `s=100`, com checkpoints temporários versionados. O benchmark SARIMA versus SARIMAX usa somente uma validação interna extraída do treino; o teste final permanece intocado até o walk-forward. Um modo reduzido, ativado apenas por variável de ambiente, testa a pipeline com 730 observações e quatro origens sem representar o resultado final.
+
+**Motivo:** a grade completa contém 57.632 candidatos SARIMA e 691.584 candidatos SARIMAX por base e precisa ser retomável. Checkpoints antigos não podem ser misturados após mudanças na preparação ou no contrato causal. O modo reduzido permite verificar código, rankings, resíduos e reajuste por origem sem alegar que a busca integral foi executada.
+
+**Efeito:** todas as cinco pipelines foram verificadas de ponta a ponta no modo reduzido. A execução completa continua explícita, reproduzível e separada dos resultados de validação técnica.
+
+## 2026-10-03 - Contrato do consolidado de métricas
+
+**Decisão:** `results/metrics.csv` passa a usar um esquema único com identificação da base, modelo, alvo, frequência, horizonte, origens, métricas, ranking, parâmetros, exógenas, notebook, commit e instante de geração.
+
+**Motivo:** MAEs só são comparáveis dentro da mesma base e do mesmo alvo. O consolidado precisa carregar contexto suficiente para impedir comparações ambíguas e permitir rastreabilidade.
+
+**Efeito:** o arquivo começa apenas com o cabeçalho e será preenchido por `series_temporais.results.write_metrics` quando as execuções finais forem concluídas; valores não serão digitados manualmente.

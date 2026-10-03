@@ -7,7 +7,7 @@
 | Responsável | P1 — Matheus Bastos Castilho |
 | Fonte indicada para a base | [Bitget — Bitcoin historical data](https://www.bitget.com/price/bitcoin/historical-data) |
 | Data desta auditoria | 2026-09-21 |
-| Arquivo congelado | `trabalho/bases/grupo1/grupo1.csv` |
+| Arquivo congelado | `data/base_01/raw.csv` |
 | SHA-256 | `dcb86b9461168a1cc3f122a40d7aa6b53ac773a5703423320a2a90c3823c38f7` |
 | Cobertura no arquivo | 2017-01-01 a 2024-10-06 |
 | Observações | 2.836 |
@@ -51,8 +51,12 @@ O candle de um dia só fica completo após o fechamento. Consequentemente, `High
 
 ## Horizonte e sazonalidade
 
-- Horizonte ainda não definido pelo grupo; registrar em `config/projeto.yaml` antes da modelagem.
-- Sazonalidades candidatas para investigação: semanal (7 dias) e anual aproximada (365 dias). A existência e a força devem ser confirmadas por STL e validação temporal; não assumir sazonalidade apenas pela frequência diária.
+- Horizonte definido: um dia à frente (`t+1`), conforme `projeto.yaml` e `metadata.yaml`.
+- STL reexecutado em 2026-10-03: força sazonal semanal (7 dias) `0,0000` e anual aproximada (365 dias) `0,0000`; forças de tendência `0,9942` e `0,7414`, respectivamente. Assim, o preço em nível não apresentou sazonalidade estável nesses dois períodos.
+- A divisão cronológica é 70% treino e 30% teste, sem embaralhamento.
+- A semente comum do projeto é 42.
+
+O dicionário de covariáveis e sua disponibilidade temporal está em `data/base_01/dicionario_variaveis_externas_base1.md`.
 
 ## Referências
 

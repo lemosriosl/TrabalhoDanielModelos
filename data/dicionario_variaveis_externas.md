@@ -41,13 +41,17 @@ O objetivo é tornar os experimentos reproduzíveis e evitar *data leakage*: uma
 
 **Base-alvo:** histórico de preços do Bitcoin.
 
-**Status da auditoria:** aprovado conceitualmente; pendente confirmar a proveniência direta pela Bitget, data de download, unidade/metodologia de `Volume` e horário de disponibilidade de `Open`.
+**Documento específico:** [`base_01/dicionario_variaveis_externas_base1.md`](base_01/dicionario_variaveis_externas_base1.md).
+
+**Status da auditoria:** regras temporais documentadas; pendente confirmar a proveniência direta pela Bitget, data de download, unidade/metodologia de `Volume` e horário de disponibilidade de `Open`.
 
 ## Grupo 2 — Tráfego na I-94
 
 **Base-alvo:** volume horário de tráfego.
 
-**Status da auditoria:** aprovado conceitualmente; pendente deduplicar os 5.445 horários repetidos com regra versionada e confirmar o tratamento do fuso local e do horário de verão.
+**Documento específico:** [`base_02/dicionario_variaveis_externas_base2.md`](base_02/dicionario_variaveis_externas_base2.md).
+
+**Status da auditoria:** duplicidades consolidadas por regra versionada; pendente confirmar o tratamento do fuso local e do horário de verão.
 
 ## Grupo 3 — Qualidade do ar em Pequim
 

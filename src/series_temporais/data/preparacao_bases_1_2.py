@@ -44,6 +44,7 @@ def preparar_base1(caminho_csv: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.Da
         raise ValueError("A Base 1 não possui grade diária completa.")
     if not clean["Close"].equals(clean["Adj Close"]):
         raise ValueError("`Adj Close` deixou de ser idêntica a `Close`; revise a documentação.")
+    clean = clean.drop(columns=["Adj Close"])
     train, test = dividir_cronologicamente(clean, "Date", 0.70)
     audit = {"linhas_origem": len(raw), "linhas_preparadas": len(clean), "datas_duplicadas": int(clean["Date"].duplicated().sum()), "lacunas_diarias": int(len(expected.difference(observed))), "nulos_alvo": int(clean["Close"].isna().sum()), "proporcao_treino": len(train) / len(clean)}
     return clean, train, test, audit

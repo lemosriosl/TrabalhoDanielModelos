@@ -9,6 +9,7 @@ frequency: D
 seasonal_period: null
 seasonal_period_candidates: [7, 365]
 horizon_steps: 1
+random_state: 42
 train_ratio: 0.70
 documentation: documentacao.md
 feature_catalog: catalogo_features_base1.csv

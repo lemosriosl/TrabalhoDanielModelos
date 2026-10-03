@@ -52,7 +52,7 @@ def test_base5_price_random_forest_keeps_observed_target_filter_as_auxiliary():
     assert "history = selecionar_alvos_observados(history_all)" in source
 
 
-def test_sarimax_final_section_is_one_step_and_updates_state():
+def test_sarimax_final_section_refits_at_every_origin():
     for number in range(1, 6):
         notebook = json.loads(
             (NOTEBOOKS / f"base_{number:02d}-grupo{number}_SARIMAX.ipynb").read_text(
@@ -62,15 +62,26 @@ def test_sarimax_final_section_is_one_step_and_updates_state():
         final_source = "".join(notebook["cells"][-1]["source"])
         assert "TESTE FINAL CORRIGIDO" in final_source
         assert "get_forecast(steps=1" in final_source
+        assert (
+            "for origin_time, row in df_test.iterrows()" in final_source
+            or "for target_time, row in df_test.iterrows()" in final_source
+        )
+        assert "fit_sarimax_model(" in final_source
+        assert "history = pd.concat(" in final_source
+        assert "refit=False" not in final_source
         if number == 5:
-            assert "for origin_time, row in df_test.iterrows()" in final_source
-            assert "fit_sarimax_model(" in final_source
-            assert "history = pd.concat(" in final_source
             assert "validate_prediction_contract" in final_source
-        else:
-            assert "result.append(" in final_source
         assert "KNOWN_AT_ORIGIN_EXOG" in final_source
         assert "validate_prediction_frame" in final_source
+
+
+def test_sarimax_full_search_is_default_and_smoke_mode_is_explicit():
+    for number in range(1, 6):
+        source = _source(NOTEBOOKS / f"base_{number:02d}-grupo{number}_SARIMAX.ipynb")
+        assert "os.getenv('SARIMAX_SMOKE_TEST', '0') == '1'" in source
+        assert "S_VALUES = list(range(0, 101))" in source
+        assert "SMOKE_ORIGINS" in source
+        assert "SMOKE_TRAIN_ROWS" in source
 
 
 def test_holt_winters_keeps_one_step_state_updates():
@@ -97,3 +108,16 @@ def test_base5_sarimax_benchmark_does_not_touch_final_test():
     benchmark_source = "".join(notebook["cells"][10]["source"])
     assert "benchmark_validation = df_train" in benchmark_source
     assert "fit_and_forecast(df_train, df_test" not in benchmark_source
+
+
+def test_all_sarimax_benchmarks_use_only_internal_training_validation():
+    for number in range(1, 6):
+        notebook = json.loads(
+            (NOTEBOOKS / f"base_{number:02d}-grupo{number}_SARIMAX.ipynb").read_text(
+                encoding="utf-8"
+            )
+        )
+        benchmark_source = "".join(notebook["cells"][10]["source"])
+        assert "benchmark_train = df_train" in benchmark_source
+        assert "benchmark_validation = df_train" in benchmark_source
+        assert "fit_and_forecast(df_train, df_test" not in benchmark_source

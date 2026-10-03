@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_minimal_project_context_exists():
-    for path in ("AGENTS.md", "projeto.yaml", "tarefas.csv", "docs/decisoes.md"):
+    for path in ("AGENTS.md", "projeto.yaml", "docs/decisoes.md"):
         assert (ROOT / path).is_file()
 
 

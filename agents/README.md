@@ -4,11 +4,11 @@ Os arquivos desta pasta sao papeis reutilizaveis. Uma pessoa continua responsave
 
 Fluxo sugerido:
 
-1. O coordenador escolhe uma demanda pequena em `collaboration/demandas.csv`.
+1. O coordenador delimita uma demanda pequena e seus critérios de conclusão.
 2. Um agente especialista executa somente o escopo descrito.
 3. Outro agente ou integrante revisa metodologia, vazamento e reproducibilidade.
-4. O responsavel humano valida a evidencia e conclui a demanda.
-5. Trabalho incompleto recebe um handoff conforme `rules/handoff.md`.
+4. O responsavel humano valida a evidência produzida.
+5. Trabalho incompleto recebe um handoff em `docs/handoffs/`, conforme `rules/handoff.md`.
 
 Papeis disponiveis:
 
