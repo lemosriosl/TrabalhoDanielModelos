@@ -169,3 +169,41 @@ def validate_prediction_frame(predictions: pd.DataFrame) -> None:
         raise ValueError("Há informação futura no histórico de uma previsão.")
     if not np.isfinite(frame[["y_true", "y_pred"]].to_numpy(dtype=float)).all():
         raise ValueError("Valores reais e previstos devem ser finitos.")
+
+
+def validate_prediction_contract(
+    predictions: pd.DataFrame,
+    expected_test: pd.DataFrame,
+    *,
+    expected_origin_col: str = "DATE",
+    expected_target_time_col: str = "target_date",
+    expected_target_col: str,
+) -> None:
+    """Confirma que um modelo avaliou exatamente as origens e o alvo canônicos."""
+
+    validate_prediction_frame(predictions)
+    required = {expected_origin_col, expected_target_time_col, expected_target_col}
+    missing = sorted(required.difference(expected_test.columns))
+    if missing:
+        raise KeyError(f"Teste canônico sem colunas obrigatórias: {missing}")
+    if len(predictions) != len(expected_test):
+        raise ValueError("O modelo não produziu uma previsão para cada origem canônica.")
+
+    origins = pd.to_datetime(predictions["origin_time"], errors="raise").reset_index(drop=True)
+    targets = pd.to_datetime(predictions["target_time"], errors="raise").reset_index(drop=True)
+    expected_origins = pd.to_datetime(
+        expected_test[expected_origin_col], errors="raise"
+    ).reset_index(drop=True)
+    expected_targets = pd.to_datetime(
+        expected_test[expected_target_time_col], errors="raise"
+    ).reset_index(drop=True)
+    if not origins.equals(expected_origins):
+        raise ValueError("As origens previstas divergem do teste canônico.")
+    if not targets.equals(expected_targets):
+        raise ValueError("Os instantes-alvo divergem do teste canônico.")
+    if not np.allclose(
+        predictions["y_true"].to_numpy(dtype=float),
+        expected_test[expected_target_col].to_numpy(dtype=float),
+        equal_nan=False,
+    ):
+        raise ValueError("Os valores reais divergem do alvo canônico.")

@@ -7,6 +7,9 @@ import pandas as pd
 
 
 PRIMITIVAS = ["DATE", "GOLD_PRICE", "TREASURY_10Y", "FED_FUNDS_RATE"]
+ALVO_CANONICO = "target_log_return_t_plus_1"
+REGRA_SEMANAL = "W-FRI"
+PROPORCAO_TREINO = 0.75
 
 
 def preparar_ouro_semanal(
@@ -175,3 +178,44 @@ def selecionar_alvos_observados(quadro: pd.DataFrame) -> pd.DataFrame:
     if indicador.isna().any() or not indicador.isin([0, 1, False, True]).all():
         raise ValueError("target_has_new_quote deve ser binário e não ausente.")
     return quadro.loc[indicador.astype(bool)].reset_index(drop=True)
+
+
+def dividir_quadro_ouro(
+    quadro: pd.DataFrame,
+    proporcao_treino: float = PROPORCAO_TREINO,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Aplica o corte cronológico comum aos quatro modelos da Base 5."""
+
+    requeridas = {"DATE", "target_date", ALVO_CANONICO}
+    ausentes = sorted(requeridas.difference(quadro.columns))
+    if ausentes:
+        raise KeyError(f"Colunas do contrato da Base 5 ausentes: {ausentes}")
+    if not 0 < proporcao_treino < 1:
+        raise ValueError("A proporção de treino deve estar entre 0 e 1.")
+    ordenado = quadro.sort_values("DATE", kind="stable").reset_index(drop=True)
+    if ordenado["DATE"].duplicated().any():
+        raise ValueError("As origens da Base 5 devem ser únicas.")
+    corte = int(len(ordenado) * proporcao_treino)
+    treino = ordenado.iloc[:corte].copy()
+    teste = ordenado.iloc[corte:].copy()
+    if treino.empty or teste.empty:
+        raise ValueError("O corte cronológico gerou treino ou teste vazio.")
+    primeira_origem_teste = pd.Timestamp(teste["DATE"].iloc[0])
+    if pd.Timestamp(treino["target_date"].max()) > primeira_origem_teste:
+        raise ValueError("O treino contém alvo ainda não revelado na primeira origem de teste.")
+    if not teste["target_date"].gt(teste["DATE"]).all():
+        raise ValueError("Cada alvo deve ocorrer uma semana após sua origem.")
+    return treino, teste
+
+
+def preparar_modelagem_ouro(
+    dados: pd.DataFrame,
+    regra_semanal: str = REGRA_SEMANAL,
+    proporcao_treino: float = PROPORCAO_TREINO,
+) -> tuple[pd.DataFrame, pd.DataFrame, list[str], pd.DataFrame, pd.DataFrame]:
+    """Produz uma única grade, alvo, lista de features e corte para a Base 5."""
+
+    semanal = preparar_ouro_semanal(dados, regra_semanal)
+    quadro, features = construir_quadro_ouro(semanal)
+    treino, teste = dividir_quadro_ouro(quadro, proporcao_treino)
+    return semanal, quadro, features, treino, teste

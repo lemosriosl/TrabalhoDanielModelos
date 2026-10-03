@@ -34,7 +34,7 @@
 
 **Motivo:** os campos nulos impediam que o projeto fosse auditado sem abrir cada notebook. Preencher somente informações comprovadas centraliza o contrato metodológico, sem transformar candidatos de modelagem em parâmetros definitivos.
 
-**Efeito:** `tarefas.csv` passa a registrar demandas e evidências. Na Base 5, o alvo canônico é o retorno logarítmico da semana seguinte; os notebooks de SARIMAX e Holt-Winters ainda usam preço e devem ser alinhados antes da comparação final dos quatro modelos.
+**Efeito:** `tarefas.csv` passa a registrar demandas e evidências. Na Base 5, o alvo canônico é o retorno logarítmico da semana seguinte; o alinhamento dos quatro modelos foi concluído na decisão específica registrada abaixo.
 
 ## 2026-10-01 - Protocolo estrito de teste walk-forward
 
@@ -51,3 +51,13 @@
 **Motivo:** a janela inicial precisa acomodar simultaneamente lags, janelas móveis e pelo menos dois ciclos da maior sazonalidade candidata. Um único número absoluto não seria coerente entre frequências diária, horária, de dez minutos e semanal.
 
 **Efeito:** as dobras temporais passam a ter um limite inferior explícito; o histórico do teste final permanece expansivo e usa toda a informação disponível no corte de treino.
+
+## 2026-10-02 - Alvo comparável da Base 5
+
+**Decisão:** os quatro modelos finais da Base 5 passam a prever diretamente `target_log_return_t_plus_1`, calculado na grade regular `W-FRI`. Todos recebem o mesmo quadro modelável, o mesmo corte cronológico de 75%/25% e as mesmas 586 origens de teste. Previsões de preço podem ser reconstruídas por `price_t * exp(retorno_previsto)`, mas não substituem o retorno como alvo principal.
+
+**Tratamento das semanas sem nova cotação:** os quatro modelos comparáveis usam a grade semanal completa no tuning, no ajuste e na avaliação principal. Retornos zero decorrentes do último preço conhecido permanecem identificados pelos indicadores de cobertura. O recorte de 523 semanas com nova cotação é apenas uma análise de robustez, nunca o ranking principal.
+
+**Motivo:** SARIMAX e Holt-Winters avaliavam preço em nível, enquanto Random Forest de retorno e XGBoost avaliavam retorno. A divergência impedia comparar MAE, origens e resíduos sob um único protocolo.
+
+**Efeito:** `preparar_modelagem_ouro` centraliza a grade semanal, o alvo, as 49 features e o corte compartilhado. O notebook `RF_preco` permanece somente como análise auxiliar e não participa do ranking final dos quatro modelos.

@@ -38,16 +38,18 @@ def test_random_forest_and_xgboost_refit_at_every_origin():
         ), name
 
 
-def test_base5_random_forests_fit_only_observed_targets_without_feature_leakage():
-    for name in (
-        "base_05-grupo5_RF_preco.ipynb",
-        "base_05-grupo5_RF_retorno.ipynb",
-    ):
-        source = _source(NOTEBOOKS / name)
-        assert "training_df = selecionar_alvos_observados(train_df)" in source, name
-        assert "history = selecionar_alvos_observados(history_all)" in source, name
-        assert "assert 'target_has_new_quote' not in feature_columns" in source, name
-        assert "assert history.target_has_new_quote.eq(1).all()" in source, name
+def test_base5_return_random_forest_uses_complete_canonical_grid():
+    source = _source(NOTEBOOKS / "base_05-grupo5_RF_retorno.ipynb")
+    assert "training_df = train_df.copy()" in source
+    assert "history = history_all" in source
+    assert "assert 'target_has_new_quote' not in feature_columns" in source
+    assert "todas (principal)" in source
+
+
+def test_base5_price_random_forest_keeps_observed_target_filter_as_auxiliary():
+    source = _source(NOTEBOOKS / "base_05-grupo5_RF_preco.ipynb")
+    assert "training_df = selecionar_alvos_observados(train_df)" in source
+    assert "history = selecionar_alvos_observados(history_all)" in source
 
 
 def test_sarimax_final_section_is_one_step_and_updates_state():
@@ -60,7 +62,13 @@ def test_sarimax_final_section_is_one_step_and_updates_state():
         final_source = "".join(notebook["cells"][-1]["source"])
         assert "TESTE FINAL CORRIGIDO" in final_source
         assert "get_forecast(steps=1" in final_source
-        assert "result.append(" in final_source
+        if number == 5:
+            assert "for origin_time, row in df_test.iterrows()" in final_source
+            assert "fit_sarimax_model(" in final_source
+            assert "history = pd.concat(" in final_source
+            assert "validate_prediction_contract" in final_source
+        else:
+            assert "result.append(" in final_source
         assert "KNOWN_AT_ORIGIN_EXOG" in final_source
         assert "validate_prediction_frame" in final_source
 
@@ -71,3 +79,21 @@ def test_holt_winters_keeps_one_step_state_updates():
         assert "prever_um_passo" in source
         assert "atualizar_estado" in source
         assert "caminho_um_passo" in source
+
+
+def test_base5_holt_winters_predicts_canonical_return_directly():
+    source = _source(NOTEBOOKS / "base_05-grupo5_HW.ipynb")
+    assert "TARGET = ALVO_CANONICO" in source
+    assert "y_series = weekly.set_index('DATE').log_return_t" in source
+    assert "predictions['y_pred_return_hw'] = predictions.pred_hw_escala_modelo" in source
+    assert "training_df = train_df.copy()" in source
+    assert "Holt-Winters — todas (principal)" in source
+
+
+def test_base5_sarimax_benchmark_does_not_touch_final_test():
+    notebook = json.loads(
+        (NOTEBOOKS / "base_05-grupo5_SARIMAX.ipynb").read_text(encoding="utf-8")
+    )
+    benchmark_source = "".join(notebook["cells"][10]["source"])
+    assert "benchmark_validation = df_train" in benchmark_source
+    assert "fit_and_forecast(df_train, df_test" not in benchmark_source

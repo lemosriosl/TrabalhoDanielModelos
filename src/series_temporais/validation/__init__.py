@@ -2,6 +2,7 @@
 
 from .temporal_split import purged_time_series_splits
 from .walk_forward import (
+    validate_prediction_contract,
     validate_prediction_frame,
     walk_forward_callback,
     walk_forward_refit,
@@ -9,6 +10,7 @@ from .walk_forward import (
 
 __all__ = [
     "purged_time_series_splits",
+    "validate_prediction_contract",
     "validate_prediction_frame",
     "walk_forward_callback",
     "walk_forward_refit",
