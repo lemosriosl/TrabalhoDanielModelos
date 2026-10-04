@@ -1,5 +1,49 @@
 # Decisões do projeto
 
+## 2026-10-03 - Apresentação científica do relatório
+
+**Decisão:** reduzir títulos internos e usar Poppins seminegrito sem caixa alta; reservar Barlow para a capa. Manter violeta como destaque interno, páginas de altura natural na tela e quebra por seção na impressão. Orientações ficam no modo de edição, mas pendências continuam explícitas em leitura e impressão. Centralizar caminhos de evidência no apêndice com referências curtas no corpo. Não destacar vencedores nem inventar valores na ausência da consolidação.
+
+## 2026-10-03 - Integrantes confirmados e refinamento de leitura
+
+**Decisão:** registrar os seis nomes completos fornecidos pelo usuário em projeto.yaml e no relatório, preservando a associação P1–P6 do planejamento documentado. Refinar tabela da equipe, identificação da capa e espaçamento responsivo sem alterar paleta, responsabilidades ou evidências de execução. A confirmação de nomes não equivale a comprovação de contribuições.
+
+## 2026-10-03 - Preenchimento documental após sincronização
+
+**Decisão:** executar pull fast-forward preservando alterações locais e preencher o relatório com identificação fornecida, configuração vigente e documentação do repositório. O pull informou que main já estava atualizada. Tratar divisão de tarefas como planejamento documentado, não evidência de execução. Usar projeto.yaml e metadata.yaml em preferência a textos antigos que ainda citam horizonte indefinido ou caminhos descontinuados. Não importar métricas/hiperparâmetros finais de documentos antigos: results/metrics.csv ainda não contém linhas de resultados. Documentar separadamente números da Base 5 registrados em sua documentação, sem extrapolar para o ranking das 20 combinações. Preservar gráficos e resultados faltantes como pendentes.
+
+## 2026-10-03 - Retorno à paleta anterior sem decoração figurativa
+
+**Decisão:** a pedido do usuário, restaurar páginas claras, violeta como cor principal e detalhes lima discretos. Remover símbolo da capa, ano decorativo e linha temporal fictícia; preservar títulos Barlow Condensed, pois a mudança solicitada trata de cores e símbolos. Manter somente identificação fornecida, escopo e configurações documentadas; autores, resultados e demais informações desconhecidas continuam como campos pendentes.
+
+## 2026-10-03 - Capa editorial inspirada nas referências
+
+**Decisão:** combinar capa azul-violeta com detalhe lima e ano 2026 na lateral, títulos em Barlow Condensed ExtraBold e caixa alta, preservando páginas internas claras. Incorporar fonte e licença no HTML. A linha da capa é decorativa e não representa resultados. Conferir desktop, celular e impressão sem alterar dados ou metodologia.
+
+## 2026-10-03 - Títulos com maior presença
+
+**Decisão:** substituir Poppins por Archivo Black apenas nos títulos principais (h1 e h2), conforme preferência do usuário por letras mais pesadas e largas. Manter Poppins em subtítulos e Segoe UI no corpo. Incorporar a fonte e sua licença OFL no HTML; verificar quebras de linha no computador e no celular antes da entrega.
+
+## 2026-10-03 - Laboratório editorial
+
+**Decisão:** aplicar o refinamento visual aprovado pelo usuário: Poppins nos títulos, Segoe UI no texto, mais respiro, linha temporal SVG decorativa explicitamente sem dados, fichas uniformes das bases e faixas de principal achado com evidência pendente. Fixar cores e traçados distintos para os quatro modelos nas orientações de gráficos. Não alterar resultados ou metodologia; as demais seções do relatório continuam em construção.
+
+## 2026-10-03 - Identidade violeta e lima do relatório
+
+**Decisão:** a pedido do grupo, aplicar violeta como cor principal, verde-lima em pequenos destaques e superfícies claras para leitura. Incorporar Poppins regular e seminegrito no HTML para manter a tipografia disponível offline, sem requisições externas ao abrir o relatório. Preservar conteúdo, dados e funcionalidades. Regerar o artefato de entrega a partir da fonte.
+
+## 2026-10-03 - Modelo do relatório e publicação privada
+
+**Decisão:** criar uma fonte HTML autocontida em `docs/relatorio/modelo.html`, gerar `entrega/relatorio.html` por código e publicar uma cópia privada pelo Sites. A estrutura segue as 14 seções do enunciado, com fichas para as cinco bases, espaço para as 20 combinações e apêndices identificados como material da entrega ao professor.
+
+**Apresentação:** páginas navegáveis, versão completa para leitura e impressão A4, cores claras com detalhes azuis e tipografia local. Não há dependências de fontes, imagens ou bibliotecas externas. Textos e gráficos pendentes permanecem explicitamente marcados; métricas não homologadas não serão preenchidas.
+
+**Preenchimento:** a edição de textos e inclusão de gráficos ocorre no navegador, sem envio dos arquivos a terceiros. As alterações precisam ser baixadas em um HTML atualizado; não há armazenamento automático nem edição colaborativa. O HTML baixado preserva o conteúdo e funciona offline.
+
+**Limite:** a impressão pode criar páginas adicionais quando os campos forem preenchidos. A versão final deve ter paginação, legibilidade e equivalência HTML/PDF novamente verificadas. A nota da estrutura não equivale à nota do trabalho concluído.
+
+**Pendências preservadas:** identificação do grupo, integrantes e resultados finais dependem de confirmação; não alterar `projeto.yaml` nem os resultados durante esta tarefa.
+
 ## 2026-09-29 - Estrutura enxuta do repositório
 
 **Decisão:** reduzir o contexto obrigatório a `AGENTS.md` e `projeto.yaml`; organizar cada base em `data/base_NN/`; centralizar notebooks em `notebooks/`; separar referências e entrega.

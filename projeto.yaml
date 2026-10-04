@@ -1,12 +1,12 @@
 projeto:
-  grupo: 3H
+  grupo: "Grupo 1 - 3ºH"
   integrantes:
+    - Levy Guilherme Lemos Rios
+    - Pedro Henrique Gomes Frossard
+    - Ruan Pelegrini Lourenço
+    - Giovanne Antony Bahia Torquato
+    - Mayumi Shimizu Castiglioni
     - Matheus Bastos Castilho
-    - Mayumi Shimizu
-    - Levy
-    - Pedro Gomes Frossard
-    - Ruan Lourenço
-    - Giovane Torquato
   modelo_especializacao: xgboost
   semente: 42
 
