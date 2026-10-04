@@ -24,6 +24,13 @@ validacao:
     base_05: 104
   passo: 1
   janela: expansiva
+  # Cadência exclusiva do XGBoost; não altera os demais modelos.
+  intervalo_retreino_xgboost_por_base:
+    base_01: 7
+    base_02: 24
+    base_03: 24
+    base_04: 144
+    base_05: 4
   metrica_principal: MAE
 
 modelos_comuns:

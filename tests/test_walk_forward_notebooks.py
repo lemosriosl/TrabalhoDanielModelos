@@ -22,7 +22,7 @@ def test_all_model_notebooks_are_valid_json():
         json.loads(notebook.read_text(encoding="utf-8"))
 
 
-def test_random_forest_and_xgboost_refit_at_every_origin():
+def test_random_forest_keeps_remote_refit_and_xgboost_has_its_own_cadence():
     names = [
         *(f"base_{number:02d}-grupo{number}_RF.ipynb" for number in range(1, 5)),
         "base_05-grupo5_RF_preco.ipynb",
@@ -31,7 +31,9 @@ def test_random_forest_and_xgboost_refit_at_every_origin():
     ]
     for name in names:
         source = _source(NOTEBOOKS / name)
-        assert "refit_every = 1" in source or "REFIT_EVERY = 1" in source, name
+        number = int(name[5:7])
+        interval = {1: 7, 2: 24, 3: 24, 4: 144, 5: 4}[number] if "XGBoost" in name else 1
+        assert f"refit_every = {interval}\n" in source or f"REFIT_EVERY = {interval}\n" in source, name
         assert "training_target_cutoff" in source, name
         assert (
             "training_target_cutoff <=" in source or "cutoff <= refit_origin" in source

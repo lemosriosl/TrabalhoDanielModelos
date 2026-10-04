@@ -1,10 +1,10 @@
 # Dicionário de variáveis externas — Base 5 (ouro semanal)
 
-**Arquivo-alvo:** `grupo5.csv`
+**Arquivo-alvo:** `data/base_05/raw.csv`
 
 **Série modelada:** último estado conhecido por semana (`W-FRI`)
 
-**Alvo:** retorno logarítmico da semana seguinte
+**Alvo canônico atual:** retorno logarítmico da semana seguinte (`target_log_return_t_plus_1`), conforme a preparação compartilhada incorporada de `origin/main` no commit `248fcb5`.
 
 **Período semanal:** 1968-05-03 a 2014-04-11
 
@@ -12,12 +12,13 @@
 
 | ID | Coluna | Interpretação | Disponibilidade adotada | Uso |
 |---|---|---|---|---|
-| G5_TREASURY_10Y | `TREASURY_10Y` | Taxa nominal de Treasury de 10 anos | Considerada conhecida na data da linha; em semana vazia permanece o último valor conhecido | Nível atual, variação semanal e lags 1, 4 e 13 |
-| G5_FED_FUNDS | `FED_FUNDS_RATE` | Taxa Fed Funds | Considerada conhecida na data da linha; em semana vazia permanece o último valor conhecido | Nível atual, variação semanal e lags 1, 4 e 13 |
+| G5_TREASURY_10Y | `TREASURY_10Y` | FRED DGS10; Treasury de vencimento constante de 10 anos, percentual | Já defasada uma observação do calendário original do ouro após ffill; última taxa datada até a origem semanal | Nível atual, variação semanal e lags 1, 4 e 13 |
+| G5_FED_FUNDS | `FED_FUNDS_RATE` | FRED DFF; taxa efetiva de federal funds, percentual | Já defasada uma observação do calendário original do ouro após ffill; última taxa datada até a origem semanal | Nível atual, variação semanal e lags 1, 4 e 13 |
 
-A fonte primária, unidade, convenção, revisões e horário de publicação não
-estão declarados no CSV. A hipótese de disponibilidade deve ser confirmada
-antes de uma entrega que exija rastreabilidade econômica estrita.
+A auditoria de 2026-10-03 comprovou fonte identificada, unidade e transformação
+por coincidência nas 9.864 linhas com a origem versionada. Horários históricos
+de publicação, fuso da origem e revisões/vintages ainda precisam de confirmação.
+Evidências e limites estão em [auditoria_taxas_base5.md](auditoria_taxas_base5.md).
 
 ## Demais colunas do arquivo
 

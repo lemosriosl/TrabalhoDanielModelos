@@ -1,5 +1,15 @@
 # Decisões do projeto
 
+## 2026-10-04 - Entrega restrita ao XGBoost
+
+**Responsável e status:** Codex, a pedido de Giovanne; entrega separada e revisada. Após a revisão dos 25 arquivos e aprovação dos 103 testes, Giovanne autorizou commit no padrão histórico e push normal da branch `codex/xgboost-base5-price`, sem merge na main.
+
+**Decisão:** integrar `origin/main` até `adb8e6d` por fast-forward e preservar a extração remota de métricas RF. A entrega local contém apenas XGBoost, auxiliares reutilizáveis, testes, documentação e `results/metrics.csv` gerado por código. Notebooks RF, SARIMAX e Holt-Winters permanecem idênticos ao remoto. Alterações e reexecuções RF foram preservadas no stash de segurança `backup antes de separar entrega XGBoost dos RF 2026-10-04` e não fazem parte desta entrega.
+
+**Protocolo:** registrar 7/24/24/144/4 origens de reajuste exclusivamente em `intervalo_retreino_xgboost_por_base`. Não impor essa cadência ao RF nem exigir sua reexecução. Comparações finais devem conferir alvos, origens e horizonte e declarar as diferentes cadências de reajuste. Testes XGBoost não dependem de alterações em notebooks de outra pessoa.
+
+**Artefatos:** preservar os resultados XGBoost existentes, os dados brutos e o `.gitignore`. CSVs completos de resíduos permanecem locais/ignorados; o consolidado versionável é `results/metrics.csv`. A publicação automática está pausada. O processo RF antigo não integra esta entrega; seu verificador de alterações concorrentes impede substituir o notebook restaurado, preservando o resultado em diretório temporário caso termine.
+
 ## 2026-10-04 - Reaproveitamento auditável das execuções do remoto
 
 **Decisão:** extrair por código as métricas e evidências já executadas em `origin/main`, identificando commit e notebook de origem. Esses artefatos permanecem separados de `results/metrics.csv` até que os quatro modelos de cada base sejam extraídos sob o mesmo critério.
@@ -7,6 +17,47 @@
 **Motivo:** os notebooks de Random Forest no remoto foram executados sem erros, mas suas métricas não foram exportadas para o consolidado. Reexecutá-los localmente com reajuste por origem tornou a finalização inviável dentro do prazo.
 
 **Efeito:** não são inventados nem editados valores manualmente. As métricas extraídas preservam seu protocolo original e só entram em ranking após a verificação de compatibilidade de alvo, horizonte e origens com SARIMAX, Holt-Winters e XGBoost.
+## 2026-10-04 - Isolamento dos checkpoints XGBoost
+
+**Responsável e status:** Codex, a pedido de Giovanne; implementação concluída e validada nos quadros reais das cinco bases.
+
+**Decisão:** identificar os checkpoints XGBoost pelo quadro efetivamente usado no tuning (features, alvo, origens, instantes dos alvos e tipos), protocolo, sementes, versões das bibliotecas e código metodológico. Alterações em Markdown ou saídas não invalidam a busca; alterações na preparação, no alvo ou na validação invalidam. Não migrar automaticamente checkpoints antigos sem esse contrato e não alterar as previsões XGBoost já executadas.
+
+**Entrega:** manter o `.gitignore` e os CSVs de resíduos ignorados, conforme solicitado. Não fazer commit nem push nesta demanda.
+
+## 2026-10-04 - Documentação final e reconsolidação pós-execução
+
+**Responsável e status:** Codex; atualizar o estudo com as cinco execuções completas realizadas por Giovanne e reconsolidar a tabela da Base 5 após a reexecução das Bases 1–3. Não ajustar novos modelos nem escolher parâmetros pelo teste.
+
+**Evidência:** `results/metrics.csv`, CSVs individuais e saídas salvas dos notebooks. Registrar três vitórias no MAE contra persistência, duas derrotas marginais, resíduos ainda autocorrelacionados e tempos separados de tuning e avaliação. Atualizar apenas a saída da comparação global da Base 5 por código, preservando suas previsões, métricas locais, parâmetros e gráficos.
+
+## 2026-10-04 - Consolidar métricas XGBoost sem novo treinamento
+
+**Responsável e status:** Codex; consolidação das cinco execuções completas solicitada por Giovanne.
+
+**Decisão:** gerar as cinco linhas XGBoost em `results/metrics.csv` pelos CSVs individuais e resumos registrados das execuções. Conferir MAE, hash do dado, quantidade de origens, causalidade e cadência antes de gravar; preservar linhas de outros modelos. Integrar a mesma exportação aos notebooks para execuções futuras.
+
+**Sem extrapolação:** posição e vencedor ficam ausentes até a comparação final dos quatro modelos. MAPE fica ausente para retorno logarítmico e para séries com zeros; nas demais bases é percentual. Tempo registrado é a soma dos tempos de ajuste do tuning e avaliação, não o tempo de parede da chamada que reutilizou checkpoints. Registrar parâmetros do estimador e cadência separadamente no JSON de hiperparâmetros. O campo commit recebe o HEAD mais `+dirty` quando existem mudanças locais.
+
+## 2026-10-04 - Exportação de resíduos da Base 5 em retorno
+
+**Responsável e status:** Codex; exportador adaptado ao contrato remoto, execução final a cargo de Giovanne.
+
+**Decisão:** salvar todas as previsões em `results/residuals/base_05_XGBoost.csv`, com retorno real e previsto, persistência de retorno zero, preços convertidos, resíduos nas duas escalas, cobertura e cortes de treino. Validar causalidade incluindo a origem do reajuste, identidade dos resíduos, conversão `price_t * exp(retorno)`, quantidade de linhas e finitude antes da gravação. O modo reduzido usa arquivo separado. Preservar entrada e não alterar treino, alvo ou métricas.
+
+## 2026-10-04 - Retreinamento periódico do XGBoost
+
+**Responsável e status:** Codex; implementação autorizada por Giovanne, cinco XGBoosts reexecutados e consolidados.
+
+**Decisão:** separar frequência de previsão da frequência de ajuste. XGBoost continua prevendo um passo em todas as origens, com features atualizadas em cada origem e hiperparâmetros congelados. Reajustar a cada 7 origens na Base 1, 24 nas Bases 2–3, 144 na Base 4 e 4 na Base 5. A janela de treino continua expansiva e só recebe alvos revelados até a origem do reajuste.
+
+**Motivo:** o reajuste por origem na Base 4 implica 82.830 treinamentos completos. A cadência operacional diária reduz esse total para 576, sem eliminar origens de avaliação. As cadências foram fixadas por custo/frequência dos dados, não por resultados do teste; não são uma otimização comprovada e podem ser estudadas posteriormente apenas dentro do treino.
+
+**Consistência:** RF, SARIMAX e Holt-Winters preservam seus procedimentos remotos. O protocolo comum exige alvo, horizonte, origens e informação disponível equivalentes, não algoritmos de ajuste idênticos. As cadências diferentes devem ser declaradas na comparação final.
+
+**Efeito:** esta decisão substitui a obrigação anterior de refit a cada origem apenas para XGBoost. Busca de 150 candidatos, purga, alvos e divisões não são alterados nesta demanda. Reexecutar RF não é requisito para concluir o pacote XGBoost.
+
+**Atualização remota:** integrado `origin/main` até `2b06f5b`, incluindo preparação, relatório e registros de execução. Alterações locais preservadas em stash antes da integração. O remoto removeu `tarefas.csv`; o acompanhamento desta demanda fica registrado aqui.
 
 ## 2026-10-03 - Apresentação científica do relatório
 

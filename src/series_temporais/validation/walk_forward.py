@@ -49,14 +49,17 @@ def walk_forward_refit(
     target_col: str,
     feature_cols: Sequence[str],
     estimator_factory: Callable[[], Any],
+    refit_every: int = 1,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Reajusta um estimador em cada origem e prevê somente um passo.
+    """Reajusta periodicamente e prevê um passo com as features de cada origem.
 
     ``estimator_factory`` deve devolver um estimador novo com ``fit`` e
     ``predict``. Os hiperparâmetros pertencem à fábrica e, portanto, precisam
     ser definidos antes desta função ser chamada.
     """
 
+    if isinstance(refit_every, bool) or not isinstance(refit_every, (int, np.integer)) or refit_every < 1:
+        raise ValueError("refit_every deve ser um inteiro positivo.")
     train, test = _validate_frames(
         train,
         test,
@@ -70,14 +73,21 @@ def walk_forward_refit(
 
     for position, (_, row) in enumerate(test.iterrows()):
         origin = row[origin_col]
-        revealed = test.loc[test[target_time_col] <= origin]
-        history = pd.concat([train, revealed], ignore_index=True)
-        cutoff = history[target_time_col].max()
-        if not cutoff <= origin:
-            raise AssertionError("O histórico contém alvo posterior à origem da previsão.")
-
-        estimator = estimator_factory()
-        estimator.fit(history.loc[:, feature_cols], history[target_col])
+        if position % refit_every == 0:
+            revealed = test.loc[test[target_time_col] <= origin]
+            history = pd.concat([train, revealed], ignore_index=True)
+            cutoff = history[target_time_col].max()
+            if not cutoff <= origin:
+                raise AssertionError("O histórico contém alvo posterior à origem da previsão.")
+            estimator = estimator_factory()
+            estimator.fit(history.loc[:, feature_cols], history[target_col])
+            refit_origin = origin
+            fits.append({
+                "model_refit_origin": origin,
+                "training_target_cutoff": cutoff,
+                "training_rows": len(history),
+                "test_position": position,
+            })
         value = float(np.asarray(estimator.predict(row.loc[feature_cols].to_frame().T))[0])
         if not np.isfinite(value):
             raise ValueError("A previsão deve ser finita.")
@@ -88,15 +98,8 @@ def walk_forward_refit(
                 "target_time": row[target_time_col],
                 "y_true": float(row[target_col]),
                 "y_pred": value,
+                "model_refit_origin": refit_origin,
                 "training_target_cutoff": cutoff,
-            }
-        )
-        fits.append(
-            {
-                "model_refit_origin": origin,
-                "training_target_cutoff": cutoff,
-                "training_rows": len(history),
-                "test_position": position,
             }
         )
 

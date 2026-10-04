@@ -69,6 +69,50 @@ def test_callback_walk_forward_receives_only_past_history():
     assert predictions.y_pred.tolist() == [3.0, 4.0, 5.0]
 
 
+@pytest.mark.parametrize("interval,expected_fits", [(1, 3), (2, 2), (10, 1)])
+def test_periodic_refit_preserves_all_origins(interval, expected_fits):
+    train, test = _frames()
+    predictions, fits = walk_forward_refit(
+        train, test, origin_col="origin", target_time_col="target_time",
+        target_col="y", feature_cols=["x"], estimator_factory=LastValueRegressor,
+        refit_every=interval,
+    )
+    assert len(predictions) == len(test)
+    assert len(fits) == expected_fits
+    assert predictions.origin_time.tolist() == test.origin.tolist()
+    assert predictions.target_time.tolist() == test.target_time.tolist()
+    assert (predictions.training_target_cutoff <= predictions.model_refit_origin).all()
+    assert (predictions.model_refit_origin <= predictions.origin_time).all()
+    if interval == 2:
+        assert predictions.y_pred.tolist() == [3.0, 3.0, 5.0]
+        assert fits.training_rows.tolist() == [3, 5]
+
+
+@pytest.mark.parametrize("interval", [0, -1, 1.5, True])
+def test_periodic_refit_rejects_invalid_interval(interval):
+    train, test = _frames()
+    with pytest.raises(ValueError, match="inteiro positivo"):
+        walk_forward_refit(
+            train, test, origin_col="origin", target_time_col="target_time",
+            target_col="y", feature_cols=["x"], estimator_factory=LastValueRegressor,
+            refit_every=interval,
+        )
+
+
+def test_periodic_refit_uses_current_features_not_recursive_predictions():
+    class FeatureRegressor(LastValueRegressor):
+        def predict(self, x):
+            return np.asarray(x["x"], dtype=float) + self.last_target
+    train, test = _frames()
+    predictions, fits = walk_forward_refit(
+        train, test, origin_col="origin", target_time_col="target_time",
+        target_col="y", feature_cols=["x"], estimator_factory=FeatureRegressor,
+        refit_every=2,
+    )
+    assert predictions.y_pred.tolist() == [16.0, 17.0, 20.0]
+    assert len(fits) == 2
+
+
 def test_walk_forward_rejects_training_target_at_test_origin():
     train, test = _frames()
     train.loc[train.index[-1], "target_time"] = test.origin.iloc[0] + pd.Timedelta(days=1)
