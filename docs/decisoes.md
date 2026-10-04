@@ -1,5 +1,13 @@
 # Decisões do projeto
 
+## 2026-10-04 - Reaproveitamento auditável das execuções do remoto
+
+**Decisão:** extrair por código as métricas e evidências já executadas em `origin/main`, identificando commit e notebook de origem. Esses artefatos permanecem separados de `results/metrics.csv` até que os quatro modelos de cada base sejam extraídos sob o mesmo critério.
+
+**Motivo:** os notebooks de Random Forest no remoto foram executados sem erros, mas suas métricas não foram exportadas para o consolidado. Reexecutá-los localmente com reajuste por origem tornou a finalização inviável dentro do prazo.
+
+**Efeito:** não são inventados nem editados valores manualmente. As métricas extraídas preservam seu protocolo original e só entram em ranking após a verificação de compatibilidade de alvo, horizonte e origens com SARIMAX, Holt-Winters e XGBoost.
+
 ## 2026-10-03 - Apresentação científica do relatório
 
 **Decisão:** reduzir títulos internos e usar Poppins seminegrito sem caixa alta; reservar Barlow para a capa. Manter violeta como destaque interno, páginas de altura natural na tela e quebra por seção na impressão. Orientações ficam no modo de edição, mas pendências continuam explícitas em leitura e impressão. Centralizar caminhos de evidência no apêndice com referências curtas no corpo. Não destacar vencedores nem inventar valores na ausência da consolidação.
