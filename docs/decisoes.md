@@ -252,3 +252,18 @@
 **Comparação dos quatro modelos:** explicar diferenças de preparação, janelas de features, covariáveis e frequência de reajuste como contribuintes plausíveis para amostras e custos distintos, sem alegar que cada diferença de contagem foi causalmente decomposta. Usar MAEs dos notebooks remotos para Random Forest; as saídas das Bases 1–4 registram oito blocos de reajuste, enquanto a Base 5 usa reajuste por origem. Desconsiderar os CSVs locais conflitantes de RF no relatório. A alteração posterior do código das Bases 1–4 para reajuste por origem não reexecutou as saídas salvas. Mostrar valores individuais e comparações pareadas verificadas, mas não converter números de origens diferentes em ranking, vitórias ou posição média homologados.
 
 **Diagnósticos e entrega:** gerar gráficos residuais finais SARIMAX apenas dos CSVs completos disponíveis para as Bases 1, 2, 3 e 5, filtrando horizonte de um passo; não apresentar gráficos de ajuste/in-sample dos notebooks como resíduos finais. O acompanhamento de tarefas fornecido pelo grupo será tratado como registro administrativo externo; sua validação diária e inclusão no pacote ficam para revisão com o professor, conforme pedido do grupo.
+## 2026-10-04 - Execução rápida provisória do SARIMAX
+
+**Decisão:** manter os cinco notebooks SARIMAX oficiais inalterados e criar uma execução rápida separada. A variante rápida usa uma grade curta de ordens não sazonais, representa a sazonalidade por defasagem causal do alvo e calendário, escolhe os parâmetros somente em dobras internas do treino, ajusta o modelo uma vez sobre toda a partição inicial e atualiza o estado a cada observação revelada sem reestimar os coeficientes.
+
+**Motivo:** a grade oficial contém centenas de milhares de ajustes por base e o reajuste em cada origem torna inviável obter resultados completos dentro da janela disponível. A atualização de estado preserva causalidade, horizonte de um passo e todas as origens do recorte SARIMAX, entregando uma aproximação útil em minutos, sem se passar pelo protocolo final.
+
+**Efeito:** as métricas rápidas ficam em `results/sarimax_fast_metrics.csv` e não entram em `results/metrics.csv` nem no ranking oficial. Elas só podem ser comparadas como estimativa provisória; a cadência de ajuste difere do protocolo estrito de reestimação em cada origem.
+
+## 2026-10-05 - Ranking descritivo com bloqueio de homologação
+
+**Decisão:** gerar por código um ranking descritivo dentro de cada base a partir de `metricas_individuais_auditadas.csv`. Ordenar pelo MAE de horizonte de um passo quando esse recorte estiver disponível, registrar vencedor por base, número de vitórias e posição média. Não calcular média bruta de MAEs entre bases.
+
+**Limite:** o ranking mantém `comparacao_homologada=false` e registra o motivo em cada linha. As origens dos quatro modelos não coincidem nas Bases 1–4 e a Base 4 não possui SARIMAX oficial final. Na Base 5, contagens iguais ainda não comprovam pareamento exato de RF e XGBoost porque faltam previsões completas por origem.
+
+**Efeito:** `results/ranking_descritivo_modelos.csv` apresenta vencedores provisórios e um vencedor geral descritivo por vitórias, com desempate por posição média e exigência de cobertura nas cinco bases. O SARIMAX rápido permanece separado e não substitui resultados oficiais ausentes.
