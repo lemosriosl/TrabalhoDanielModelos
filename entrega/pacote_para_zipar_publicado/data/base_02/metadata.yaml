@@ -1,0 +1,16 @@
+id: base_02
+raw_file: raw.csv
+prepared_file: prepared.csv
+train_file: train.csv
+test_file: test.csv
+target: traffic_volume
+time_column: date_time
+frequency: h
+seasonal_period: null
+seasonal_period_candidates: [24, 168]
+horizon_steps: 1
+random_state: 42
+train_ratio: 0.80
+documentation: documentacao.md
+feature_catalog: catalogo_features_base2.csv
+external_availability: disponibilidade_covariaveis_base2.csv

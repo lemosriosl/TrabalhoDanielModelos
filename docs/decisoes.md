@@ -13,6 +13,11 @@
 **Reprodução:** reutilizar os CSVs completos locais e conferir quantidade de previsões, MAE do consolidado e causalidade antes de gerar a figura. Salvar a imagem nas saídas do notebook por execução somente da nova célula; não executar tuning, walk-forward ou consolidação de métricas. Em execução integral futura, usar o quadro em memória e distinguir o modo reduzido. CSVs continuam ignorados; não alterar `.gitignore`. A geração dos gráficos não inclui treinamento nem publicação no remoto.
 
 **Verificação:** as cinco células de gráfico foram executadas isoladamente, com 842/3372/2847/82830/586 resíduos e uma imagem incorporada por notebook. Células de código e saídas anteriores permaneceram intactas; `results/metrics.csv`, raw e `.gitignore` não mudaram. Os testes dos gráficos passaram e `git diff --check` não apontou erros. O executor temporário foi removido; os únicos avisos foram de compatibilidade de bibliotecas do ambiente, sem erro salvo nas novas células.
+## 2026-10-05 - Pacote estrito conforme o enunciado
+
+**Decisão:** a pasta versionada `entrega/pacote_para_zipar_publicado/` conterá somente as categorias solicitadas na seção de entrega do enunciado: PDF e HTML do relatório, fonte do relatório, código da análise, cinco bases brutas com metadados necessários, resultados por MAE e registro de demandas fornecido pelo grupo. Arquivos de testes, documentação interna, versões antigas do relatório, notebooks auxiliares não usados e resultados descritivos posteriores ao relatório ficam no repositório, fora do pacote. O PDF de acompanhamento recebido em 05/10/2026 será copiado sem alterar seu conteúdo.
+
+**Limite:** o acompanhamento possui datas, responsáveis, esforço, complexidade e status, mas não comprova por si só uma linha de execução para cada dia nem substitui a validação humana. O SARIMAX rápido acrescentado no remoto após o relatório não será confundido com a avaliação extensa da Base 4; seu ranking descritivo não entra no arquivo consolidado do pacote. A simplificação da pasta não altera as ressalvas metodológicas nem produz o ZIP de envio.
 
 ## 2026-10-04 - Entrega v2 com resultados descritivos e limites de comparação
 
@@ -246,3 +251,38 @@
 **Fonte da Base 4:** a tabela de `data/base_04/raw.csv` foi comparada célula por célula com `jena_climate_2009_2016.csv` da distribuição TensorFlow/Keras: 420.551 linhas, 15 colunas e nenhum valor diferente. A serialização em bytes não é igual. A referência do conjunto fica documentada, sem presumir a data original de download do grupo.
 
 **Horizonte SARIMAX:** os CSVs completos das Bases 2 e 3 contêm, respectivamente, 14 e 53 previsões cujo alvo não está exatamente uma hora após a origem. Os MAEs originais (574,980677 e 10,439642) misturam horizontes. A tabela auditada preserva esses valores como registro bruto e acrescenta MAE calculado somente nas 7.584 e 6.771 previsões de um passo (574,086284 e 10,369544). Ljung–Box foi recalculado nesse mesmo recorte. Nenhum arquivo bruto ou CSV original de previsões foi alterado. A correção definitiva exige alinhar a execução SARIMAX à grade temporal canônica; a filtragem não resolve a amostra diferente dos demais modelos.
+
+## 2026-10-05 - Triagem sem reexecutar modelos e pré-entrega
+
+**Decisão:** preservar as 19 avaliações individuais como evidências descritivas e não apresentar ranking, vitórias, posição média ou vencedor dos quatro modelos. A divergência de origens, os horizontes SARIMAX inválidos e a contradição entre CSV e notebook de RF não podem ser eliminados por justificativa textual. Uma comparação pareada, estritamente exploratória, será gerada por código apenas para Holt-Winters e SARIMAX nas origens com instante-alvo e valor real idênticos; ela não substitui a comparação dos quatro modelos exigida pelo enunciado.
+
+**Entrega:** manter relatório HTML e PDF com conteúdo equivalente e preparar uma pasta local para ZIP por script, contendo fontes do relatório, código, notebooks, dados brutos, resultados auditados e um manifesto de pendências. Não criar registro diário fictício nem rotular o consolidado parcial como final. A pasta gerada será ignorada pelo Git para não duplicar bases e notebooks no histórico; o script e os documentos de orientação serão versionados. O ZIP não será produzido automaticamente enquanto faltar o registro diário real e a revisão humana da entrega parcial.
+
+**Figuras recuperadas:** incorporar STL, resíduos e ACF de Holt-Winters/Random Forest, painéis XGBoost e importância Random Forest diretamente das saídas PNG salvas nos notebooks. Na Base 5, as figuras residuais e ACF de Holt-Winters/Random Forest representam o subconjunto de robustez de 523 cotações novas; o MAE principal permanece referente a 586 origens. O Ljung–Box Random Forest da Base 5 também vem desse subconjunto, e sua contagem deve ser identificada como 523. Não apresentar esses painéis como diagnósticos integrais do teste principal nem atribuir a SARIMAX gráficos de quatro origens do modo reduzido.
+
+## 2026-10-05 - Publicação da pasta de pré-entrega no Git
+
+**Decisão estrutural:** a pedido do grupo, versionar uma única pasta de pré-entrega em `entrega/pacote_para_zipar_publicado/`, sem criar arquivo ZIP. As montagens locais anteriores permanecem ignoradas. O manifesto de hashes e o aviso de pendências acompanham a pasta versionada; sua presença no remoto não altera o status metodológico incompleto nem supre o registro diário ausente.
+
+## 2026-10-05 - Enquadramento da pipe rápida e comparação descritiva
+
+**Decisão metodológica:** descrever a pipe rápida SARIMAX como um protocolo operacional de busca e teste reduzidos aplicado nos notebooks das cinco bases; os notebooks mostram quatro origens no walk-forward salvo. Isso permite comparar a estrutura do procedimento, não os MAEs brutos entre bases com unidades diferentes nem substituir a avaliação final. Os CSVs mais extensos das Bases 1, 2, 3 e 5 foram produzidos depois por código com configuração congelada do notebook; a Base 4 não possui avaliação extensa por custo computacional. Nas Bases 2 e 3, os desvios de horizonte foram encontrados nesses CSVs posteriores, não apenas na saída smoke.
+
+**Comparação dos quatro modelos:** explicar diferenças de preparação, janelas de features, covariáveis e frequência de reajuste como contribuintes plausíveis para amostras e custos distintos, sem alegar que cada diferença de contagem foi causalmente decomposta. Usar MAEs dos notebooks remotos para Random Forest; as saídas das Bases 1–4 registram oito blocos de reajuste, enquanto a Base 5 usa reajuste por origem. Desconsiderar os CSVs locais conflitantes de RF no relatório. A alteração posterior do código das Bases 1–4 para reajuste por origem não reexecutou as saídas salvas. Mostrar valores individuais e comparações pareadas verificadas, mas não converter números de origens diferentes em ranking, vitórias ou posição média homologados.
+
+**Diagnósticos e entrega:** gerar gráficos residuais finais SARIMAX apenas dos CSVs completos disponíveis para as Bases 1, 2, 3 e 5, filtrando horizonte de um passo; não apresentar gráficos de ajuste/in-sample dos notebooks como resíduos finais. O acompanhamento de tarefas fornecido pelo grupo será tratado como registro administrativo externo; sua validação diária e inclusão no pacote ficam para revisão com o professor, conforme pedido do grupo.
+## 2026-10-04 - Execução rápida provisória do SARIMAX
+
+**Decisão:** manter os cinco notebooks SARIMAX oficiais inalterados e criar uma execução rápida separada. A variante rápida usa uma grade curta de ordens não sazonais, representa a sazonalidade por defasagem causal do alvo e calendário, escolhe os parâmetros somente em dobras internas do treino, ajusta o modelo uma vez sobre toda a partição inicial e atualiza o estado a cada observação revelada sem reestimar os coeficientes.
+
+**Motivo:** a grade oficial contém centenas de milhares de ajustes por base e o reajuste em cada origem torna inviável obter resultados completos dentro da janela disponível. A atualização de estado preserva causalidade, horizonte de um passo e todas as origens do recorte SARIMAX, entregando uma aproximação útil em minutos, sem se passar pelo protocolo final.
+
+**Efeito:** as métricas rápidas ficam em `results/sarimax_fast_metrics.csv` e não entram em `results/metrics.csv` nem no ranking oficial. Elas só podem ser comparadas como estimativa provisória; a cadência de ajuste difere do protocolo estrito de reestimação em cada origem.
+
+## 2026-10-05 - Ranking descritivo com bloqueio de homologação
+
+**Decisão:** gerar por código um ranking descritivo dentro de cada base a partir de `metricas_individuais_auditadas.csv`. Ordenar pelo MAE de horizonte de um passo quando esse recorte estiver disponível, registrar vencedor por base, número de vitórias e posição média. Não calcular média bruta de MAEs entre bases.
+
+**Limite:** o ranking mantém `comparacao_homologada=false` e registra o motivo em cada linha. As origens dos quatro modelos não coincidem nas Bases 1–4 e a Base 4 não possui SARIMAX oficial final. Na Base 5, contagens iguais ainda não comprovam pareamento exato de RF e XGBoost porque faltam previsões completas por origem.
+
+**Efeito:** `results/ranking_descritivo_modelos.csv` apresenta vencedores provisórios e um vencedor geral descritivo por vitórias, com desempate por posição média e exigência de cobertura nas cinco bases. O SARIMAX rápido permanece separado e não substitui resultados oficiais ausentes.

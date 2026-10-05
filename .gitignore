@@ -40,4 +40,6 @@ report/html/**
 report/pdf/**
 !report/pdf/.gitkeep
 entrega/*.zip
+entrega/pacote_para_zipar/
+entrega/pacote_para_zipar_revisado/
 

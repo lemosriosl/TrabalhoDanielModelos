@@ -62,3 +62,18 @@ CSV completo. Nas Bases 2 e 3, o SARIMAX possui respectivamente 14 e 53
 linhas cujo alvo fica mais de uma hora após a origem; por isso, seu MAE bruto
 mistura horizontes. O relatório usa somente as linhas de uma hora para esses
 dois MAEs e para o Ljung–Box, sem alterar os CSVs originais.
+### SARIMAX rápido provisório
+
+`sarimax_fast_metrics.csv` é um consolidado provisório separado. Ele usa busca
+curta, ajuste único no treino inicial e atualização de estado sem reestimar os
+coeficientes em cada origem. Serve para obter uma referência rápida e plausível,
+mas não deve ser misturado ao ranking oficial de `metrics.csv`.
+
+### Ranking descritivo
+
+`ranking_descritivo_modelos.csv` ordena os MAEs apenas dentro de cada base,
+marca o vencedor descritivo por base e resume vitórias e posição média. Quando
+disponível, usa o MAE filtrado para horizonte de um passo. O arquivo não calcula
+média de MAEs entre bases e mantém `comparacao_homologada=false`, pois as origens
+dos quatro modelos ainda não são equivalentes. Na Base 4, o SARIMAX oficial
+permanece ausente; o resultado rápido não é usado para preencher essa lacuna.
