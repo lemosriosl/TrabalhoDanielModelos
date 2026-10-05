@@ -1,5 +1,16 @@
 # Base 4 - Clima de Jena
 
+## Proveniência verificada em 2026-10-04
+
+O conteúdo tabular de `data/base_04/raw.csv` coincide integralmente com
+`jena_climate_2009_2016.csv` disponibilizado no [exemplo oficial da Keras](https://keras.io/examples/timeseries/timeseries_weather_forecasting/)
+e hospedado em [TensorFlow/Keras](https://storage.googleapis.com/tensorflow/tf-keras-datasets/jena_climate_2009_2016.csv.zip).
+Foram comparadas as 420.551 linhas e as 15 colunas, sem diferença de valores.
+Os arquivos não são idênticos em bytes: o CSV local usa serialização distinta
+(aspas e quebras de linha). Isso verifica a equivalência dos dados, não a data
+nem o caminho exato da transferência original feita pelo grupo. A Keras atribui
+as observações à estação do Max Planck Institute for Biogeochemistry em Jena.
+
 
 ## 1. Identificacao da base
 
@@ -8,13 +19,13 @@
 |---|---|
 | Nome no projeto | Grupo 4 |
 | Arquivo | `trabalho/bases/grupo4/grupo4.csv` |
-| Fonte/conjunto reconhecido | Serie meteorologica de Jena, conhecida como Jena Climate |
+| Fonte/conjunto reconhecido | Jena Climate, Max Planck Institute for Biogeochemistry; cópia tabular equivalente à distribuição TensorFlow/Keras indicada acima |
 | Tipo de dado | Serie temporal meteorologica multivariada |
 | Frequencia nominal | 10 minutos |
 | Periodo observado | 2009-01-01 00:10:00 a 2017-01-01 00:00:00 |
 | Quantidade de linhas | 420.551 |
 | Quantidade de colunas | 15, incluindo a data |
-| Localidade | Estacao meteorologica em Jena, Alemanha; confirmar a referencia original na entrega |
+| Localidade | Estação meteorológica do Max Planck Institute for Biogeochemistry em Jena, Alemanha; equivalência tabular com a distribuição TensorFlow/Keras verificada acima |
 
 
 O arquivo contem varias variaveis meteorologicas medidas no mesmo instante. Para o Holt-Winters, deve ser escolhida uma unica coluna-alvo, mantendo o modelo univariado.
@@ -149,7 +160,7 @@ O periodo escolhido nao deve ser definido somente pelo maior valor de forca da s
 - Uma sazonalidade anual em dados de 10 minutos gera um periodo muito extenso para Holt-Winters.
 - A direcao do vento e uma variavel circular; nao deve ser tratada como uma temperatura ou uma escala linear comum.
 - As variaveis meteorologicas sao relacionadas, mas o Holt-Winters permanece univariado; utilizar as demais colunas mudaria o modelo e o protocolo.
-- A fonte e a unidade devem ser confirmadas na documentacao final do projeto.
+- A unidade do alvo é °C e a equivalência tabular com a distribuição TensorFlow/Keras foi verificada; ainda não há registro da data da transferência original pelo grupo.
 
 
 ## 8. Checklist antes da entrega

@@ -8,3 +8,10 @@
   .audit-mobile-hint{display:none;color:#52657b;font-size:14px}
   @media(max-width:700px){.audit-mobile-hint{display:block}}
   @media print{.audit-note{break-inside:avoid}}
+  @media print{
+    .page,.page:not(:first-child){break-before:auto!important;break-after:auto!important;min-height:0!important;display:block!important;overflow:visible!important}
+    .page.cover{break-after:page!important}
+    .page-top{break-after:avoid-page}
+    .page-foot{display:none!important}
+    .audit-figure img{max-height:52mm!important}
+  }
