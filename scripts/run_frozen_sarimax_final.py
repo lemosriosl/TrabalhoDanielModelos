@@ -10,11 +10,13 @@ import argparse
 import ast
 import json
 import os
+import time
 from io import StringIO
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import numpy as np
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -82,7 +84,99 @@ def final_frame_setup_source(notebook: dict[str, Any], base: int) -> str:
     return cell_source(notebook, marker)
 
 
-def run_final_evaluation(base: int) -> tuple[pd.DataFrame, dict[str, Any]]:
+def validate_base4_checkpoint_prefix(
+    predictions: pd.DataFrame, train: pd.DataFrame, test: pd.DataFrame
+) -> None:
+    """Recusa uma retomada que não coincide com o começo do teste canônico."""
+
+    from series_temporais.validation import validate_prediction_frame
+
+    validate_prediction_frame(predictions)
+    count = len(predictions)
+    if count > len(test):
+        raise ValueError("Checkpoint contém mais previsões que o teste.")
+    expected_targets = pd.DatetimeIndex(test.index[:count])
+    expected_origins = pd.DatetimeIndex(
+        [train.index[-1], *test.index[: count - 1]]
+    )
+    targets = pd.DatetimeIndex(pd.to_datetime(predictions["target_time"]))
+    origins = pd.DatetimeIndex(pd.to_datetime(predictions["origin_time"]))
+    cutoffs = pd.DatetimeIndex(
+        pd.to_datetime(predictions["training_target_cutoff"])
+    )
+    if not targets.equals(expected_targets) or not origins.equals(expected_origins):
+        raise ValueError("Checkpoint não corresponde às origens canônicas da Base 4.")
+    if not cutoffs.equals(expected_origins):
+        raise ValueError("Checkpoint contém corte de treino incorreto.")
+    if not np.allclose(
+        predictions["y_true"].to_numpy(dtype=float),
+        test["vendas"].iloc[:count].to_numpy(dtype=float),
+    ):
+        raise ValueError("Checkpoint contém valores reais divergentes.")
+    if not np.allclose(
+        predictions["residual"].to_numpy(dtype=float),
+        predictions["y_true"].to_numpy(dtype=float)
+        - predictions["y_pred"].to_numpy(dtype=float),
+    ):
+        raise ValueError("Checkpoint contém resíduos divergentes.")
+    if not predictions["base_id"].eq("base_04").all() or not predictions[
+        "modelo"
+    ].eq("sarimax").all():
+        raise ValueError("Checkpoint pertence a outra base ou modelo.")
+
+
+def checkpoint_base4(
+    namespace: dict[str, Any], winner: dict[str, Any], every: int
+) -> tuple[pd.DataFrame, bool, str, list[str]]:
+    """Avalia blocos consecutivos com o mesmo histórico causal do loop integral."""
+
+    if every < 1:
+        raise ValueError("checkpoint_every deve ser positivo.")
+    train = namespace["df_train"].copy()
+    test = namespace["df_test"].copy()
+    output = ROOT / "results" / "predictions" / "base_04__sarimax.csv"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        completed = pd.read_csv(output)
+        validate_base4_checkpoint_prefix(completed, train, test)
+        if "converged" not in completed.columns:
+            raise ValueError("Checkpoint sem registro de convergência.")
+    else:
+        completed = pd.DataFrame()
+    convergence = bool(completed["converged"].all()) if len(completed) else True
+    warnings_seen: list[str] = []
+    exog_cols = list(winner["exog_cols"])
+
+    for start in range(len(completed), len(test), every):
+        end = min(start + every, len(test))
+        namespace["df_train"] = pd.concat([train, test.iloc[:start]])
+        namespace["df_test"] = test.iloc[start:end].copy()
+        part, converged, warning_text, exog_cols = namespace[
+            "walk_forward_sarimax_model"
+        ](winner)
+        part.insert(0, "base_id", "base_04")
+        part.insert(1, "modelo", "sarimax")
+        part["residual"] = part["y_true"] - part["y_pred"]
+        part["converged"] = bool(converged)
+        completed = pd.concat([completed, part], ignore_index=True)
+        validate_base4_checkpoint_prefix(completed, train, test)
+        convergence = convergence and bool(converged)
+        if warning_text:
+            warnings_seen.append(warning_text)
+        temporary = output.with_suffix(".csv.tmp")
+        completed.to_csv(temporary, index=False)
+        os.replace(temporary, output)
+        print(f"CHECKPOINT_BASE04={end}/{len(test)}", flush=True)
+
+    namespace["df_train"] = train
+    namespace["df_test"] = test
+    return completed, convergence, " | ".join(warnings_seen[:3]), exog_cols
+
+
+def run_final_evaluation(
+    base: int, *, benchmark_origins: int | None = None,
+    checkpoint_every: int | None = None,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
     """Reexecuta o trecho final causal usando o vencedor persistido."""
 
     path = notebook_path(base)
@@ -98,6 +192,10 @@ def run_final_evaluation(base: int) -> tuple[pd.DataFrame, dict[str, Any]]:
     namespace["plt"].show = lambda *_args, **_kwargs: None
     exec(cell_source(notebook, "DATA_PATH = ROOT"), namespace)
     exec(final_frame_setup_source(notebook, base), namespace)
+    if benchmark_origins is not None:
+        if benchmark_origins < 1:
+            raise ValueError("benchmark_origins deve ser positivo.")
+        namespace["df_test"] = namespace["df_test"].iloc[:benchmark_origins].copy()
 
     final_cell = cell_source(notebook, "TESTE FINAL CORRIGIDO")
     function_definitions = final_cell.split("base_predictions =", maxsplit=1)[0]
@@ -115,13 +213,21 @@ def run_final_evaluation(base: int) -> tuple[pd.DataFrame, dict[str, Any]]:
     )
     exec(function_definitions, namespace)
 
-    predictions, converged, warnings_seen, exog_cols = namespace[
-        "walk_forward_sarimax_model"
-    ](winner)
+    if checkpoint_every is not None:
+        if base != 4 or benchmark_origins is not None:
+            raise ValueError("Checkpoint é exclusivo do teste final da Base 4.")
+        predictions, converged, warnings_seen, exog_cols = checkpoint_base4(
+            namespace, winner, checkpoint_every
+        )
+    else:
+        predictions, converged, warnings_seen, exog_cols = namespace[
+            "walk_forward_sarimax_model"
+        ](winner)
     namespace["validate_prediction_frame"](predictions)
-    predictions.insert(0, "base_id", f"base_{base:02d}")
-    predictions.insert(1, "modelo", "sarimax")
-    predictions["residual"] = predictions["y_true"] - predictions["y_pred"]
+    if "base_id" not in predictions.columns:
+        predictions.insert(0, "base_id", f"base_{base:02d}")
+        predictions.insert(1, "modelo", "sarimax")
+        predictions["residual"] = predictions["y_true"] - predictions["y_pred"]
 
     evidence = {
         "base_id": f"base_{base:02d}",
@@ -138,9 +244,22 @@ def run_final_evaluation(base: int) -> tuple[pd.DataFrame, dict[str, Any]]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", type=int, choices=range(1, 6), required=True)
+    parser.add_argument("--benchmark-origins", type=int)
+    parser.add_argument("--checkpoint-every", type=int)
     args = parser.parse_args()
 
-    predictions, evidence = run_final_evaluation(args.base)
+    started = time.perf_counter()
+    predictions, evidence = run_final_evaluation(
+        args.base, benchmark_origins=args.benchmark_origins,
+        checkpoint_every=args.checkpoint_every,
+    )
+    if args.benchmark_origins is not None:
+        elapsed = time.perf_counter() - started
+        print(
+            f"Benchmark Base {args.base}: {len(predictions)} origens em "
+            f"{elapsed:.2f}s; nenhum resultado final foi gravado."
+        )
+        return
     output_dir = ROOT / "results" / "predictions"
     output_dir.mkdir(parents=True, exist_ok=True)
     output = output_dir / f"base_{args.base:02d}__sarimax.csv"

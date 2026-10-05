@@ -1,0 +1,29 @@
+{
+  "base_id": "base_03",
+  "notebook": "notebooks/base_03-grupo3_SARIMAX.ipynb",
+  "frozen_config": {
+    "order": [
+      0,
+      1,
+      0
+    ],
+    "seasonal_order": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "trend": "n",
+    "exog_cols": [
+      "temperatura",
+      "feriado"
+    ]
+  },
+  "exog_used": [
+    "temperatura",
+    "feriado"
+  ],
+  "origins": 6824,
+  "converged_all": true,
+  "warnings": ""
+}

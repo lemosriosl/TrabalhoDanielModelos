@@ -1,5 +1,9 @@
 # Decisões do projeto
 
+## 2026-10-04 - Relatório v2 inspirado no Rondo
+
+**Decisão:** preservar o relatório v1 e gerar v2 autocontida com conteúdo acadêmico verificado e referência Rondo como direção visual. Adotar abertura escura, cartões translúcidos, navegação horizontal e seções claras; não incorporar músicas, preços ou mídia comercial do exemplo. Respeitar redução de movimento e impressão completa. Sincronizar main em 906e81a preservando decisões locais e stash de segurança recuperável. Atualizar somente na v2 os resultados XGBoost versionados e sua cadência, sem usar SARIMAX local em andamento.
+
 ## 2026-10-04 - Entrega restrita ao XGBoost
 
 **Responsável e status:** Codex, a pedido de Giovanne; entrega separada e revisada. Após a revisão dos 25 arquivos e aprovação dos 103 testes, Giovanne autorizou commit no padrão histórico e push normal da branch `codex/xgboost-base5-price`, sem merge na main.
@@ -9,6 +13,10 @@
 **Protocolo:** registrar 7/24/24/144/4 origens de reajuste exclusivamente em `intervalo_retreino_xgboost_por_base`. Não impor essa cadência ao RF nem exigir sua reexecução. Comparações finais devem conferir alvos, origens e horizonte e declarar as diferentes cadências de reajuste. Testes XGBoost não dependem de alterações em notebooks de outra pessoa.
 
 **Artefatos:** preservar os resultados XGBoost existentes, os dados brutos e o `.gitignore`. CSVs completos de resíduos permanecem locais/ignorados; o consolidado versionável é `results/metrics.csv`. A publicação automática está pausada. O processo RF antigo não integra esta entrega; seu verificador de alterações concorrentes impede substituir o notebook restaurado, preservando o resultado em diretório temporário caso termine.
+
+## 2026-10-04 - Informações sincronizadas e resultados parciais
+
+**Decisão:** preencher o relatório somente com evidências rastreadas em origin/main (adb8e6dbfacec244fb2ede2194219a211745cfd7), sem utilizar arquivos locais da execução SARIMAX em andamento. Incorporar a extração RF versionada como resultado parcial, não como ranking homologado; origens das Bases 1–4 não estão preenchidas nessa extração. SARIMAX remoto tem saídas de execução reduzida, não prova de teste final completo. Atualizar indicação do registro de demandas, agora externo ao repositório conforme AGENTS.md. Não editar results/ manualmente nem executar modelos nesta tarefa.
 
 ## 2026-10-04 - Reaproveitamento auditável das execuções do remoto
 
@@ -180,6 +188,14 @@
 **Decisão:** os cinco notebooks SARIMAX mantêm como padrão a busca completa de `s=0` a `s=100`, com checkpoints temporários versionados. O benchmark SARIMA versus SARIMAX usa somente uma validação interna extraída do treino; o teste final permanece intocado até o walk-forward. Um modo reduzido, ativado apenas por variável de ambiente, testa a pipeline com 730 observações e quatro origens sem representar o resultado final.
 
 **Motivo:** a grade completa contém 57.632 candidatos SARIMA e 691.584 candidatos SARIMAX por base e precisa ser retomável. Checkpoints antigos não podem ser misturados após mudanças na preparação ou no contrato causal. O modo reduzido permite verificar código, rankings, resíduos e reajuste por origem sem alegar que a busca integral foi executada.
+
+## 2026-10-04 - Reuso auditável de configuração SARIMAX e teste final
+
+**Decisão:** as configurações vencedoras registradas nos notebooks executados de `origin/main` serão lidas dos próprios outputs e tratadas como hiperparâmetros congelados. Um executor separado fará somente o walk-forward final completo, com uma previsão de um passo por origem e sem rodar novamente a busca de candidatos. Os notebooks remotos permanecem inalterados; previsões e métricas serão geradas por código e validadas antes de qualquer consolidação.
+
+**Motivo:** a execução salva no remoto está explicitamente marcada como teste reduzido (730 linhas e quatro origens), mas registra a configuração selecionada. Repetir a grade inteira não é necessário para aplicar a avaliação final com a configuração já congelada.
+
+**Retomada da Base 4:** o benchmark de três origens finais consumiu 52,72 segundos com 132.707 linhas iniciais de treino. A execução integral tem 33.177 origens e pode durar vários dias. Para não perder previsões já computadas em uma interrupção, o executor gravará checkpoints atômicos em blocos contíguos. Ao retomar, validará cada previsão existente contra o prefixo do teste canônico; o histórico de cada bloco incluirá somente observações já reveladas. O modelo e seus parâmetros permanecem os mesmos e são reajustados em cada origem.
 
 **Efeito:** todas as cinco pipelines foram verificadas de ponta a ponta no modo reduzido. A execução completa continua explícita, reproduzível e separada dos resultados de validação técnica.
 
