@@ -14,6 +14,8 @@ A persistência — repetir o último nível observado — é o baseline. O MAE 
 
 ## Funcionamento e intuição
 
+As razões técnicas de escolha das features, previsão de variação/retorno, busca temporal e cadência operacional estão em [Justificativas do XGBoost](justificativas_xgboost.md), com um roteiro de apresentação. Elas não demonstram superioridade nem corrigem a pendência das origens distintas entre famílias. As justificativas acrescentadas nesta revisão referem-se somente ao XGBoost.
+
 O XGBoost constrói árvores de decisão em sequência. A primeira árvore produz uma aproximação inicial; cada árvore seguinte tenta reduzir os erros que permaneceram. Tecnicamente, a nova árvore aproxima o gradiente da função de perda, e a previsão final é a soma das contribuições das árvores multiplicadas pela taxa de aprendizado.
 
 Árvores são adequadas para relações não lineares, limiares e interações. Por exemplo, o efeito da hora sobre o tráfego pode mudar conforme o dia da semana, e o efeito da umidade sobre a temperatura pode depender do vento. O XGBoost pode aprender essas combinações sem que todas sejam especificadas manualmente.
@@ -107,7 +109,9 @@ A avaliação principal inclui todas as 586 semanas. No recorte de 523 semanas c
 
 ### Resíduos, ACF e Ljung–Box
 
-Resíduos são `real - previsto`: positivos indicam subestimação. As séries individuais e a ACF são exibidas nos notebooks; os CSVs preservam todos os erros, não somente uma amostra.
+Resíduos são `real - previsto`: positivos indicam subestimação. Os CSVs preservam todos os erros, não somente uma amostra. Os cinco notebooks incluem agora uma célula autônoma **Resíduos XGBoost ao longo do tempo**, separada da ACF, com data do alvo no eixo horizontal e referência em zero. Na Base 5 o gráfico principal usa retorno, incluindo todas as 586 semanas; preço continua auxiliar. Lacunas de calendário interrompem a linha, sem interpolação dos erros.
+
+A célula foi executada isoladamente a partir dos CSVs completos existentes e as figuras ficaram incorporadas às saídas dos notebooks, sem novo ajuste ou mudança de métricas. Em um kernel novo, pode-se executar somente essa célula para reproduzir o gráfico: ela lê o CSV local, valida as datas, os resíduos, a contagem e o MAE de `results/metrics.csv`. Os CSVs continuam ignorados pelo Git; para regenerar a figura após clonar, é preciso recuperar esses vetores completos. Em execução integral do notebook, a célula usa o quadro `predictions` em memória.
 
 | Base | Defasagens com rejeição de ausência de autocorrelação (5%) | Sem rejeição |
 |---|---|---|

@@ -130,3 +130,90 @@ def test_level_export_rejects_future_cutoff_and_incomplete_run(tmp_path):
     frame.loc[0, "training_target_cutoff"] = frame.loc[0, "target_time"]
     with pytest.raises(ValueError, match="causalidade"):
         salvar_residuos_nivel(frame, tmp_path, 1, expected_rows=len(frame))
+
+
+@pytest.mark.parametrize("base", [1, 2, 3, 4, 5])
+def test_temporal_residual_plot_preserves_all_values_and_input(base):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from series_temporais.reporting.residuos import plotar_residuos_temporais_xgboost
+    frame = sample() if base == 5 else level_sample()
+    original = frame.copy(deep=True)
+    column = "residual_return_xgb" if base == 5 else "residuo_xgb"
+    fig, audit = plotar_residuos_temporais_xgboost(
+        frame, base, frequency="W-FRI", expected_rows=12,
+        expected_mae=frame[column].abs().mean())
+    np.testing.assert_allclose(fig.axes[0].lines[0].get_ydata(), frame[column])
+    np.testing.assert_allclose(fig.axes[0].lines[1].get_ydata(), [0, 0])
+    assert audit["origens_avaliadas"] == 12 and audit["lacunas_no_tracado"] == 0
+    assert ("Retorno logarítmico" in fig.axes[0].get_ylabel()) == (base == 5)
+    pd.testing.assert_frame_equal(frame, original)
+    plt.close(fig)
+
+
+def test_temporal_residual_plot_does_not_interpolate_calendar_gaps():
+    import matplotlib.pyplot as plt
+    from series_temporais.reporting.residuos import plotar_residuos_temporais_xgboost
+    frame = sample().drop(index=[3, 4])
+    fig, audit = plotar_residuos_temporais_xgboost(frame, 5, frequency="W-FRI")
+    plotted = fig.axes[0].lines[0].get_ydata()
+    assert len(plotted) == 12 and np.isnan(plotted[3:5]).all()
+    assert audit["origens_avaliadas"] == 10 and audit["lacunas_no_tracado"] == 2
+    plt.close(fig)
+
+
+@pytest.mark.parametrize("problem", ["count", "mae", "infinity", "identity", "future", "horizon", "order"])
+def test_temporal_residual_plot_rejects_invalid_execution(problem):
+    from series_temporais.reporting.residuos import plotar_residuos_temporais_xgboost
+    frame = sample()
+    kwargs = {"expected_rows": 12, "expected_mae": frame.residual_return_xgb.abs().mean()}
+    if problem == "count": kwargs["expected_rows"] = 13
+    if problem == "mae": kwargs["expected_mae"] = 999
+    if problem == "infinity": frame.loc[0, "residual_return_xgb"] = np.inf
+    if problem == "identity": frame.loc[0, "residual_return_xgb"] = 999
+    if problem == "future": frame.loc[0, "training_target_cutoff"] = frame.loc[0, "target_date"]
+    if problem == "horizon": frame.loc[0, "target_date"] += pd.Timedelta(days=7)
+    if problem == "order": frame = frame.iloc[::-1]
+    with pytest.raises(ValueError):
+        plotar_residuos_temporais_xgboost(frame, 5, frequency="W-FRI", **kwargs)
+
+
+def test_csv_residual_plot_checks_consolidated_metrics(tmp_path):
+    import matplotlib.pyplot as plt
+    from series_temporais.reporting.residuos import grafico_residuos_xgboost
+    directory = tmp_path / "results/residuals"
+    directory.mkdir(parents=True)
+    data = tmp_path / "data/base_05"
+    data.mkdir(parents=True)
+    (data / "metadata.yaml").write_text("target: target_log_return_t_plus_1\nfrequency: W-FRI\n", encoding="utf-8")
+    frame = sample()
+    frame.to_csv(directory / "base_05_XGBoost.csv", index=False)
+    metric = pd.DataFrame([{"base_id": "base_05", "modelo": "XGBoost",
+                           "alvo": "target_log_return_t_plus_1", "frequencia": "W-FRI",
+                           "origens_avaliadas": 12, "mae": frame.residual_return_xgb.abs().mean()}])
+    metric.to_csv(tmp_path / "results/metrics.csv", index=False)
+    fig, audit = grafico_residuos_xgboost(tmp_path, 5)
+    assert len(audit["csv_sha256"]) == 64 and audit["modo"] == "full"
+    plt.close(fig)
+    metric.loc[0, "mae"] = 123
+    metric.to_csv(tmp_path / "results/metrics.csv", index=False)
+    with pytest.raises(ValueError, match="MAE"):
+        grafico_residuos_xgboost(tmp_path, 5)
+
+
+def test_five_notebooks_have_standalone_residual_plot_cells():
+    import ast
+    import json
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    for base in range(1, 6):
+        notebook = json.loads((root / f"notebooks/base_{base:02d}-grupo{base}_XGBoost.ipynb").read_text(encoding="utf-8"))
+        cells = [cell for cell in notebook["cells"] if cell.get("id") == f"xgb-residuos-temporais-{base}"]
+        assert len(cells) == 1
+        cell = cells[0]
+        assert "residuos-temporais-xgboost" in cell["metadata"]["tags"]
+        calls = [node.func.id for node in ast.walk(ast.parse("".join(cell["source"])))
+                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)]
+        assert "grafico_residuos_xgboost" in calls
+        assert not {"XGBRegressor", "temporal_random_search", "walk_forward"}.intersection(calls)

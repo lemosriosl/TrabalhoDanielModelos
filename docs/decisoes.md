@@ -1,5 +1,19 @@
 # Decisões do projeto
 
+## 2026-10-05 - Commit restrito às justificativas e resíduos XGBoost
+
+**Escopo autorizado:** pausar a revisão HW e fazer somente um commit local da parte XGBoost. Incluir justificativa nos cinco notebooks e no estudo/documentação própria, gráficos temporais incorporados às saídas, auxiliar de plotting, testes e orientação de reprodução. Excluir HW, EDA/STL, auditoria geral, relatório geral, dados, CSVs ignorados e mudanças de métricas. Selecionar somente os trechos XGBoost em arquivos de documentação compartilhados. Preservar as demais alterações locais sem commit; não publicar no remoto.
+
+**Revisão do commit:** 92 testes da parte XGBoost passaram em um snapshot extraído do índice Git, sem os novos auxiliares HW locais. Conferidas as cinco imagens incorporadas, código/saídas anteriores preservados e ausência de mudanças em métricas/dados. O commit contém 11 arquivos, incluindo apenas os trechos XGBoost da documentação compartilhada.
+
+## 2026-10-05 - Gráficos temporais dos resíduos XGBoost sem retreino
+
+**Decisão:** acrescentar uma célula autônoma aos cinco notebooks XGBoost, com gráfico de `real - previsto` na data do alvo, linha zero e unidade do alvo. Na Base 5 usar retorno logarítmico (principal), não preço auxiliar. Manter todas as previsões; interromper o traçado em lacunas de calendário sem interpolar resíduos. ACF permanece um diagnóstico separado.
+
+**Reprodução:** reutilizar os CSVs completos locais e conferir quantidade de previsões, MAE do consolidado e causalidade antes de gerar a figura. Salvar a imagem nas saídas do notebook por execução somente da nova célula; não executar tuning, walk-forward ou consolidação de métricas. Em execução integral futura, usar o quadro em memória e distinguir o modo reduzido. CSVs continuam ignorados; não alterar `.gitignore`. A geração dos gráficos não inclui treinamento nem publicação no remoto.
+
+**Verificação:** as cinco células de gráfico foram executadas isoladamente, com 842/3372/2847/82830/586 resíduos e uma imagem incorporada por notebook. Células de código e saídas anteriores permaneceram intactas; `results/metrics.csv`, raw e `.gitignore` não mudaram. Os testes dos gráficos passaram e `git diff --check` não apontou erros. O executor temporário foi removido; os únicos avisos foram de compatibilidade de bibliotecas do ambiente, sem erro salvo nas novas células.
+
 ## 2026-10-04 - Entrega v2 com resultados descritivos e limites de comparação
 
 **Decisão:** publicar no repositório o código gerador e o HTML v2 atualizado do site local, incluindo MAE e número de origens de cada execução disponível. Os valores são apresentados como resultados individuais, sem ranking ou vencedor geral: as Bases 1–4 têm conjuntos de teste diferentes, a Base 4 ainda não tem SARIMAX final, e a igualdade origem a origem dos quatro modelos da Base 5 não foi comprovada. O resultado SARIMAX parcial da Base 4 não recebe MAE na matriz.

@@ -39,6 +39,12 @@ anteriores não são migrados automaticamente: a próxima execução pode repeti
 a busca completa. Essa atualização não altera os resultados já consolidados.
 Os CSVs individuais de resíduos continuam ignorados pelo Git.
 
+Os gráficos temporais de resíduos XGBoost ficam incorporados às saídas dos cinco
+notebooks, além da ACF já existente. A célula **Resíduos XGBoost ao longo do tempo**
+pode ser executada sozinha, em kernel novo, usando o CSV completo local e verificando
+sua contagem e MAE contra o consolidado. Não dispara tuning/retreino nem reescreve
+CSV ou métricas. Na Base 5, a escala principal é retorno logarítmico.
+
 ### Evidências individuais para o relatório v2
 
 `metricas_individuais_auditadas.csv`, `ljung_box_auditado.csv` e
