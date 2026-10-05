@@ -1,0 +1,10 @@
+.audit-note{border-left:4px solid #8d5e16;background:#fff8e9;padding:18px 22px;margin:22px 0;line-height:1.6}
+  .audit-note h3{margin:0 0 10px;color:#5b3d12}
+  .audit-note p{margin:8px 0}
+  .audit-note ul{margin:10px 0 0;padding-left:22px}
+  .audit-note li{margin:6px 0}
+  .audit-small{display:block;font-size:12px;color:#52657b;font-weight:400;margin-top:3px}
+  .audit-matrix td{min-width:122px}
+  .audit-mobile-hint{display:none;color:#52657b;font-size:14px}
+  @media(max-width:700px){.audit-mobile-hint{display:block}}
+  @media print{.audit-note{break-inside:avoid}}

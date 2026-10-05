@@ -1,5 +1,11 @@
 # Decisões do projeto
 
+## 2026-10-04 - Entrega v2 com resultados descritivos e limites de comparação
+
+**Decisão:** publicar no repositório o código gerador e o HTML v2 atualizado do site local, incluindo MAE e número de origens de cada execução disponível. Os valores são apresentados como resultados individuais, sem ranking ou vencedor geral: as Bases 1–4 têm conjuntos de teste diferentes, a Base 4 ainda não tem SARIMAX final, e a igualdade origem a origem dos quatro modelos da Base 5 não foi comprovada. O resultado SARIMAX parcial da Base 4 não recebe MAE na matriz.
+
+**Evidência e limite:** XGBoost vem de `results/metrics.csv`; Random Forest, da extração versionada dos notebooks; SARIMAX final das Bases 1, 2, 3 e 5 e Holt-Winters vêm dos CSVs locais de previsões. Diferenças de preparação, histórico de features e corte de teste são hipóteses plausíveis para a divergência, não causas integralmente comprovadas. O relatório explicita essa incerteza e não mistura MAEs de bases ou amostras distintas.
+
 ## 2026-10-04 - Relatório v2 inspirado no Rondo
 
 **Decisão:** preservar o relatório v1 e gerar v2 autocontida com conteúdo acadêmico verificado e referência Rondo como direção visual. Adotar abertura escura, cartões translúcidos, navegação horizontal e seções claras; não incorporar músicas, preços ou mídia comercial do exemplo. Respeitar redução de movimento e impressão completa. Sincronizar main em 906e81a preservando decisões locais e stash de segurança recuperável. Atualizar somente na v2 os resultados XGBoost versionados e sua cadência, sem usar SARIMAX local em andamento.

@@ -463,6 +463,19 @@ table{font-size:14px}th{background:#e9ebef80;color:#474b55;font-weight:500}tbody
 @media print{.v2-menu{display:none!important}#report{padding:0}.page,.page:nth-child(even),.page.cover{max-width:none;margin:0;padding:0;min-height:0;background:#fff!important;color:var(--ink);border:0;border-radius:0}.v2-ring{display:none}.v2-hero-grid{display:block;padding:0}.cover h1{color:var(--ink);font-size:32pt;max-width:none}.cover .page-top,.cover .page-foot,.cover .eyebrow,.cover .page-top .tag,.cover .meta-label,.cover .cover-grid span,.cover .lead{color:var(--muted);border-color:var(--line)}.cover .cover-grid b,.cover .cover-grid>div:first-child b,.cover .slot[data-pending="false"]{color:var(--ink)}.cover .pill,.cover .pill:last-child{color:var(--ink);border-color:var(--line)}h2{font-size:22pt}.source-register{padding:0;border:0}.callout{background:#f7f7f8}.page-top{font-size:8pt}}
 
 </style>
+<style>
+.audit-note{border-left:4px solid #8d5e16;background:#fff8e9;padding:18px 22px;margin:22px 0;line-height:1.6}
+  .audit-note h3{margin:0 0 10px;color:#5b3d12}
+  .audit-note p{margin:8px 0}
+  .audit-note ul{margin:10px 0 0;padding-left:22px}
+  .audit-note li{margin:6px 0}
+  .audit-small{display:block;font-size:12px;color:#52657b;font-weight:400;margin-top:3px}
+  .audit-matrix td{min-width:122px}
+  .audit-mobile-hint{display:none;color:#52657b;font-size:14px}
+  @media(max-width:700px){.audit-mobile-hint{display:block}}
+  @media print{.audit-note{break-inside:avoid}}
+
+</style>
 </head>
 <body>
 <a class="skip" href="#report">Ir para o relatório</a>
@@ -622,7 +635,7 @@ table{font-size:14px}th{background:#e9ebef80;color:#474b55;font-weight:500}tbody
   if(document.modelContext?.registerTool){const lifecycle=new AbortController();const tools=[{name:'list_report_fields',title:'Consultar campos do relatório',description:'Lista campos editáveis e pendências desta cópia local do relatório.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute:()=>({fields:Array.from(report.querySelectorAll('[data-field]')).map(e=>({id:e.dataset.field,text:e.textContent,pending:e.dataset.pending==='true'}))})},{name:'update_report_fields',title:'Preencher campos do relatório',description:'Altera apenas textos desta cópia no navegador. Não publica nem salva; o usuário deve baixar o HTML.',inputSchema:{type:'object',properties:{fields:{type:'array',maxItems:50,items:{type:'object',properties:{id:{type:'string'},text:{type:'string',maxLength:20000}},required:['id','text'],additionalProperties:false}}},required:['fields'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute:input=>{if(!input||!Array.isArray(input.fields)||input.fields.length>50)throw Error('Lista de campos inválida');const changes=input.fields.map(v=>{if(!v||typeof v.id!=='string'||typeof v.text!=='string'||v.text.length>20000)throw Error('Campo inválido');const element=Array.from(report.querySelectorAll('[data-field]')).find(e=>e.dataset.field===v.id);if(!element)throw Error('Campo inexistente');return {element,text:v.text}});changes.forEach(v=>{v.element.textContent=v.text;v.element.dispatchEvent(new Event('input',{bubbles:true}))});return {updated:changes.length,saved:false}}}];for(const tool of tools){try{Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{})}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true})}
 })();
 </script>
-<script>window.REPORT_V2_SNAPSHOT={"commit": "7e7ebc65449e419a90d4492a07d489f48a49a1a5", "metrics": [{"base_id": "base_01", "modelo": "XGBoost", "alvo": "Close", "frequencia": "D", "horizonte_passos": "1", "origens_avaliadas": "842", "mae": "694.1672931834524", "mape": "1.8028081837428365", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "451.0818220000656", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 0.85, \"learning_rate\": 0.01, \"max_depth\": 9, \"min_child_weight\": 2, \"n_estimators\": 50, \"reg_alpha\": 0.1, \"reg_lambda\": 10.0, \"subsample\": 0.765}, \"refit_every\": 7, \"search_candidates\": 150}", "features_exogenas": "[\"Open_t\", \"High_t\", \"Low_t\", \"Volume_t\"]", "notebook": "notebooks/base_01-grupo1_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}, {"base_id": "base_02", "modelo": "XGBoost", "alvo": "traffic_volume", "frequencia": "h", "horizonte_passos": "1", "origens_avaliadas": "3372", "mae": "127.89155544740096", "mape": "5.361673620033851", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "1994.586044499949", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 1.0, \"learning_rate\": 0.01, \"max_depth\": 9, \"min_child_weight\": 7, \"n_estimators\": 900, \"reg_alpha\": 0.0, \"reg_lambda\": 1.0, \"subsample\": 0.765}, \"refit_every\": 24, \"search_candidates\": 150}", "features_exogenas": "[\"is_holiday_alvo\", \"temp_t\", \"rain_1h_t\", \"snow_1h_t\", \"clouds_all_t\"]", "notebook": "notebooks/base_02-grupo2_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}, {"base_id": "base_03", "modelo": "XGBoost", "alvo": "PM2.5", "frequencia": "h", "horizonte_passos": "1", "origens_avaliadas": "2847", "mae": "9.52865132252205", "mape": "25.382860762569987", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "591.459709200004", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 0.69, \"learning_rate\": 0.02, \"max_depth\": 8, \"min_child_weight\": 3, \"n_estimators\": 100, \"reg_alpha\": 0.05, \"reg_lambda\": 10.0, \"subsample\": 0.7}, \"refit_every\": 24, \"search_candidates\": 150}", "features_exogenas": "[\"PM10_t\", \"SO2_t\", \"NO2_t\", \"CO_t\", \"O3_t\", \"TEMP_t\", \"PRES_t\", \"DEWP_t\", \"RAIN_t\", \"WSPM_t\", \"wd_sin_t\", \"wd_cos_t\"]", "notebook": "notebooks/base_03-grupo3_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}, {"base_id": "base_04", "modelo": "XGBoost", "alvo": "T (degC)", "frequencia": "10min", "horizonte_passos": "1", "origens_avaliadas": "82830", "mae": "0.13648594918635815", "mape": "", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "4774.788245200107", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 0.69, \"learning_rate\": 0.02, \"max_depth\": 8, \"min_child_weight\": 3, \"n_estimators\": 100, \"reg_alpha\": 0.05, \"reg_lambda\": 10.0, \"subsample\": 0.7}, \"refit_every\": 144, \"search_candidates\": 150}", "features_exogenas": "[\"p (mbar)_t\", \"Tpot (K)_t\", \"Tdew (degC)_t\", \"rh (%)_t\", \"VPmax (mbar)_t\", \"VPact (mbar)_t\", \"VPdef (mbar)_t\", \"sh (g/kg)_t\", \"H2OC (mmol/mol)_t\", \"rho (g/m**3)_t\", \"wv (m/s)_t\", \"max. wv (m/s)_t\", \"wd_sin_t\", \"wd_cos_t\"]", "notebook": "notebooks/base_04-grupo4_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}, {"base_id": "base_05", "modelo": "XGBoost", "alvo": "target_log_return_t_plus_1", "frequencia": "W-FRI", "horizonte_passos": "1", "origens_avaliadas": "586", "mae": "0.020133274286363047", "mape": "", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "710.7409383997729", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 0.6, \"learning_rate\": 0.01, \"max_depth\": 4, \"min_child_weight\": 5, \"n_estimators\": 50, \"reg_alpha\": 0.1, \"reg_lambda\": 0.5, \"subsample\": 0.7}, \"refit_every\": 4, \"search_candidates\": 150}", "features_exogenas": "[\"treasury_10y_t\", \"fed_funds_rate_t\"]", "notebook": "notebooks/base_05-grupo5_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}]};</script>
+<script>window.REPORT_V2_SNAPSHOT={"commit": "b483b781e226822f6b9477f1e303c7d0b2e43feb", "metrics": [{"base_id": "base_01", "modelo": "XGBoost", "alvo": "Close", "frequencia": "D", "horizonte_passos": "1", "origens_avaliadas": "842", "mae": "694.1672931834524", "mape": "1.8028081837428365", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "451.0818220000656", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 0.85, \"learning_rate\": 0.01, \"max_depth\": 9, \"min_child_weight\": 2, \"n_estimators\": 50, \"reg_alpha\": 0.1, \"reg_lambda\": 10.0, \"subsample\": 0.765}, \"refit_every\": 7, \"search_candidates\": 150}", "features_exogenas": "[\"Open_t\", \"High_t\", \"Low_t\", \"Volume_t\"]", "notebook": "notebooks/base_01-grupo1_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}, {"base_id": "base_02", "modelo": "XGBoost", "alvo": "traffic_volume", "frequencia": "h", "horizonte_passos": "1", "origens_avaliadas": "3372", "mae": "127.89155544740096", "mape": "5.361673620033851", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "1994.586044499949", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 1.0, \"learning_rate\": 0.01, \"max_depth\": 9, \"min_child_weight\": 7, \"n_estimators\": 900, \"reg_alpha\": 0.0, \"reg_lambda\": 1.0, \"subsample\": 0.765}, \"refit_every\": 24, \"search_candidates\": 150}", "features_exogenas": "[\"is_holiday_alvo\", \"temp_t\", \"rain_1h_t\", \"snow_1h_t\", \"clouds_all_t\"]", "notebook": "notebooks/base_02-grupo2_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}, {"base_id": "base_03", "modelo": "XGBoost", "alvo": "PM2.5", "frequencia": "h", "horizonte_passos": "1", "origens_avaliadas": "2847", "mae": "9.52865132252205", "mape": "25.382860762569987", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "591.459709200004", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 0.69, \"learning_rate\": 0.02, \"max_depth\": 8, \"min_child_weight\": 3, \"n_estimators\": 100, \"reg_alpha\": 0.05, \"reg_lambda\": 10.0, \"subsample\": 0.7}, \"refit_every\": 24, \"search_candidates\": 150}", "features_exogenas": "[\"PM10_t\", \"SO2_t\", \"NO2_t\", \"CO_t\", \"O3_t\", \"TEMP_t\", \"PRES_t\", \"DEWP_t\", \"RAIN_t\", \"WSPM_t\", \"wd_sin_t\", \"wd_cos_t\"]", "notebook": "notebooks/base_03-grupo3_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}, {"base_id": "base_04", "modelo": "XGBoost", "alvo": "T (degC)", "frequencia": "10min", "horizonte_passos": "1", "origens_avaliadas": "82830", "mae": "0.13648594918635815", "mape": "", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "4774.788245200107", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 0.69, \"learning_rate\": 0.02, \"max_depth\": 8, \"min_child_weight\": 3, \"n_estimators\": 100, \"reg_alpha\": 0.05, \"reg_lambda\": 10.0, \"subsample\": 0.7}, \"refit_every\": 144, \"search_candidates\": 150}", "features_exogenas": "[\"p (mbar)_t\", \"Tpot (K)_t\", \"Tdew (degC)_t\", \"rh (%)_t\", \"VPmax (mbar)_t\", \"VPact (mbar)_t\", \"VPdef (mbar)_t\", \"sh (g/kg)_t\", \"H2OC (mmol/mol)_t\", \"rho (g/m**3)_t\", \"wv (m/s)_t\", \"max. wv (m/s)_t\", \"wd_sin_t\", \"wd_cos_t\"]", "notebook": "notebooks/base_04-grupo4_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}, {"base_id": "base_05", "modelo": "XGBoost", "alvo": "target_log_return_t_plus_1", "frequencia": "W-FRI", "horizonte_passos": "1", "origens_avaliadas": "586", "mae": "0.020133274286363047", "mape": "", "posicao_base": "", "vencedor": "", "tempo_execucao_segundos": "710.7409383997729", "hiperparametros": "{\"estimador\": {\"colsample_bytree\": 0.6, \"learning_rate\": 0.01, \"max_depth\": 4, \"min_child_weight\": 5, \"n_estimators\": 50, \"reg_alpha\": 0.1, \"reg_lambda\": 0.5, \"subsample\": 0.7}, \"refit_every\": 4, \"search_candidates\": 150}", "features_exogenas": "[\"treasury_10y_t\", \"fed_funds_rate_t\"]", "notebook": "notebooks/base_05-grupo5_XGBoost.ipynb", "commit": "2b06f5b598b1686a820574051dad9ae19628da51+dirty", "gerado_em": "2026-10-04T08:25:31.992576+00:00"}]};</script>
 <script>
 (() => {
   'use strict';
@@ -663,6 +676,91 @@ table{font-size:14px}th{background:#e9ebef80;color:#474b55;font-weight:500}tbody
   const xgb=document.createElement('p');xgb.textContent='Atualização sincronizada: as cinco execuções XGBoost foram consolidadas em results/metrics.csv. A busca utiliza 150 candidatos (120 amplos e 30 refinados), três dobras temporais purgadas e hiperparâmetros congelados no teste. Nas Bases 1–4, aprende a variação e reconstrói o nível; na Base 5, prevê retorno logarítmico.';chapter(11).append(xgb);
   chapter(14).querySelectorAll('p').forEach(el=>{if(el.textContent.startsWith('Verificação em 04/10/2026:'))el.textContent='Relatório v2 gerado após git pull, sincronizado em '+window.REPORT_V2_SNAPSHOT.commit+'. Preservados o relatório v1 e os arquivos locais da execução SARIMAX em andamento. Essa execução local não integra as métricas apresentadas aqui.';});
   document.querySelectorAll('.v2-base-card').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const page=document.querySelector(a.getAttribute('href'));const select=document.querySelector('#page-select');select.value=Array.from(document.querySelectorAll('.page')).indexOf(page);select.dispatchEvent(new Event('change'));}));
+})();
+
+</script>
+<script>
+(() => {
+  'use strict';
+  if(document.body.dataset.auditVersion==='1')return;
+  document.body.dataset.auditVersion='1';
+  const chapter = number => document.querySelector(`[data-chapter="${number}"] .page-body`);
+  const paragraph = text => { const p=document.createElement('p');p.textContent=text;return p; };
+  const note = (title, paragraphs, bullets=[]) => {
+    const box=document.createElement('section');box.className='audit-note';
+    const heading=document.createElement('h3');heading.textContent=title;box.append(heading);
+    paragraphs.forEach(text=>box.append(paragraph(text)));
+    if(bullets.length){const list=document.createElement('ul');bullets.forEach(text=>{const item=document.createElement('li');item.textContent=text;list.append(item)});box.append(list)}
+    return box;
+  };
+  const data=[
+    {base:'01', sarimax:['698,560126','851'], hw:['812,049677','851'], rf:['764,717551','não informado'], xgb:['694,167293','842']},
+    {base:'02', sarimax:['574,980677','7.598'], hw:['250,150540','8.115'], rf:['129,760961','não informado'], xgb:['127,891555','3.372']},
+    {base:'03', sarimax:['10,439642','6.824'], hw:['14,196441','6.828'], rf:['10,092369','não informado'], xgb:['9,528651','2.847']},
+    {base:'04', sarimax:[null,'33.177 previstas; execução parcial'], hw:['0,135438','84.045'], rf:['0,136593','não informado'], xgb:['0,136486','82.830']},
+    {base:'05', sarimax:['0,029219','586'], hw:['0,020078','586'], rf:['0,020517','586 registradas'], xgb:['0,020133','586']}
+  ];
+  const results=chapter(8);
+  results.querySelector('.lead').textContent='Resultados existentes, apresentados com suas amostras e sem ranking não sustentado.';
+  results.querySelector('.callout').innerHTML='<strong>Leitura correta</strong> Os MAEs abaixo são descritivos. Nas Bases 1–4, as avaliações não compartilham exatamente as mesmas origens; portanto, o menor número não comprova superioridade de um modelo.';
+  const matrix=results.querySelector('table');matrix.classList.add('audit-matrix');
+  data.forEach((entry,index)=>{
+    const cells=matrix.tBodies[0].rows[index].cells;
+    [entry.sarimax,entry.hw,entry.rf,entry.xgb].forEach((value,column)=>{
+      cells[column+1].replaceChildren();
+      const number=document.createElement('strong');number.textContent=value[0]??'Não concluído';
+      const count=document.createElement('small');count.className='audit-small';count.textContent=`Origens: ${value[1]}`;
+      cells[column+1].append(number,count);
+    });
+  });
+  matrix.caption.textContent='MAE fora da amostra por execução — valores não comparáveis como ranking final';
+  const mobileHint=paragraph('No celular, deslize a matriz horizontalmente para ver os quatro modelos.');
+  mobileHint.className='audit-mobile-hint';matrix.closest('.table-wrap').before(mobileHint);
+  results.querySelectorAll('p').forEach(el=>{
+    if(el.textContent.startsWith('Fonte da extração:')&&el.textContent.includes('não foram importados'))
+      el.textContent='Fonte da extração Random Forest: commit 2b06f5b598b1686a820574051dad9ae19628da51. A matriz acima apresenta esses MAEs apenas como registros descritivos; nas Bases 1–4, a extração não informa quantas origens foram avaliadas, e nenhum ranking foi calculado.';
+  });
+  results.append(note('Por que os números não batem',[
+    'A auditoria encontrou conjuntos de origens distintos, mesmo quando o alvo e o horizonte nominal de um passo são iguais. Diferentes cortes efetivos de teste, filtragem de linhas e histórico exigido pelas features são explicações possíveis; não foi comprovada a contribuição exata de cada fator em todas as bases. A cadência de reajuste do XGBoost também é própria do modelo e não corrige a diferença de amostra.',
+    'A solução metodologicamente correta seria recalcular todos os MAEs nas mesmas observações de cada base. Como essa reavaliação não foi concluída, este relatório registra os resultados individuais, mas não atribui vitórias, posição média ou vencedor geral.'
+  ],[
+    'Base 1: SARIMAX e Holt-Winters usam as mesmas 851 origens; XGBoost usa 842. A extração remota do Random Forest não informa a contagem.',
+    'Base 2: os conjuntos registrados têm 8.115, 7.598 e 3.372 origens para Holt-Winters, SARIMAX e XGBoost; a contagem do Random Forest remoto não consta.',
+    'Base 3: Holt-Winters usa 6.828 origens, SARIMAX 6.824 e XGBoost 2.847; falta a contagem remota do Random Forest.',
+    'Base 4: Holt-Winters usa 84.045 origens e XGBoost 82.830. O SARIMAX continua em execução para 33.177 origens previstas; seu MAE parcial foi excluído.',
+    'Base 5: os quatro registros indicam 586 origens. A igualdade exata de instantes e valores foi conferida entre Holt-Winters e SARIMAX; os artefatos por origem de Random Forest e XGBoost não estavam disponíveis nesta auditoria.'
+  ]));
+  results.append(note('Proveniência dos valores',[
+    'XGBoost: results/metrics.csv versionado no repositório. Random Forest: results/extraidos_do_remoto/random_forest_metrics.csv, extraído das saídas dos notebooks remotos. SARIMAX: CSVs finais locais das Bases 1, 2, 3 e 5, com auditorias compactas versionadas. Holt-Winters: CSVs locais de previsões. Os CSVs completos locais são ignorados pelo Git; clonar o repositório não os recupera.',
+    'Os cinco notebooks SARIMAX do remoto possuem saídas de teste reduzido, não a avaliação final completa. Os 35 notebooks permaneceram idênticos ao remoto; células executadas e ausência de erro salvo não demonstram, por si só, igualdade de protocolo entre modelos.'
+  ]));
+  const summary=chapter(1);
+  summary.querySelectorAll('.panel').forEach(panel=>{
+    const title=panel.querySelector('h3')?.textContent;
+    const field=panel.querySelector('.slot');if(!field)return;
+    if(title==='Resultado central')field.textContent='Há métricas registradas para os quatro modelos nas cinco bases, mas as origens avaliadas divergem nas Bases 1–4; o SARIMAX da Base 4 segue incompleto.';
+    if(title==='Recomendação principal')field.textContent='Apresentar os MAEs como resultados individuais e declarar explicitamente que não há vencedor geral homologado.';
+    field.dataset.pending='false';field.classList.add('filled');
+  });
+  summary.append(note('Síntese de entrega',[
+    'O estudo demonstra pipelines temporais e resultados fora da amostra. A principal limitação é de comparabilidade, não uma autorização para igualar amostras por aproximação. O relatório preserva os resultados existentes e explicita os limites de inferência.'
+  ]));
+  const protocol=chapter(6);
+  protocol.append(note('Protocolo planejado versus execução observada',[
+    'O projeto define horizonte de um passo, avanço temporal e intenção de origens comuns. A auditoria dos artefatos mostrou que esse último requisito não foi plenamente cumprido. Por isso, a análise quantitativa entre modelos é exploratória e deve ser lida junto com o número de origens de cada célula da matriz.'
+  ]));
+  const conclusion=chapter(12);
+  conclusion.append(note('Conclusão que os dados permitem',[
+    'Os modelos produziram evidências individuais de previsão fora da amostra, mas a auditoria não sustenta uma classificação única das quatro famílias nas cinco bases. MAEs de séries diferentes têm unidades distintas e não devem ser somados ou promediados; MAEs da mesma base com origens diferentes não devem ser usados para proclamar um vencedor.',
+    'A Base 5 é a mais próxima de uma comparação comum pela contagem de 586 origens, porém a igualdade exata de Random Forest e XGBoost com o teste canônico não pôde ser verificada a partir dos artefatos disponíveis. A Base 4 permanece sem avaliação SARIMAX final. Essas limitações são parte do resultado do trabalho, não resultados corrigidos ou omitidos.'
+  ]));
+  chapter(14).querySelectorAll('p').forEach(el=>{
+    if(el.textContent.startsWith('Relatório v2 gerado após git pull'))
+      el.textContent='Auditoria documental atualizada em 04/10/2026 com base no commit b483b781e226822f6b9477f1e303c7d0b2e43feb e nos CSVs locais de previsão disponíveis nesta data. Os resultados SARIMAX da Base 4 permanecem parciais e não integram a comparação final.';
+  });
+  const notice=document.querySelector('.notice');
+  if(notice){notice.querySelector('strong').textContent='Resultados auditados, comparação limitada.';notice.childNodes.forEach(node=>{if(node.nodeType===Node.TEXT_NODE&&node.textContent.includes('Resultados e evidências pendentes'))node.textContent=' Os resultados disponíveis e as limitações de comparabilidade estão descritos no relatório.'})}
+  document.querySelectorAll('.page-foot span:first-child').forEach(el=>el.textContent='Séries Temporais · resultados com limitações declaradas');
 })();
 
 </script>
