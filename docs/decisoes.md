@@ -220,3 +220,15 @@
 **Motivo:** resultados executados não devem ficar ocultos apenas por ainda não integrarem o consolidado canônico. Ao mesmo tempo, transcrever MAEs de amostras temporais diferentes como um ranking violaria o protocolo do projeto.
 
 **Efeito:** o relatório passa a diferenciar resultados individuais auditados, diagnósticos disponíveis e comparações ainda não homologadas. A ausência da execução SARIMAX final da Base 4, a falta de contagens de origem do RF nas Bases 1–4 e o registro diário externo permanecem explícitos.
+
+## 2026-10-04 - Reconciliação de evidências do relatório v2
+
+**Decisão:** gerar por código tabelas separadas de MAEs individuais e Ljung–Box, preservando a fonte de cada célula. Para Holt-Winters e SARIMAX (exceto Base 4), recalcular métricas e diagnósticos a partir dos CSVs completos de previsões locais; para Random Forest e XGBoost, usar as saídas finais executadas dos notebooks e o consolidado XGBoost disponível. Não incorporar os diagnósticos SARIMAX de quatro origens do modo reduzido. A execução SARIMAX da Base 4 permanece fora do escopo solicitado.
+
+**Correção documental:** as contagens do Random Forest nas Bases 1–4 estavam salvas nas tabelas de divisão dos notebooks: 842, 3.372, 2.847 e 82.830. A nota anterior que as chamava de ausentes estava incorreta. Os CSVs locais de RF das Bases 1 e 2 apresentam MAEs diferentes dos notebooks executados, embora tenham a mesma quantidade de origens; os resultados não serão misturados ou declarados reconciliados sem verificar a origem dessa divergência.
+
+**Limite:** nas Bases 1–4, as contagens de origens entre famílias diferem; na Base 5, faltam os arquivos integrais de previsão por origem de RF e XGBoost para comprovar identidade exata dos instantes. Portanto, MAEs individuais não produzem posições, vitórias ou vencedor homologado. As saídas geradas ficam em `results/metricas_individuais_auditadas.csv`, `results/ljung_box_auditado.csv` e `results/achados_auditoria.json`; testes verificam o contrato temporal e as inconsistências detectadas.
+
+**Fonte da Base 4:** a tabela de `data/base_04/raw.csv` foi comparada célula por célula com `jena_climate_2009_2016.csv` da distribuição TensorFlow/Keras: 420.551 linhas, 15 colunas e nenhum valor diferente. A serialização em bytes não é igual. A referência do conjunto fica documentada, sem presumir a data original de download do grupo.
+
+**Horizonte SARIMAX:** os CSVs completos das Bases 2 e 3 contêm, respectivamente, 14 e 53 previsões cujo alvo não está exatamente uma hora após a origem. Os MAEs originais (574,980677 e 10,439642) misturam horizontes. A tabela auditada preserva esses valores como registro bruto e acrescenta MAE calculado somente nas 7.584 e 6.771 previsões de um passo (574,086284 e 10,369544). Ljung–Box foi recalculado nesse mesmo recorte. Nenhum arquivo bruto ou CSV original de previsões foi alterado. A correção definitiva exige alinhar a execução SARIMAX à grade temporal canônica; a filtragem não resolve a amostra diferente dos demais modelos.

@@ -1,0 +1,20 @@
+base_id,modelo,mae,origens,origens_horizonte_1,mae_horizonte_1,fonte,tipo_fonte
+base_01,Holt-Winters,812.049677198456,851,851,812.049677198456,results/predictions/base_01__holt_winters.csv,csv_final
+base_01,SARIMAX,698.560125824588,851,851,698.560125824588,results/predictions/base_01__sarimax.csv,csv_final
+base_01,Random Forest,764.717551,842,,,notebooks/base_01-grupo1_RF.ipynb,notebook_executado
+base_01,XGBoost,694.1672931834524,842,,,results/metrics.csv,consolidado_xgboost
+base_02,Holt-Winters,250.15053968952375,8115,8115,250.15053968952375,results/predictions/base_02__holt_winters.csv,csv_final
+base_02,SARIMAX,574.9806770934385,7598,7584,574.0862835381646,results/predictions/base_02__sarimax.csv,csv_final
+base_02,Random Forest,129.760961,3372,,,notebooks/base_02-grupo2_RF.ipynb,notebook_executado
+base_02,XGBoost,127.89155544740096,3372,,,results/metrics.csv,consolidado_xgboost
+base_03,Holt-Winters,14.196441055587488,6828,6828,14.196441055587488,results/predictions/base_03__holt_winters.csv,csv_final
+base_03,SARIMAX,10.439642327940096,6824,6771,10.369543853497781,results/predictions/base_03__sarimax.csv,csv_final
+base_03,Random Forest,10.092369,2847,,,notebooks/base_03-grupo3_RF.ipynb,notebook_executado
+base_03,XGBoost,9.52865132252205,2847,,,results/metrics.csv,consolidado_xgboost
+base_04,Holt-Winters,0.13543796725542454,84045,84045,0.13543796725542454,results/predictions/base_04__holt_winters.csv,csv_final
+base_04,Random Forest,0.136593,82830,,,notebooks/base_04-grupo4_RF.ipynb,notebook_executado
+base_04,XGBoost,0.1364859491863581,82830,,,results/metrics.csv,consolidado_xgboost
+base_05,Holt-Winters,0.020077713230202143,586,586,0.020077713230202143,results/predictions/base_05__holt_winters.csv,csv_final
+base_05,SARIMAX,0.029219290080755828,586,586,0.029219290080755828,results/predictions/base_05__sarimax.csv,csv_final
+base_05,Random Forest,0.020517,586,,,notebooks/base_05-grupo5_RF_retorno.ipynb,notebook_executado
+base_05,XGBoost,0.020133274286363,586,,,results/metrics.csv,consolidado_xgboost

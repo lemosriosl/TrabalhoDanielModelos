@@ -1,8 +1,8 @@
 # Métricas consolidadas
 
-`metrics.csv` é o consolidado reproduzível da comparação final. Ele começa apenas
-com o cabeçalho e recebe linhas somente depois que cada notebook termina o teste
-walk-forward canônico.
+`metrics.csv` é o consolidado canônico. Nesta auditoria contém cinco linhas
+XGBoost, sem posições ou vencedor; os demais modelos ainda não foram integrados
+ao mesmo protocolo de origens. Não interpretar esse arquivo como ranking final.
 
 O arquivo deve ser gerado com `series_temporais.results.write_metrics`; não deve
 ser preenchido manualmente. Cada linha identifica a base, o alvo, a frequência,
@@ -38,3 +38,21 @@ alvo, origens, protocolo, versões e implementação metodológica. Checkpoints
 anteriores não são migrados automaticamente: a próxima execução pode repetir
 a busca completa. Essa atualização não altera os resultados já consolidados.
 Os CSVs individuais de resíduos continuam ignorados pelo Git.
+
+### Evidências individuais para o relatório v2
+
+`metricas_individuais_auditadas.csv`, `ljung_box_auditado.csv` e
+`achados_auditoria.json` são gerados por
+`python src/series_temporais/reporting/evidencias_relatorio.py`.
+Cada linha informa a fonte: CSV completo local de previsões de Holt-Winters
+ou SARIMAX, saída executada de notebook de Random Forest ou XGBoost, ou
+o consolidado XGBoost. O SARIMAX da Base 4 não entra nesses arquivos por
+solicitação do grupo. Os CSVs de RF das Bases 1 e 2 divergem de seus notebooks;
+o JSON registra essa inconsistência. Como as origens dos quatro modelos não
+coincidem nas Bases 1–4, estas tabelas são descritivas, não um ranking.
+
+As colunas `origens_horizonte_1` e `mae_horizonte_1` valem para os modelos com
+CSV completo. Nas Bases 2 e 3, o SARIMAX possui respectivamente 14 e 53
+linhas cujo alvo fica mais de uma hora após a origem; por isso, seu MAE bruto
+mistura horizontes. O relatório usa somente as linhas de uma hora para esses
+dois MAEs e para o Ljung–Box, sem alterar os CSVs originais.

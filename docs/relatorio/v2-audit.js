@@ -28,10 +28,10 @@
     return box;
   };
   const data=[
-    {base:'01', sarimax:['698,560126','851'], hw:['812,049677','851'], rf:['764,717551','não informado'], xgb:['694,167293','842']},
-    {base:'02', sarimax:['574,980677','7.598'], hw:['250,150540','8.115'], rf:['129,760961','não informado'], xgb:['127,891555','3.372']},
-    {base:'03', sarimax:['10,439642','6.824'], hw:['14,196441','6.828'], rf:['10,092369','não informado'], xgb:['9,528651','2.847']},
-    {base:'04', sarimax:[null,'33.177 previstas; execução parcial'], hw:['0,135438','84.045'], rf:['0,136593','não informado'], xgb:['0,136486','82.830']},
+    {base:'01', sarimax:['698,560126','851'], hw:['812,049677','851'], rf:['764,717551','842 no notebook'], xgb:['694,167293','842']},
+    {base:'02', sarimax:['574,086284','7.584 de 7.598 · 14 horizontes excluídos'], hw:['250,150540','8.115'], rf:['129,760961','3.372 no notebook'], xgb:['127,891555','3.372']},
+    {base:'03', sarimax:['10,369544','6.771 de 6.824 · 53 horizontes excluídos'], hw:['14,196441','6.828'], rf:['10,092369','2.847 no notebook'], xgb:['9,528651','2.847']},
+    {base:'04', sarimax:[null,'execução final não concluída'], hw:['0,135438','84.045'], rf:['0,136593','82.830 no notebook'], xgb:['0,136486','82.830']},
     {base:'05', sarimax:['0,029219','586'], hw:['0,020078','586'], rf:['0,020517','586 registradas'], xgb:['0,020133','586']}
   ];
   const results=chapter(8);
@@ -52,17 +52,21 @@
   mobileHint.className='audit-mobile-hint';matrix.closest('.table-wrap').before(mobileHint);
   results.querySelectorAll('p').forEach(el=>{
     if(el.textContent.startsWith('Fonte da extração:')&&el.textContent.includes('não foram importados'))
-      el.textContent='Fonte da extração Random Forest: commit 2b06f5b598b1686a820574051dad9ae19628da51. A matriz acima apresenta esses MAEs apenas como registros descritivos; nas Bases 1–4, a extração não informa quantas origens foram avaliadas, e nenhum ranking foi calculado.';
+      el.textContent='Fonte da extração Random Forest: commit 2b06f5b598b1686a820574051dad9ae19628da51. As quantidades de origens foram recuperadas diretamente das tabelas de divisão salvas nos notebooks. Nenhum ranking dos quatro modelos foi calculado.';
   });
   results.append(note('Por que os números não batem',[
     'A auditoria encontrou conjuntos de origens distintos, mesmo quando o alvo e o horizonte nominal de um passo são iguais. Diferentes cortes efetivos de teste, filtragem de linhas e histórico exigido pelas features são explicações possíveis; não foi comprovada a contribuição exata de cada fator em todas as bases. A cadência de reajuste do XGBoost também é própria do modelo e não corrige a diferença de amostra.',
     'A solução metodologicamente correta seria recalcular todos os MAEs nas mesmas observações de cada base. Como essa reavaliação não foi concluída, este relatório registra os resultados individuais, mas não atribui vitórias, posição média ou vencedor geral.'
   ],[
-    'Base 1: SARIMAX e Holt-Winters usam as mesmas 851 origens; XGBoost usa 842. A extração remota do Random Forest não informa a contagem.',
-    'Base 2: os conjuntos registrados têm 8.115, 7.598 e 3.372 origens para Holt-Winters, SARIMAX e XGBoost; a contagem do Random Forest remoto não consta.',
-    'Base 3: Holt-Winters usa 6.828 origens, SARIMAX 6.824 e XGBoost 2.847; falta a contagem remota do Random Forest.',
-    'Base 4: Holt-Winters usa 84.045 origens e XGBoost 82.830. O SARIMAX continua em execução para 33.177 origens previstas; seu MAE parcial foi excluído.',
+    'Base 1: SARIMAX e Holt-Winters usam 851 origens; RF e XGBoost usam 842. O CSV local do RF tem MAE diferente do notebook e precisa ser reconciliado.',
+    'Base 2: Holt-Winters usa 8.115 origens; SARIMAX tem 7.598 linhas, mas apenas 7.584 de horizonte correto; RF e XGBoost usam 3.372. O CSV local do RF tem MAE diferente do notebook.',
+    'Base 3: Holt-Winters usa 6.828 origens; SARIMAX tem 6.824 linhas, mas apenas 6.771 de horizonte correto; RF e XGBoost usam 2.847.',
+    'Base 4: Holt-Winters usa 84.045 origens; RF e XGBoost usam 82.830. A execução final SARIMAX está fora do escopo desta atualização.',
     'Base 5: os quatro registros indicam 586 origens. A igualdade exata de instantes e valores foi conferida entre Holt-Winters e SARIMAX; os artefatos por origem de Random Forest e XGBoost não estavam disponíveis nesta auditoria.'
+  ]));
+  results.append(note('Horizonte efetivo do SARIMAX nas Bases 2 e 3',[
+    'A auditoria encontrou 14 previsões da Base 2 e 53 da Base 3 cujo alvo está mais de um passo à frente da origem. Os MAEs originais dos CSVs (574,980677 e 10,439642) misturam horizontes e não são apresentados como teste de um passo. A matriz usa o MAE recalculado apenas nas 7.584 e 6.771 linhas de horizonte correto: 574,086284 e 10,369544. Isso não resolve a diferença de origens entre modelos.',
+    'Na Base 3, seis origens compartilhadas com Holt-Winters apontam para alvo/horário diferente no SARIMAX. O diagnóstico de Ljung–Box desta auditoria também filtra as linhas de horizonte inválido. As linhas originais foram preservadas nos CSVs, sem edição manual.'
   ]));
   results.append(note('Proveniência dos valores',[
     'XGBoost: results/metrics.csv versionado no repositório. Random Forest: results/extraidos_do_remoto/random_forest_metrics.csv, extraído das saídas dos notebooks remotos. SARIMAX: CSVs finais locais das Bases 1, 2, 3 e 5, com auditorias compactas versionadas. Holt-Winters: CSVs locais de previsões. Os CSVs completos locais são ignorados pelo Git; clonar o repositório não os recupera.',
@@ -84,41 +88,58 @@
     ['05 · Ouro', '52 semanas', '0,0000', '0,9275']
   ]));
   stl.append(note('Leitura das decomposições',[
-    'Bitcoin e ouro em nível apresentam tendência forte, mas não sazonalidade estável nos períodos testados. Tráfego e temperatura apresentam ciclos diário e semanal relevantes. PM2.5 combina tendência forte com sazonalidade moderada. As figuras completas permanecem nos notebooks exploratórios, que são a fonte visual destas tabelas.'
+    'Bitcoin e ouro em nível apresentam tendência forte, mas não sazonalidade estável nos períodos testados. Tráfego e temperatura apresentam ciclos diário e semanal relevantes. PM2.5 combina tendência forte com sazonalidade moderada. As figuras abaixo foram incorporadas das saídas executadas dos notebooks.'
   ]));
+  const oldStlFigure=stl.querySelector('.figure');if(oldStlFigure)oldStlFigure.remove();
+  window.REPORT_V2_SNAPSHOT.stl_figures.forEach(item=>{
+    const figure=document.createElement('figure');figure.className='figure audit-figure';
+    const img=document.createElement('img');img.src=item.data;img.alt=`Decomposição STL registrada para a Base ${item.base}`;
+    const caption=document.createElement('figcaption');caption.textContent=`Base ${item.base}: decomposição STL da série de treino. Fonte: ${item.source}.`;
+    figure.append(img,caption);stl.append(figure);
+  });
   const baseFindings=[
     ['01','Bitcoin: XGBoost e Random Forest usam 842 origens; SARIMAX e Holt-Winters, 851. O menor MAE registrado é 694,167293 do XGBoost, mas a diferença de amostra impede classificá-lo como vencedor.', 'A série tem tendência forte e sazonalidade semanal/anual nula nos testes STL.'],
-    ['02','Tráfego: os MAEs executados são 574,980677 (SARIMAX), 250,150540 (Holt-Winters), 129,760961 (RF) e 127,891555 (XGBoost), com 7.598, 8.115 e 3.372 origens registradas.', 'A sazonalidade semanal é alta (0,9717), compatível com a vantagem dos modelos que usam lags e calendário.'],
-    ['03','PM2.5: XGBoost registra MAE 9,528651, SARIMAX 10,439642, RF 10,092369 e Holt-Winters 14,196441; as amostras têm tamanhos distintos.', 'Há tendência forte no ciclo diário e sazonalidade moderada.'],
+    ['02','Tráfego: os MAEs de um passo são 574,086284 (SARIMAX, 7.584 origens após filtrar 14 horizontes inválidos), 250,150540 (Holt-Winters, 8.115), 129,760961 (RF, 3.372) e 127,891555 (XGBoost, 3.372).', 'A sazonalidade semanal é alta (0,9717), mas os modelos ainda não compartilham a mesma amostra de teste.'],
+    ['03','PM2.5: XGBoost registra MAE 9,528651, SARIMAX 10,369544 em 6.771 origens válidas, RF 10,092369 e Holt-Winters 14,196441; há 53 horizontes SARIMAX inválidos e as amostras divergem.', 'Há tendência forte no ciclo diário e sazonalidade moderada; a falha de horizonte impede homologar o CSV SARIMAX sem filtragem ou correção da execução.'],
     ['04','Temperatura: Holt-Winters, RF e XGBoost registram MAE 0,135438, 0,136593 e 0,136486. SARIMAX ainda não possui MAE final utilizável.', 'Ciclos diário e semanal são fortes, mas os diagnósticos residuais ainda rejeitam ruído branco.'],
     ['05','Ouro: os quatro registros possuem 586 origens: SARIMAX 0,029219, Holt-Winters 0,020078, RF 0,020517 e XGBoost 0,020133. A igualdade exata das origens de RF/XGBoost não foi recuperada nos artefatos locais.', 'O retorno semanal não mostrou sazonalidade estável; a tendência reportada pertence ao preço em nível.']
   ];
   baseFindings.forEach((entry,index)=>{
     const scope=document.querySelector(`#pagina-${index+5} .page-body`);
-    fill(scope, 'Referenciar a tabela comparativa de MAE e os gráficos definitivos; registrar unidade e observações de teste comuns', entry[0]);
-    fill(scope, 'Preencher a principal interpretação desta base após a validação final', entry[1]);
+    fill(scope, 'Referenciar a tabela comparativa de MAE e os gráficos definitivos; registrar unidade e observações de teste comuns', entry[1]);
+    fill(scope, 'Preencher a principal interpretação desta base após a validação final', entry[2]);
     fill(scope, 'Indicar tabela, figura ou resultado validado que sustenta a conclusão', 'Notebooks executados, CSVs de previsões e matriz auditada da seção 08.');
   });
+  fill(document.querySelector('#pagina-8 .page-body'), 'Explicar o fenômeno, a origem da base, o endereço da fonte e a data de acesso', 'Temperatura em °C na série Jena Climate, da estação do Max Planck Institute for Biogeochemistry. O raw.csv local é tabularmente idêntico às 420.551 linhas e 15 colunas da distribuição TensorFlow/Keras; a data de download original do grupo não foi registrada. Fonte: keras.io/examples/timeseries/timeseries_weather_forecasting/.');
+  fill(document.querySelector('#pagina-9 .page-body'), 'Explicar o fenômeno, a origem da base, o endereço da fonte e a data de acesso', 'Ouro semanal derivado do CSV adaptado de repositórios indicados na documentação. As taxas foram identificadas como séries DGS10 e DFF do FRED e a defasagem na origem foi verificada; moeda do ouro, horário histórico de publicação e data de download do grupo ainda não estão comprovados.');
   const residuals=chapter(9);
-  residuals.querySelector('.lead').textContent='Diagnósticos executados, identificados por modelo e sem transformar saídas reduzidas em resultado final.';
+  residuals.querySelector('.lead').textContent='Diagnósticos de resíduos fora da amostra: CSVs finais de Holt-Winters e SARIMAX; saídas executadas dos notebooks de Random Forest e XGBoost.';
+  residuals.querySelector('p').textContent='O teste de Ljung–Box avalia autocorrelação residual. p < 0,05 rejeita a hipótese de resíduos sem autocorrelação até o lag indicado; isso aponta estrutura não capturada, mas não invalida sozinho o MAE. Os lags e p-valores exatos, com fonte de cada resultado, estão no arquivo results/ljung_box_auditado.csv.';
+  const byDiagnostic=new Map();
+  window.REPORT_V2_SNAPSHOT.diagnostics.forEach(row=>{
+    const key=`${row.base_id}/${row.modelo}`;
+    if(!byDiagnostic.has(key))byDiagnostic.set(key,[]);
+    byDiagnostic.get(key).push(row);
+  });
+  const individual=new Map(window.REPORT_V2_SNAPSHOT.individual.map(row=>[`${row.base_id}/${row.modelo}`,row]));
+  const diagRows=Array.from(byDiagnostic,([key,rows])=>{
+    const [base,model]=key.split('/');
+    const p=rows.map(row=>`${row.lag}: ${Number(row.p_valor)===0?'<1e-300':Number(row.p_valor).toExponential(2)}`).join(' · ');
+    const rejected=rows.filter(row=>Number(row.p_valor)<0.05).map(row=>row.lag);
+    return [`${base.slice(-2)} / ${model}`,Number(individual.get(key)?.origens_horizonte_1||individual.get(key)?.origens).toLocaleString('pt-BR'),p,
+      rejected.length ? `Rejeita em ${rejected.join(', ')}` : 'Não rejeita nos lags testados'];
+  });
+  residuals.querySelector('.table-wrap').replaceWith(table('Ljung–Box dos resíduos fora da amostra (lag: p-valor)',
+    ['Base / modelo','Origens','Lag: p-valor','Leitura a 5%'],diagRows));
   residuals.append(note('Ljung–Box já executado',[
-    'Holt-Winters, Random Forest e XGBoost possuem diagnósticos fora da amostra registrados nos notebooks. Os notebooks SARIMAX exibem Ljung–Box do modo reduzido; por isso, esses valores não foram misturados à tabela final.'
-  ]));
-  residuals.append(table('Ljung–Box registrado nos notebooks', ['Base / modelo', 'Lags', 'Leitura'], [
-    ['01 / Holt-Winters', '1, 7, 14, 30', 'Rejeita ruído branco em todos os lags apresentados.'],
-    ['01 / Random Forest', '1, 7, 14, 30', 'Não rejeita no lag 1; rejeita nos lags 7, 14 e 30.'],
-    ['01 / XGBoost', '1, 7, 14, 30', 'Rejeita em 1, 14 e 30; não rejeita no lag 7.'],
-    ['02 / Holt-Winters, RF e XGBoost', '1, 24, 48, 168', 'Rejeitam ruído branco nos lags exibidos.'],
-    ['03 / Holt-Winters, RF e XGBoost', '1, 24, 48, 168', 'Rejeitam ruído branco nos lags exibidos.'],
-    ['04 / Holt-Winters, RF e XGBoost', '1, 6, 144, 288', 'Rejeitam ruído branco nos lags exibidos.'],
-    ['05 / Holt-Winters', '1, 4, 13, 26', 'Não rejeita no lag 1; rejeita a partir do lag 4.'],
-    ['05 / Random Forest', '1, 4, 13, 26', 'Não rejeita no lag 1; rejeita a partir do lag 4.'],
-    ['05 / XGBoost', '1, 4, 13, 26, 52', 'Não rejeita no lag 1; rejeita a partir do lag 4.']
+    'Holt-Winters e SARIMAX (exceto Base 4) foram recalculados dos CSVs completos de previsões, sem reutilizar a saída reduzida dos notebooks SARIMAX. Nas Bases 2 e 3, o Ljung–Box do SARIMAX usa somente as linhas cujo horizonte é exatamente um passo. Random Forest e XGBoost vêm das tabelas executadas dos notebooks; seus resíduos integrais não estão todos disponíveis localmente.'
   ]));
   residuals.append(note('Limite do SARIMAX',[
-    'As células executadas de SARIMAX mostram diagnósticos do teste reduzido de quatro origens. Os CSVs finais locais das Bases 1, 2, 3 e 5 existem, mas a tabela consolidada de Ljung–Box dessas execuções ainda não foi gerada por código. A Base 4 continua sem execução final SARIMAX.'
+    'As células executadas de SARIMAX mostram diagnósticos do teste reduzido de quatro origens, descartados nesta tabela. O diagnóstico final das Bases 1, 2, 3 e 5 agora foi gerado por código a partir dos CSVs locais completos. A Base 4 permanece fora do escopo solicitado.'
   ]));
   const importance=chapter(10);
+  const oldImportanceFigure=importance.querySelector('.figure');
+  if(oldImportanceFigure)oldImportanceFigure.replaceWith(paragraph('As tabelas de importância estão nos notebooks; não foi exportada uma figura comparável para os quatro modelos e cinco bases. A tabela abaixo registra apenas os sinais verificáveis, sem alegar equivalência entre métodos.'));
   importance.append(table('Principais sinais do XGBoost nas execuções finais', ['Base', 'Features com maior Gain registrado', 'Leitura'], [
     ['01', 'target_std_7; target_lag_30; target_mean_30', 'Dependência de volatilidade e histórico; ganho marginal sobre persistência é fraco.'],
     ['02', 'target_lag_3; hora; target_lag_1', 'Rotina intradiária e dependência recente são dominantes.'],
@@ -129,6 +150,27 @@
   importance.append(note('Importância do Random Forest',[
     'Os cinco notebooks Random Forest executados calculam importância nativa. A documentação da Base 5 registra retorno corrente, volatilidade, dispersão histórica, lags de retorno e defasagens da Fed Funds entre as primeiras posições. Os valores completos por base precisam ser exportados de modo uniforme antes de uma tabela única; relevância preditiva não demonstra causalidade.'
   ]));
+  const rfTable=Array.from(results.querySelectorAll('table')).find(element=>element.caption?.textContent.includes('Random Forest —'));
+  if(rfTable){
+    rfTable.caption.textContent='Random Forest — saídas executadas dos notebooks';
+    window.REPORT_V2_SNAPSHOT.individual.filter(row=>row.modelo==='Random Forest').forEach((row,index)=>{
+      rfTable.tBodies[0].rows[index].cells[3].textContent=Number(row.origens).toLocaleString('pt-BR');
+    });
+  }
+  const staleResults=Array.from(results.querySelectorAll('p')).find(el=>el.textContent.startsWith('A documentação da Base 5 registra'));
+  if(staleResults)staleResults.textContent='Na Base 5, o Random Forest registra MAE 0,020517 nas 586 origens e o baseline de retorno zero, 0,020101. O resultado RF está salvo no notebook executado, mas seu arquivo completo de previsões não está disponível nesta cópia.';
+  document.querySelectorAll('.page-body p').forEach(el=>{
+    if(el.textContent.includes('results/metrics.csv ainda contém somente o cabeçalho'))el.textContent='Há 19 avaliações individuais registradas; o consolidado canônico results/metrics.csv contém cinco linhas XGBoost. As origens diferentes impedem ranking homologado.';
+    if(el.textContent.includes('A referência primária de Jena permanece pendente'))el.textContent=el.textContent.replace('A referência primária de Jena permanece pendente','A equivalência de Jena com a distribuição TensorFlow/Keras foi verificada');
+    if(el.textContent.includes('referência de extração da série de Jena pendente'))el.textContent=el.textContent.replace('referência de extração da série de Jena pendente','equivalência tabular da série de Jena verificada, mas data original de download pendente');
+    if(el.textContent.includes('fornecedor, moeda e horário de publicação de dados da Base 5 não confirmados'))el.textContent=el.textContent.replace('fornecedor, moeda e horário de publicação de dados da Base 5 não confirmados','moeda do ouro e horários históricos de publicação das taxas da Base 5 ainda não confirmados');
+  });
+  const resultNotes=Array.from(results.querySelectorAll('.callout'));
+  resultNotes.forEach(el=>{if(el.textContent.includes('somente o cabeçalho')||el.textContent.includes('Consolidação pendente'))el.innerHTML='<strong>Consolidação incompleta</strong> Há 19 MAEs individuais, mas somente cinco linhas XGBoost no consolidado canônico e amostras diferentes nas Bases 1–4. Não há ranking homologado.';});
+  const appendix=chapter(14);
+  appendix.append(note('Achados reproduzíveis da auditoria',[
+    'As tabelas results/metricas_individuais_auditadas.csv e results/ljung_box_auditado.csv são geradas por código. Seus dados distinguem CSV final, saída de notebook e consolidado XGBoost. O SARIMAX da Base 4 não foi executado nesta atualização.'
+  ],window.REPORT_V2_SNAPSHOT.findings));
   const summary=chapter(1);
   summary.querySelectorAll('.panel').forEach(panel=>{
     const title=panel.querySelector('h3')?.textContent;
@@ -159,10 +201,28 @@
     'A Base 5 é a mais próxima de uma comparação comum pela contagem de 586 origens, porém a igualdade exata de Random Forest e XGBoost com o teste canônico não pôde ser verificada a partir dos artefatos disponíveis. A Base 4 permanece sem avaliação SARIMAX final. Essas limitações são parte do resultado do trabalho, não resultados corrigidos ou omitidos.'
   ]));
   fill(conclusion, 'Preencher após verificar origens comuns, MAE, resíduos e importância das features', 'As execuções confirmam previsões fora da amostra e diagnósticos residuais. Tráfego e temperatura exibem padrões sazonais fortes; Bitcoin e ouro são mais difíceis de melhorar além da persistência. Não há evidência suficiente para declarar vencedor único entre os quatro modelos nas cinco bases.');
-  fill(conclusion, 'Vincular cada recomendação a evidência validada e indicar condições de aplicação', 'Reavaliar os quatro modelos sobre a mesma lista de origens em cada base, exportar resíduos e importância de modo uniforme e só então calcular ranking, vitórias e posição média. Confirmar também a fonte da série de Jena e a proveniência, moeda e horário das taxas do ouro antes da entrega definitiva.');
+  fill(conclusion, 'Vincular cada recomendação a evidência validada e indicar condições de aplicação', 'Reavaliar os quatro modelos sobre a mesma lista de origens em cada base, exportar resíduos e importância de modo uniforme e só então calcular ranking, vitórias e posição média. A equivalência de Jena com a distribuição TensorFlow/Keras foi comprovada; ainda faltam a data da transferência e a moeda do ouro e os horários históricos de publicação das taxas para homologação operacional.');
+  document.querySelector('#pagina-2 .finding .block-slot').textContent='Os quatro modelos possuem evidências individuais fora da amostra, mas as Bases 1–4 não têm origens comuns entre famílias; não existe ranking final defensável. O SARIMAX da Base 4 está excluído desta atualização.';
+  document.querySelector('#pagina-2 .finding .block-slot').dataset.pending='false';
+  document.querySelector('#pagina-2 .finding-evidence .slot').textContent='Matriz de MAE da seção 08 e auditoria em results/achados_auditoria.json.';
+  document.querySelector('#pagina-2 .finding-evidence .slot').dataset.pending='false';
+  const overview=document.querySelector('#pagina-4 .finding');
+  if(overview){
+    overview.querySelector('.block-slot').textContent='As cinco bases variam em unidade, frequência e força sazonal; por isso, a comparação entre elas exige posições e vitórias obtidas após alinhar as origens, nunca média bruta de MAE.';
+    overview.querySelector('.block-slot').dataset.pending='false';
+    overview.querySelector('.finding-evidence .slot').textContent='Metadados das cinco bases; seções 05 e 08 deste relatório.';
+    overview.querySelector('.finding-evidence .slot').dataset.pending='false';
+  }
+  fill(chapter(13), 'Padronizar referências completas e datas reais de acesso; não inventar datas de download', 'Referências de origem documentadas por base e por DOI quando disponível. Datas de download não comprovadas não foram fabricadas; confirmar antes da submissão final.');
+  fill(appendix, 'Anexar logs, parâmetros, contratos de teste, previsões e arquivos reproduzíveis', 'Arquivos de evidência: results/metricas_individuais_auditadas.csv, results/ljung_box_auditado.csv, results/achados_auditoria.json, results/metrics.csv, notebooks executados e CSVs locais completos de Holt-Winters e SARIMAX (exceto Base 4). A disponibilidade dos CSVs locais deve ser conferida no ambiente de entrega.');
+  const dailyTable=Array.from(appendix.querySelectorAll('table')).find(el=>el.caption?.textContent.includes('Registro diário individual'));
+  if(dailyTable){dailyTable.tBodies[0].replaceChildren();dailyTable.after(paragraph('O registro diário não foi fornecido ao repositório; não é possível inferir autores, datas, carga ou complexidade de trabalho a partir dos commits. O grupo deve anexar a planilha externa real.'));}
   chapter(14).querySelectorAll('p').forEach(el=>{
     if(el.textContent.startsWith('Relatório v2 gerado após git pull'))
-      el.textContent='Auditoria documental atualizada em 04/10/2026 com base no commit b483b781e226822f6b9477f1e303c7d0b2e43feb e nos CSVs locais de previsão disponíveis nesta data. Os resultados SARIMAX da Base 4 permanecem parciais e não integram a comparação final.';
+      el.textContent=`Auditoria documental atualizada em 04/10/2026. Revisão Git consultada na geração: ${window.REPORT_V2_SNAPSHOT.commit}; os novos arquivos desta atualização não estão necessariamente incluídos nesse identificador. Foram usados os CSVs locais de previsão disponíveis. O SARIMAX da Base 4 não integra a comparação.`;
+  });
+  results.querySelectorAll('.subtle').forEach(el=>{
+    if(el.textContent.includes('sincronizados em'))el.textContent='Origem documental: results/metrics.csv, projeto.yaml e docs/modelo_xgboost.md. O identificador Git do consolidado e os CSVs locais têm proveniências próprias; a auditoria distingue essas fontes.';
   });
   const notice=document.querySelector('.notice');
   if(notice){notice.querySelector('strong').textContent='Resultados auditados, comparação limitada.';notice.childNodes.forEach(node=>{if(node.nodeType===Node.TEXT_NODE&&node.textContent.includes('Resultados e evidências pendentes'))node.textContent=' Os resultados disponíveis e as limitações de comparabilidade estão descritos no relatório.'})}

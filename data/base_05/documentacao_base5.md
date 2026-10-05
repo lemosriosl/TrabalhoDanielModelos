@@ -16,9 +16,10 @@
 | Divisão | 75% treino / 25% teste, cronológica |
 | Semente | 42 |
 
-O CSV não declara fornecedor primário, unidade ou moeda do preço, nem a
-proveniência exata e o horário de publicação das taxas. O notebook assume que
-cada valor datado já estava disponível até o encerramento da respectiva semana.
+O CSV não declara fornecedor primário, unidade ou moeda do preço. A auditoria
+em `auditoria_taxas_base5.md` identificou as taxas como DGS10 e DFF do FRED e
+verificou a defasagem já presente no CSV; horários históricos de publicação,
+fuso da origem semanal e revisões/vintages ainda não foram comprovados.
 
 ## 2. Estrutura e auditoria do novo CSV
 
@@ -163,10 +164,13 @@ dependência temporal sem explicar.
 ## 9. Limitações
 
 - Confirmar unidade, moeda, fornecedor, licença e data de obtenção do preço.
-- Confirmar fonte, convenção e horário de disponibilidade das duas taxas.
+- Fonte, identificação e defasagem das taxas foram verificadas em
+  `auditoria_taxas_base5.md`; confirmar horário histórico de publicação, fuso
+  da origem semanal e revisões/vintages.
 - O preenchimento de semanas vazias cria retornos zero. Esses estados são
   identificados por indicadores de cobertura e permanecem no protocolo
   principal para que os quatro modelos usem exatamente a mesma grade.
-- A execução registrada de XGBoost e SARIMAX usa modo reduzido de busca para
-  validação do fluxo; a busca completa permanece configurada nos notebooks e
-  deve ser usada para os números definitivos da entrega.
+- O XGBoost registra avaliação final completa em `results/metrics.csv`.
+  Os notebooks SARIMAX mostram modo reduzido, enquanto a avaliação final da
+  Base 5 deve ser aferida pelo CSV completo de previsões local; não confundir
+  as quatro origens de diagnóstico do notebook com as 586 origens finais.
