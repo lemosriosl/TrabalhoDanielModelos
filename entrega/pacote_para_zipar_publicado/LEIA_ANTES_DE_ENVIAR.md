@@ -9,9 +9,9 @@ Consulte `docs/triagem_sem_reexecucao.md` antes de usar os números.
 ## Bloqueios para a entrega integral
 
 - Origens e horizontes dos quatro modelos não estão homologados; não há vitórias ou posição média válidas.
-- SARIMAX da Base 4 não possui avaliação final.
+- SARIMAX da Base 4 não possui avaliação final extensa; a pipe rápida do notebook não a substitui.
 - CSVs integrais de RF/XGBoost não foram recuperados para todas as bases.
 - Revisão humana e eventual orientação do professor sobre a entrega parcial permanecem necessárias.
-- Registro diário real: NÃO INCLUÍDO; solicitar ao grupo.
+- Registro diário real: NÃO INCLUÍDO; acompanhamento externo será revisto pelo grupo.
 
 Não crie o ZIP final até conferir esses bloqueios e o manifesto de hashes.

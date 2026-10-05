@@ -28,3 +28,19 @@ def test_staging_never_replaces_an_existing_folder(tmp_path, monkeypatch):
     assert "NÃO INCLUÍDO" in (destination / "LEIA_ANTES_DE_ENVIAR.md").read_text(encoding="utf-8")
     with pytest.raises(FileExistsError):
         module.preparar_pacote(root, destination)
+
+
+def test_update_requires_intact_manifest(tmp_path, monkeypatch):
+    root = tmp_path / "project"
+    source = root / "entrega" / "relatorio_v2.html"
+    source.parent.mkdir(parents=True)
+    source.write_text("primeiro", encoding="utf-8")
+    monkeypatch.setattr(module, "listar_arquivos", lambda _: [source])
+    destination = tmp_path / "staging"
+    module.preparar_pacote(root, destination)
+    source.write_text("atualizado", encoding="utf-8")
+    module.atualizar_pacote(root, destination)
+    assert (destination / "relatorio_v2.html").read_text(encoding="utf-8") == "atualizado"
+    (destination / "relatorio_v2.html").write_text("alterado pelo usuário", encoding="utf-8")
+    with pytest.raises(ValueError, match="modificada"):
+        module.atualizar_pacote(root, destination)

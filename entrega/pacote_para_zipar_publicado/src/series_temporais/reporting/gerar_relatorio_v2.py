@@ -1,5 +1,6 @@
 """Gera uma v2 independente, sem modificar o relatório v1 ou resultados."""
 from pathlib import Path
+import base64
 import csv
 import json
 import subprocess
@@ -46,6 +47,26 @@ def figuras_notebook(raiz: Path, specs: list[tuple[str, int]]) -> list[dict]:
     return figures
 
 
+def figuras_sarimax(raiz: Path, kind: str) -> list[dict]:
+    folder = raiz / 'results' / 'figuras_sarimax'
+    with (folder / 'manifesto.csv').open(encoding='utf-8', newline='') as stream:
+        rows = list(csv.DictReader(stream))
+    if {row['base_id'] for row in rows} != {'base_01', 'base_02', 'base_03', 'base_05'}:
+        raise ValueError('Esperadas figuras SARIMAX das Bases 1, 2, 3 e 5.')
+    figures = []
+    for row in sorted(rows, key=lambda value: value['base_id']):
+        filename = row[f'figura_{kind}']
+        path = folder / filename
+        figures.append({
+            'base': int(row['base_id'][-2:]),
+            'source': f'results/figuras_sarimax/{filename}',
+            'detail': (f"{int(row['origens_horizonte_1']):,} origens válidas; "
+                       f"{row['horizontes_excluidos']} horizontes excluídos").replace(',', '.'),
+            'data': 'data:image/png;base64,' + base64.b64encode(path.read_bytes()).decode('ascii'),
+        })
+    return figures
+
+
 def gerar(raiz: Path) -> Path:
     fontes = raiz / 'docs' / 'relatorio'
     html = (fontes / 'modelo.html').read_text(encoding='utf-8')
@@ -76,6 +97,8 @@ def gerar(raiz: Path) -> Path:
                            'rf_residual_figures': figuras_notebook(raiz, RF_RESIDUAL_FIGURES),
                            'rf_importance_figures': figuras_notebook(raiz, RF_IMPORTANCE_FIGURES),
                            'rf_acf_figures': figuras_notebook(raiz, RF_ACF_FIGURES),
+                           'sarimax_residual_figures': figuras_sarimax(raiz, 'residuos'),
+                           'sarimax_acf_figures': figuras_sarimax(raiz, 'acf'),
                            'xgb_diagnostic_figures': figuras_notebook(raiz, XGB_DIAGNOSTIC_FIGURES)},
                           ensure_ascii=False).replace('<', '\\u003c')
     html = html.replace('</head>', '<style>\n' + css + '\n</style>\n<style>\n' + audit_css + '\n</style>\n</head>', 1)

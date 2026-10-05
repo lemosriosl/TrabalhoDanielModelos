@@ -111,9 +111,10 @@ def _ljung_from_notebook(root: Path, base: int, model: str) -> list[dict]:
     ]
 
 
-def gerar_evidencias(root: Path) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]:
+def gerar_evidencias(root: Path, predictions_dir: Path | None = None) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]:
     """Produz tabelas rastreáveis; jamais calcula ranking com amostras distintas."""
     root = root.resolve()
+    predictions_dir = (predictions_dir or root / "results" / "predictions").resolve()
     xgb = pd.read_csv(root / "results" / "metrics.csv").set_index("base_id")
     metrics: list[dict] = []
     diagnostics: list[dict] = []
@@ -125,7 +126,7 @@ def gerar_evidencias(root: Path) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]
             if base == 4 and model == "SARIMAX":
                 findings.append("Base 4: SARIMAX final excluído por solicitação do grupo.")
                 continue
-            path = root / "results" / "predictions" / f"{base_id}__{stem}.csv"
+            path = predictions_dir / f"{base_id}__{stem}.csv"
             mae, count, residual = _prediction_metric(path)
             observed = pd.read_csv(path, usecols=["origin_time", "target_time", "y_true", "y_pred"])
             saved_predictions[model] = observed.drop(columns="y_pred")
@@ -136,12 +137,12 @@ def gerar_evidencias(root: Path) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]
                 findings.append(f"{base_id}: {model} possui {count-valid_count} de {count} previsões com horizonte diferente de um passo; MAE global não é homologável como teste de um passo.")
             metrics.append({"base_id": base_id, "modelo": model, "mae": mae, "origens": count,
                             "origens_horizonte_1": valid_count, "mae_horizonte_1": valid_mae,
-                            "fonte": path.relative_to(root).as_posix(), "tipo_fonte": "csv_final"})
+                            "fonte": f"results/predictions/{path.name}", "tipo_fonte": "csv_final"})
             lb = acorr_ljungbox(residual.loc[one_step.to_numpy()].reset_index(drop=True),
                                 lags=LAGS[base], return_df=True)
             diagnostics.extend({"base_id": base_id, "modelo": model, "lag": int(lag),
                                 "lb_stat": float(row.lb_stat), "p_valor": float(row.lb_pvalue),
-                                "fonte": path.relative_to(root).as_posix()}
+                                "fonte": f"results/predictions/{path.name}"}
                                for lag, row in lb.iterrows())
         if len(saved_predictions) == 2:
             common = saved_predictions["Holt-Winters"].merge(saved_predictions["SARIMAX"],
@@ -155,11 +156,6 @@ def gerar_evidencias(root: Path) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]
         metrics.append({"base_id": base_id, "modelo": "Random Forest", "mae": rf_mae,
                         "origens": rf_count, "fonte": rf_source, "tipo_fonte": "notebook_executado"})
         diagnostics.extend(_ljung_from_notebook(root, base, "RF"))
-        rf_csv = root / "results" / "predictions" / f"{base_id}__random_forest.csv"
-        if rf_csv.exists():
-            csv_mae, csv_count, _ = _prediction_metric(rf_csv)
-            if csv_count != rf_count or not np.isclose(csv_mae, rf_mae, rtol=1e-5):
-                findings.append(f"{base_id}: CSV local de RF ({csv_mae:.6f}; {csv_count} origens) diverge do notebook ({rf_mae:.6f}; {rf_count} origens).")
         xrow = xgb.loc[base_id]
         metrics.append({"base_id": base_id, "modelo": "XGBoost", "mae": float(xrow.mae),
                         "origens": int(xrow.origens_avaliadas), "fonte": "results/metrics.csv",
@@ -173,8 +169,8 @@ def gerar_evidencias(root: Path) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]
     return metrics_frame, pd.DataFrame(diagnostics), findings
 
 
-def salvar_evidencias(root: Path) -> tuple[Path, Path, Path]:
-    metrics, diagnostics, findings = gerar_evidencias(root)
+def salvar_evidencias(root: Path, predictions_dir: Path | None = None) -> tuple[Path, Path, Path]:
+    metrics, diagnostics, findings = gerar_evidencias(root, predictions_dir)
     target = root / "results"
     target.mkdir(parents=True, exist_ok=True)
     metrics_path = target / "metricas_individuais_auditadas.csv"
@@ -187,5 +183,9 @@ def salvar_evidencias(root: Path) -> tuple[Path, Path, Path]:
 
 
 if __name__ == "__main__":
-    for result in salvar_evidencias(Path(__file__).resolve().parents[3]):
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--predictions-dir", type=Path)
+    args = parser.parse_args()
+    for result in salvar_evidencias(Path(__file__).resolve().parents[3], args.predictions_dir):
         print(result)

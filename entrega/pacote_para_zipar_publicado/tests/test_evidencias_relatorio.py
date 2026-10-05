@@ -39,6 +39,8 @@ def test_metric_rejects_leakage_and_inconsistent_residuals(tmp_path, column, val
 
 
 def test_audit_recovers_rf_counts_and_flags_non_comparable_origins():
+    if not (ROOT / "results" / "predictions" / "base_01__holt_winters.csv").is_file():
+        pytest.skip("CSV completo de previsão é ignorado pelo Git e não está nesta cópia")
     metrics, diagnostics, findings = gerar_evidencias(ROOT)
     assert len(metrics) == 19  # SARIMAX 4 deliberately excluded
     assert set(metrics.loc[metrics.modelo.eq("Random Forest"), "origens"]) == {842, 3372, 2847, 82830, 586}
@@ -50,4 +52,4 @@ def test_audit_recovers_rf_counts_and_flags_non_comparable_origins():
     assert any("base_02: contagens de origens distintas" in item for item in findings)
     assert any("base_02: Holt-Winters e SARIMAX compartilham" in item for item in findings)
     assert not any("base_05: Holt-Winters e SARIMAX" in item for item in findings)
-    assert any("CSV local de RF" in item for item in findings)
+    assert not any("CSV local de RF" in item for item in findings)

@@ -244,3 +244,11 @@
 ## 2026-10-05 - Publicação da pasta de pré-entrega no Git
 
 **Decisão estrutural:** a pedido do grupo, versionar uma única pasta de pré-entrega em `entrega/pacote_para_zipar_publicado/`, sem criar arquivo ZIP. As montagens locais anteriores permanecem ignoradas. O manifesto de hashes e o aviso de pendências acompanham a pasta versionada; sua presença no remoto não altera o status metodológico incompleto nem supre o registro diário ausente.
+
+## 2026-10-05 - Enquadramento da pipe rápida e comparação descritiva
+
+**Decisão metodológica:** descrever a pipe rápida SARIMAX como um protocolo operacional de busca e teste reduzidos aplicado nos notebooks das cinco bases; os notebooks mostram quatro origens no walk-forward salvo. Isso permite comparar a estrutura do procedimento, não os MAEs brutos entre bases com unidades diferentes nem substituir a avaliação final. Os CSVs mais extensos das Bases 1, 2, 3 e 5 foram produzidos depois por código com configuração congelada do notebook; a Base 4 não possui avaliação extensa por custo computacional. Nas Bases 2 e 3, os desvios de horizonte foram encontrados nesses CSVs posteriores, não apenas na saída smoke.
+
+**Comparação dos quatro modelos:** explicar diferenças de preparação, janelas de features, covariáveis e frequência de reajuste como contribuintes plausíveis para amostras e custos distintos, sem alegar que cada diferença de contagem foi causalmente decomposta. Usar MAEs dos notebooks remotos para Random Forest; as saídas das Bases 1–4 registram oito blocos de reajuste, enquanto a Base 5 usa reajuste por origem. Desconsiderar os CSVs locais conflitantes de RF no relatório. A alteração posterior do código das Bases 1–4 para reajuste por origem não reexecutou as saídas salvas. Mostrar valores individuais e comparações pareadas verificadas, mas não converter números de origens diferentes em ranking, vitórias ou posição média homologados.
+
+**Diagnósticos e entrega:** gerar gráficos residuais finais SARIMAX apenas dos CSVs completos disponíveis para as Bases 1, 2, 3 e 5, filtrando horizonte de um passo; não apresentar gráficos de ajuste/in-sample dos notebooks como resíduos finais. O acompanhamento de tarefas fornecido pelo grupo será tratado como registro administrativo externo; sua validação diária e inclusão no pacote ficam para revisão com o professor, conforme pedido do grupo.

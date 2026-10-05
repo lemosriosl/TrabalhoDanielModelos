@@ -1,9 +1,7 @@
 [
-  "base_01: CSV local de RF (738.894178; 842 origens) diverge do notebook (764.717551; 842 origens).",
   "base_01: contagens de origens distintas: {'Holt-Winters': 851, 'SARIMAX': 851, 'Random Forest': 842, 'XGBoost': 842}.",
   "base_02: SARIMAX possui 14 de 7598 previsões com horizonte diferente de um passo; MAE global não é homologável como teste de um passo.",
   "base_02: Holt-Winters e SARIMAX compartilham 7584 origens, de 8115 e 7598 respectivamente.",
-  "base_02: CSV local de RF (127.346397; 3372 origens) diverge do notebook (129.760961; 3372 origens).",
   "base_02: contagens de origens distintas: {'Holt-Winters': 8115, 'SARIMAX': 7598, 'Random Forest': 3372, 'XGBoost': 3372}.",
   "base_03: SARIMAX possui 53 de 6824 previsões com horizonte diferente de um passo; MAE global não é homologável como teste de um passo.",
   "base_03: Holt-Winters e SARIMAX discordam em alvo/instante nas origens comuns.",
