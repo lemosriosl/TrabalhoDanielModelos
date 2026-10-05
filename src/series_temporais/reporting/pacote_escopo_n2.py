@@ -24,8 +24,6 @@ RESULT_SOURCE = (
     "results/metricas_individuais_auditadas.csv",
     "results/comparacao_pareada_hw_sarimax.csv",
     "results/ljung_box_auditado.csv",
-    "results/achados_auditoria.json",
-    "results/extraidos_do_remoto/random_forest_metrics.csv",
 )
 EXCLUDED_CODE = {
     "src/series_temporais/reporting/gerar_relatorio.py",  # versão anterior
@@ -55,6 +53,7 @@ def selecionar_arquivos(root: Path) -> dict[Path, Path]:
         include(name)
     for name in REPORT_SOURCE + RESULT_SOURCE:
         include(name)
+    include("results/random_forest_metrics.csv")
     for base in range(1, 6):
         for name in ("raw.csv", "metadata.yaml"):
             include(f"data/base_{base:02d}/{name}")

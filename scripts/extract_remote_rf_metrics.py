@@ -47,7 +47,7 @@ for base_id, (filename, metric_column, model_name) in SPECS.items():
         }
     )
 
-output = ROOT / "results" / "extraidos_do_remoto" / "random_forest_metrics.csv"
+output = ROOT / "results" / "random_forest_metrics.csv"
 output.parent.mkdir(parents=True, exist_ok=True)
 pd.DataFrame(rows).to_csv(output, index=False, encoding="utf-8", lineterminator="\n")
 print(output)

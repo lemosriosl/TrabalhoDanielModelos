@@ -142,7 +142,7 @@ O tempo do tuning é a soma dos ajustes registrados para os candidatos, incluind
 - Horizonte, origens e cortes foram espelhados do Random Forest e devem permanecer iguais nos quatro modelos.
 - Se o catálogo de features for alterado, o tuning e o teste precisam ser executados novamente; não se deve reutilizar os parâmetros atuais.
 - A interpretação final deve considerar resíduos, ACF e Ljung–Box exibidos em cada notebook. Rejeição de ruído branco indica estrutura temporal ainda não capturada.
-- Os notebooks e resultados RF permanecem como no remoto. A cadência 7/24/24/144/4 é exclusiva do XGBoost e não impõe reexecução dos outros modelos. Na comparação final, declarar a diferença de cadência de reajuste e homologar alvo, horizonte e origens; três vitórias aqui significam somente comparação com persistência. O CSV `results/extraidos_do_remoto/random_forest_metrics.csv` preserva as métricas RF extraídas pelo grupo, separadas do consolidado canônico.
+- Os notebooks e resultados RF permanecem como no remoto. A cadência 7/24/24/144/4 é exclusiva do XGBoost e não impõe reexecução dos outros modelos. Na comparação final, declarar a diferença de cadência de reajuste e homologar alvo, horizonte e origens; três vitórias aqui significam somente comparação com persistência. O CSV `results/random_forest_metrics.csv` preserva as métricas RF extraídas pelo grupo, separadas do consolidado canônico.
 
 ## Reprodutibilidade
 

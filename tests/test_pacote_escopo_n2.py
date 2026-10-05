@@ -13,7 +13,10 @@ def test_selecao_cobre_escopo_sem_arquivos_suplementares():
     assert {f"data/base_{base:02d}/raw.csv" for base in range(1, 6)} <= names
     assert {"relatorio_v2.pdf", "relatorio_v2.html",
             "results/metricas_individuais_auditadas.csv",
+            "results/random_forest_metrics.csv",
             "docs/relatorio/modelo.html"} <= names
+    assert "results/achados_auditoria.json" not in names
+    assert "results/extraidos_do_remoto/random_forest_metrics.csv" not in names
     assert not any(name.startswith(("tests/", "references/")) for name in names)
     assert not any("SARIMAX_fast" in name or "RF_preco" in name for name in names)
     assert not any(name.endswith(("README.md", "AGENTS.md", "ranking_descritivo_modelos.csv")) for name in names)

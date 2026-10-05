@@ -84,7 +84,7 @@
     'Na Base 3, seis origens compartilhadas com Holt-Winters apontam para alvo/horário diferente no SARIMAX. O diagnóstico de Ljung–Box desta auditoria também filtra as linhas de horizonte inválido. As linhas originais foram preservadas nos CSVs, sem edição manual.'
   ]));
   results.append(note('Proveniência dos valores',[
-    'XGBoost: results/metrics.csv versionado no repositório e notebooks com busca completa registrada. Random Forest: exclusivamente results/extraidos_do_remoto/random_forest_metrics.csv, extraído das saídas dos notebooks remotos; CSVs locais divergentes de RF não são usados neste relatório. SARIMAX: CSVs extensos das Bases 1, 2, 3 e 5, gerados após o smoke test com configuração congelada, com auditorias compactas versionadas. Holt-Winters: CSVs de previsões fora da amostra. Os CSVs completos de previsões não estão todos no Git.',
+    'XGBoost: results/metrics.csv versionado no repositório e notebooks com busca completa registrada. Random Forest: results/random_forest_metrics.csv no pacote, extraído das saídas dos notebooks remotos; CSVs locais divergentes de RF não são usados neste relatório. SARIMAX: CSVs extensos das Bases 1, 2, 3 e 5, gerados após o smoke test com configuração congelada, com auditorias compactas versionadas. Holt-Winters: CSVs de previsões fora da amostra. Os CSVs completos de previsões não estão todos no Git.',
     'Os notebooks SARIMAX das cinco bases registram uma pipe rápida em modo reduzido: busca abreviada e quatro origens no walk-forward salvo. Isso verifica a execução do procedimento, mas não é o teste completo. A execução extensa da Base 4 não foi realizada. Para RF 1–4, as saídas salvas refletem oito blocos de reajuste; a mudança posterior no código para reajuste por origem não atualizou esses resultados.'
   ]));
   results.append(note('Comparação descritiva, com limites explícitos',[
@@ -283,7 +283,7 @@
   fill(conclusion, 'Vincular cada recomendação a evidência validada e indicar condições de aplicação', 'Reavaliar os quatro modelos sobre a mesma lista de origens em cada base, exportar resíduos e importância de modo uniforme e só então calcular ranking, vitórias e posição média. A equivalência de Jena com a distribuição TensorFlow/Keras foi comprovada; ainda faltam a data da transferência e a moeda do ouro e os horários históricos de publicação das taxas para homologação operacional.');
   document.querySelector('#pagina-2 .finding .block-slot').textContent='Os quatro modelos possuem evidências individuais fora da amostra, mas as Bases 1–4 não têm origens comuns entre famílias; não existe ranking final defensável. O SARIMAX da Base 4 está excluído desta atualização.';
   document.querySelector('#pagina-2 .finding .block-slot').dataset.pending='false';
-  document.querySelector('#pagina-2 .finding-evidence .slot').textContent='Matriz de MAE da seção 08 e auditoria em results/achados_auditoria.json.';
+  document.querySelector('#pagina-2 .finding-evidence .slot').textContent='Matriz de MAE da seção 08 e achados reconstruídos das tabelas compactas de resultados.';
   document.querySelector('#pagina-2 .finding-evidence .slot').dataset.pending='false';
   const overview=document.querySelector('#pagina-4 .finding');
   if(overview){

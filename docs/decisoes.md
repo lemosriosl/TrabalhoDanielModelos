@@ -1,5 +1,9 @@
 # Decisões do projeto
 
+## 2026-10-05 - Coerência do pacote após simplificação dos resultados
+
+**Decisão:** manter no pacote a métrica Random Forest em `results/random_forest_metrics.csv` e não recolocar `achados_auditoria.json`. O relatório apontará para o novo caminho e reconstruirá os achados exibíveis a partir das tabelas compactas incluídas. O achado sobre discordância de alvo/instante da Base 3, que não pode ser reconstituído só com agregados, permanece documentado no relatório, mas não é apresentado como derivado dessas tabelas. Não há alteração de MAE, previsões ou modelos.
+
 ## 2026-10-05 - Correções rápidas do relatório V2, sem retreino
 
 **Escopo:** alinhar os números STL das Bases 3 e 4 às figuras RF já executadas (maior trecho contínuo observado, sem interpolação); incorporar os cinco gráficos temporais de resíduos XGBoost já salvos; corrigir a inferência indevida sobre sazonalidade do retorno do ouro e ampliar as ressalvas dos diagnósticos em calendários descontínuos. Regenerar HTML/PDF por código, sem alterar previsões, métricas, dados, tuning ou parâmetros. A comparação comum entre famílias continua pendente. As mudanças locais HW anteriores permanecem preservadas em stash e não integram esta rodada.

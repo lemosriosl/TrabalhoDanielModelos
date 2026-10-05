@@ -81,6 +81,43 @@ def figuras_residuos_xgboost(raiz: Path) -> list[dict]:
     return figuras_notebook(raiz, specs)
 
 
+def achados_compactos(individual: list[dict], paired: list[dict]) -> list[str]:
+    """Resume somente fatos verificáveis nas tabelas que acompanham o pacote."""
+    por_base = {f'base_{base:02d}': [] for base in range(1, 6)}
+    for row in individual:
+        por_base[row['base_id']].append(row)
+    pareados = {row['base_id']: row for row in paired}
+    findings = []
+    for base_id, rows in por_base.items():
+        models = {row['modelo']: row for row in rows}
+        sarimax = models.get('SARIMAX')
+        if sarimax is None:
+            findings.append(f"{base_id}: SARIMAX final não consta das métricas individuais.")
+        elif sarimax.get('origens_horizonte_1'):
+            total = int(sarimax['origens'])
+            validas = int(sarimax['origens_horizonte_1'])
+            if validas != total:
+                findings.append(
+                    f"{base_id}: SARIMAX possui {total-validas} de {total} previsões com "
+                    "horizonte diferente de um passo; MAE global não é homologável como teste de um passo."
+                )
+        pair = pareados.get(base_id)
+        hw = models.get('Holt-Winters')
+        if pair and hw and sarimax:
+            common = int(pair['origens_pareadas'])
+            total_hw, total_sarimax = int(hw['origens']), int(sarimax['origens'])
+            if common < total_hw or common < total_sarimax:
+                findings.append(
+                    f"{base_id}: Holt-Winters e SARIMAX têm {common} origens pareadas, "
+                    f"de {total_hw} e {total_sarimax} respectivamente; a tabela agregada "
+                    "não comprova igualdade dos alvos."
+                )
+        counts = {row['modelo']: int(row['origens']) for row in rows}
+        if len(set(counts.values())) > 1:
+            findings.append(f"{base_id}: contagens de origens distintas: {counts}.")
+    return findings
+
+
 def gerar(raiz: Path) -> Path:
     fontes = raiz / 'docs' / 'relatorio'
     html = (fontes / 'modelo.html').read_text(encoding='utf-8')
@@ -96,7 +133,7 @@ def gerar(raiz: Path) -> Path:
         diagnostics = list(csv.DictReader(stream))
     with (raiz / 'results' / 'comparacao_pareada_hw_sarimax.csv').open(encoding='utf-8', newline='') as stream:
         paired = list(csv.DictReader(stream))
-    findings = json.loads((raiz / 'results' / 'achados_auditoria.json').read_text(encoding='utf-8'))
+    findings = achados_compactos(individual, paired)
     if len(metrics) != 5 or len({row['base_id'] for row in metrics}) != 5:
         raise ValueError('Esperadas cinco bases XGBoost no consolidado.')
     if len(paired) != 4 or {row['base_id'] for row in paired} != {'base_01', 'base_02', 'base_03', 'base_05'}:
