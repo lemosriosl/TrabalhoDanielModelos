@@ -67,6 +67,20 @@ def figuras_sarimax(raiz: Path, kind: str) -> list[dict]:
     return figures
 
 
+def figuras_residuos_xgboost(raiz: Path) -> list[dict]:
+    """Seleciona a célula diagnóstica executada por tag, sem ajustar modelos."""
+    specs = []
+    for base in range(1, 6):
+        name = f'base_{base:02d}-grupo{base}_XGBoost.ipynb'
+        notebook = json.loads((raiz / 'notebooks' / name).read_text(encoding='utf-8'))
+        indexes = [i for i, cell in enumerate(notebook['cells'])
+                   if 'residuos-temporais-xgboost' in cell.get('metadata', {}).get('tags', [])]
+        if len(indexes) != 1:
+            raise ValueError(f'Esperada uma célula de resíduos XGBoost: {name}')
+        specs.append((name, indexes[0]))
+    return figuras_notebook(raiz, specs)
+
+
 def gerar(raiz: Path) -> Path:
     fontes = raiz / 'docs' / 'relatorio'
     html = (fontes / 'modelo.html').read_text(encoding='utf-8')
@@ -104,7 +118,8 @@ def gerar(raiz: Path) -> Path:
                            'rf_acf_figures': figuras_notebook(raiz, RF_ACF_FIGURES),
                            'sarimax_residual_figures': figuras_sarimax(raiz, 'residuos'),
                            'sarimax_acf_figures': figuras_sarimax(raiz, 'acf'),
-                           'xgb_diagnostic_figures': figuras_notebook(raiz, XGB_DIAGNOSTIC_FIGURES)},
+                           'xgb_diagnostic_figures': figuras_notebook(raiz, XGB_DIAGNOSTIC_FIGURES),
+                           'xgb_residual_figures': figuras_residuos_xgboost(raiz)},
                           ensure_ascii=False).replace('<', '\\u003c')
     html = html.replace('</head>', '<style>\n' + css + '\n</style>\n<style>\n' + audit_css + '\n</style>\n</head>', 1)
     html = html.replace('</body>', '<script>window.REPORT_V2_SNAPSHOT=' + snapshot + ';</script>\n<script>\n' + js + '\n</script>\n<script>\n' + audit_js + '\n</script>\n</body>', 1)

@@ -1,5 +1,10 @@
 # Decisões do projeto
 
+## 2026-10-05 - Correções rápidas do relatório V2, sem retreino
+
+**Escopo:** alinhar os números STL das Bases 3 e 4 às figuras RF já executadas (maior trecho contínuo observado, sem interpolação); incorporar os cinco gráficos temporais de resíduos XGBoost já salvos; corrigir a inferência indevida sobre sazonalidade do retorno do ouro e ampliar as ressalvas dos diagnósticos em calendários descontínuos. Regenerar HTML/PDF por código, sem alterar previsões, métricas, dados, tuning ou parâmetros. A comparação comum entre famílias continua pendente. As mudanças locais HW anteriores permanecem preservadas em stash e não integram esta rodada.
+
+
 ## 2026-10-05 - Commit restrito às justificativas e resíduos XGBoost
 
 **Escopo autorizado:** pausar a revisão HW e fazer somente um commit local da parte XGBoost. Incluir justificativa nos cinco notebooks e no estudo/documentação própria, gráficos temporais incorporados às saídas, auxiliar de plotting, testes e orientação de reprodução. Excluir HW, EDA/STL, auditoria geral, relatório geral, dados, CSVs ignorados e mudanças de métricas. Selecionar somente os trechos XGBoost em arquivos de documentação compartilhados. Preservar as demais alterações locais sem commit; não publicar no remoto.

@@ -116,17 +116,17 @@
     })));
   const stl=chapter(5);
   stl.append(note('STL executada nas cinco bases',[
-    'As decomposições e as medidas abaixo foram extraídas das saídas salvas dos notebooks exploratórios. Elas descrevem a série no treino e orientam a interpretação; não escolhem sozinhas o melhor modelo.'
+    'As decomposições e as medidas abaixo vêm das saídas executadas indicadas nas legendas. Nas Bases 3 e 4, tabela e figura usam a mesma execução RF: maior trecho contínuo observado do treino, sem interpolação (1.509 e 189.497 pontos, respectivamente). A figura mostra o ciclo diário; a tabela também registra o semanal. Essas análises exploratórias não escolhem sozinhas o melhor modelo.'
   ]));
   stl.append(table('Força sazonal e de tendência registradas', ['Base', 'Período', 'Força sazonal', 'Força de tendência'], [
     ['01 · Bitcoin', '7 dias', '0,0000', '0,9942'],
     ['01 · Bitcoin', '365 dias', '0,0000', '0,7414'],
     ['02 · Tráfego', '24 horas', '0,8080', '0,1037'],
     ['02 · Tráfego', '168 horas', '0,9717', '0,0386'],
-    ['03 · PM2.5', '24 horas', '0,3970', '0,8739'],
-    ['03 · PM2.5', '168 horas', '0,3314', '0,3801'],
-    ['04 · Temperatura', '144 passos', '0,8605', '0,9816'],
-    ['04 · Temperatura', '1.008 passos', '0,6250', '0,9165'],
+    ['03 · PM2.5', '24 horas', '0,3157', '0,8802'],
+    ['03 · PM2.5', '168 horas', '0,2515', '0,3098'],
+    ['04 · Temperatura', '144 passos', '0,8596', '0,9836'],
+    ['04 · Temperatura', '1.008 passos', '0,6107', '0,9192'],
     ['05 · Ouro', '52 semanas', '0,0000', '0,9275']
   ]));
   stl.append(note('Leitura das decomposições',[
@@ -144,7 +144,7 @@
     ['02','Tráfego: os MAEs de um passo são 574,086284 (SARIMAX, 7.584 origens após filtrar 14 horizontes inválidos), 250,150540 (Holt-Winters, 8.115), 129,760961 (RF, 3.372) e 127,891555 (XGBoost, 3.372).', 'A sazonalidade semanal é alta (0,9717), mas os modelos ainda não compartilham a mesma amostra de teste.'],
     ['03','PM2.5: XGBoost registra MAE 9,528651, SARIMAX 10,369544 em 6.771 origens válidas, RF 10,092369 e Holt-Winters 14,196441; há 53 horizontes SARIMAX inválidos e as amostras divergem.', 'Há tendência forte no ciclo diário e sazonalidade moderada; a falha de horizonte impede homologar o CSV SARIMAX sem filtragem ou correção da execução.'],
     ['04','Temperatura: Holt-Winters, RF e XGBoost registram MAE 0,135438, 0,136593 e 0,136486. SARIMAX ainda não possui MAE final utilizável.', 'Ciclos diário e semanal são fortes, mas os diagnósticos residuais ainda rejeitam ruído branco.'],
-    ['05','Ouro: os quatro registros possuem 586 origens: SARIMAX 0,029219, Holt-Winters 0,020078, RF 0,020517 e XGBoost 0,020133. A igualdade exata das origens de RF/XGBoost não foi recuperada nos artefatos locais.', 'O retorno semanal não mostrou sazonalidade estável; a tendência reportada pertence ao preço em nível.']
+    ['05','Ouro: os quatro registros possuem 586 origens: SARIMAX 0,029219, Holt-Winters 0,020078, RF 0,020517 e XGBoost 0,020133. A igualdade exata das origens de RF/XGBoost não foi recuperada nos artefatos locais.', 'A STL apresentada é do preço semanal, com força sazonal zero no período 52 e tendência forte. Ela não permite concluir, diretamente, sobre a sazonalidade do retorno logarítmico usado como alvo.']
   ];
   baseFindings.forEach((entry,index)=>{
     const scope=document.querySelector(`#pagina-${index+5} .page-body`);
@@ -181,8 +181,12 @@
     'As figuras de ajuste e as quatro origens do teste reduzido nos notebooks não são confundidas com resíduos finais. Os gráficos abaixo foram gerados sem novo treino a partir dos CSVs extensos das Bases 1, 2, 3 e 5, mantendo apenas horizonte de um passo; a Base 4 não possui avaliação final. O manifesto em results/figuras_sarimax/ registra a contagem, as exclusões e o hash de cada CSV de origem. Nas Bases 2 e 3, a ACF e o Ljung-Box percorrem a sequência de previsões válidas após a exclusão, que pode conter saltos de horário; isso limita a interpretação literal de cada lag temporal.'
   ]));
   residuals.append(note('Figuras recuperadas dos notebooks executados',[
-    'Os painéis a seguir mostram resíduos ao longo do tempo e ACF de Holt-Winters e Random Forest. Os painéis XGBoost incluem observados versus previstos, ACF residual e Gain. Na Base 5, os gráficos de Holt-Winters e Random Forest são do subconjunto de robustez de 523 cotações novas, diferente do MAE principal de 586 origens. A série temporal residual completa de XGBoost não foi localizada nos artefatos salvos; o painel de ACF disponível não a substitui.'
+    'Os painéis a seguir mostram resíduos ao longo do tempo e ACF de Holt-Winters e Random Forest. Os cinco gráficos temporais completos do XGBoost foram incorporados das novas células diagnósticas executadas, sem retreino nem alteração de MAE. Na Base 5, o gráfico XGBoost usa todas as 586 semanas de retorno; os gráficos HW/RF usam o subconjunto de robustez de 523 cotações novas. Os painéis de previsão, ACF e Gain permanecem separados.'
   ]));
+  residuals.append(note('Calendário dos diagnósticos: ressalva adicional',[
+    'As sequências de origens avaliáveis do XGBoost nas Bases 2, 3 e 4 contêm lacunas; os diagnósticos salvos RF também exigem conferência do calendário. Na Base 5, selecionar somente cotações novas remove semanas. Por isso, lags calculados na sequência filtrada não devem ser interpretados automaticamente como horas, intervalos de dez minutos ou semanas consecutivas. Os gráficos temporais XGBoost interrompem a linha nas lacunas, mas os valores ACF/Ljung–Box existentes não foram recalculados nesta revisão.'
+  ]));
+  residuals.append(gallery('XGBoost: resíduos completos ao longo do tempo',window.REPORT_V2_SNAPSHOT.xgb_residual_figures,'Resíduos XGBoost fora da amostra'));
   residuals.append(gallery('SARIMAX: resíduos finais de um passo',window.REPORT_V2_SNAPSHOT.sarimax_residual_figures,'Resíduos SARIMAX fora da amostra'));
   residuals.append(gallery('SARIMAX: ACF residual final',window.REPORT_V2_SNAPSHOT.sarimax_acf_figures,'ACF SARIMAX fora da amostra'));
   residuals.append(gallery('Holt-Winters: resíduos por origem',window.REPORT_V2_SNAPSHOT.hw_residual_figures,'Resíduos Holt-Winters por origem'));
