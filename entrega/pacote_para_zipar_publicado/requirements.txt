@@ -1,0 +1,13 @@
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+statsmodels
+scikit-learn
+xgboost
+pyyaml
+jupyter
+nbconvert
+pytest
+

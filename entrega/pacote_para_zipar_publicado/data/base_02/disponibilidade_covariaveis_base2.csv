@@ -1,0 +1,9 @@
+coluna,disponibilidade,atraso,feature,status,justificativa
+is_holiday,conhecido_antecipadamente,0,is_holiday_alvo,aprovado,Feriado da data-alvo; calendário conhecido antecipadamente.
+temp,na_origem,0,temp_t,em_validacao,Observada na hora t; não simula previsão meteorológica futura.
+rain_1h,na_origem,0,rain_1h_t,em_validacao,Acumulado observado na hora t.
+snow_1h,na_origem,0,snow_1h_t,em_validacao,Acumulado observado na hora t.
+clouds_all,na_origem,0,clouds_all_t,em_validacao,Cobertura observada na hora t.
+weather_main,proibida,0,,excluido,Proibida no quadro modelável.
+weather_description,proibida,0,,excluido,Proibida no quadro modelável.
+holiday,proibida,0,,excluido,Proibida no quadro modelável.

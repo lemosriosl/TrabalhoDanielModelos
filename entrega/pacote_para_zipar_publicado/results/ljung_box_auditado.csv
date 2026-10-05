@@ -1,0 +1,80 @@
+base_id,modelo,lag,lb_stat,p_valor,fonte
+base_01,Holt-Winters,1,173.16443775278262,1.5068084508037947e-39,results/predictions/base_01__holt_winters.csv
+base_01,Holt-Winters,7,245.83361387715678,2.1340839982897712e-49,results/predictions/base_01__holt_winters.csv
+base_01,Holt-Winters,14,279.8302326909542,1.8723383678342503e-51,results/predictions/base_01__holt_winters.csv
+base_01,Holt-Winters,30,421.4534552691095,1.2703173552793962e-70,results/predictions/base_01__holt_winters.csv
+base_01,SARIMAX,1,4.467810201003847,0.03453923045120609,results/predictions/base_01__sarimax.csv
+base_01,SARIMAX,7,12.089214878939664,0.09766289700911893,results/predictions/base_01__sarimax.csv
+base_01,SARIMAX,14,30.319756741445353,0.006894206310337503,results/predictions/base_01__sarimax.csv
+base_01,SARIMAX,30,69.45554407882213,5.74015037545724e-05,results/predictions/base_01__sarimax.csv
+base_01,Random Forest,1,0.632732,0.4263551,notebooks/base_01-grupo1_RF.ipynb#cell-23
+base_01,Random Forest,7,30.909051,6.462161e-05,notebooks/base_01-grupo1_RF.ipynb#cell-23
+base_01,Random Forest,14,57.321548,3.440505e-07,notebooks/base_01-grupo1_RF.ipynb#cell-23
+base_01,Random Forest,30,142.028655,1.701673e-16,notebooks/base_01-grupo1_RF.ipynb#cell-23
+base_01,XGBoost,1,5.475513,0.019285,notebooks/base_01-grupo1_XGBoost.ipynb#cell-10
+base_01,XGBoost,7,13.657884,0.057612,notebooks/base_01-grupo1_XGBoost.ipynb#cell-10
+base_01,XGBoost,14,32.225019,0.003721,notebooks/base_01-grupo1_XGBoost.ipynb#cell-10
+base_01,XGBoost,30,71.33914,3.2e-05,notebooks/base_01-grupo1_XGBoost.ipynb#cell-10
+base_02,Holt-Winters,1,4316.508919984976,0.0,results/predictions/base_02__holt_winters.csv
+base_02,Holt-Winters,24,9192.102933685863,0.0,results/predictions/base_02__holt_winters.csv
+base_02,Holt-Winters,48,10126.57446194733,0.0,results/predictions/base_02__holt_winters.csv
+base_02,Holt-Winters,168,11077.966975771473,0.0,results/predictions/base_02__holt_winters.csv
+base_02,SARIMAX,1,2742.4798033959114,0.0,results/predictions/base_02__sarimax.csv
+base_02,SARIMAX,24,13979.524827008781,0.0,results/predictions/base_02__sarimax.csv
+base_02,SARIMAX,48,24210.183593789352,0.0,results/predictions/base_02__sarimax.csv
+base_02,SARIMAX,168,66538.93732684432,0.0,results/predictions/base_02__sarimax.csv
+base_02,Random Forest,1,77.295902,1.471711e-18,notebooks/base_02-grupo2_RF.ipynb#cell-23
+base_02,Random Forest,24,180.167223,6.806906e-26,notebooks/base_02-grupo2_RF.ipynb#cell-23
+base_02,Random Forest,48,212.966301,1.1863530000000002e-22,notebooks/base_02-grupo2_RF.ipynb#cell-23
+base_02,Random Forest,168,402.036055,3.163425e-21,notebooks/base_02-grupo2_RF.ipynb#cell-23
+base_02,XGBoost,1,45.498509,1.527551e-11,notebooks/base_02-grupo2_XGBoost.ipynb#cell-10
+base_02,XGBoost,24,122.821719,3.041395e-15,notebooks/base_02-grupo2_XGBoost.ipynb#cell-10
+base_02,XGBoost,48,147.313449,5.053396e-12,notebooks/base_02-grupo2_XGBoost.ipynb#cell-10
+base_02,XGBoost,168,311.270244,1.207509e-10,notebooks/base_02-grupo2_XGBoost.ipynb#cell-10
+base_03,Holt-Winters,1,2994.980107973632,0.0,results/predictions/base_03__holt_winters.csv
+base_03,Holt-Winters,24,4428.190759772086,0.0,results/predictions/base_03__holt_winters.csv
+base_03,Holt-Winters,48,4967.44073804373,0.0,results/predictions/base_03__holt_winters.csv
+base_03,Holt-Winters,168,6261.15470402578,0.0,results/predictions/base_03__holt_winters.csv
+base_03,SARIMAX,1,584.0154580287254,5.0192869839410866e-129,results/predictions/base_03__sarimax.csv
+base_03,SARIMAX,24,770.1958691288513,4.0436291809866146e-147,results/predictions/base_03__sarimax.csv
+base_03,SARIMAX,48,873.9152185720105,3.7390091733461502e-152,results/predictions/base_03__sarimax.csv
+base_03,SARIMAX,168,1214.6848304074242,5.3347452209271065e-158,results/predictions/base_03__sarimax.csv
+base_03,Random Forest,1,213.678797,2.164158e-48,notebooks/base_03-grupo3_RF.ipynb#cell-23
+base_03,Random Forest,24,983.575548,2.738335e-192,notebooks/base_03-grupo3_RF.ipynb#cell-23
+base_03,Random Forest,48,1161.255045,1.026463e-211,notebooks/base_03-grupo3_RF.ipynb#cell-23
+base_03,Random Forest,168,1438.123966,1.923213e-200,notebooks/base_03-grupo3_RF.ipynb#cell-23
+base_03,XGBoost,1,141.426111,1.298276e-32,notebooks/base_03-grupo3_XGBoost.ipynb#cell-10
+base_03,XGBoost,24,174.686811,7.53841e-25,notebooks/base_03-grupo3_XGBoost.ipynb#cell-10
+base_03,XGBoost,48,208.762858,6.168771e-22,notebooks/base_03-grupo3_XGBoost.ipynb#cell-10
+base_03,XGBoost,168,375.575131,6.5062420000000004e-18,notebooks/base_03-grupo3_XGBoost.ipynb#cell-10
+base_04,Holt-Winters,1,516.2163330486468,2.8166602689354034e-114,results/predictions/base_04__holt_winters.csv
+base_04,Holt-Winters,6,4497.193765894767,0.0,results/predictions/base_04__holt_winters.csv
+base_04,Holt-Winters,144,10541.698487860098,0.0,results/predictions/base_04__holt_winters.csv
+base_04,Holt-Winters,288,16169.063787445924,0.0,results/predictions/base_04__holt_winters.csv
+base_04,Random Forest,1,8005.413251,0.0,notebooks/base_04-grupo4_RF.ipynb#cell-23
+base_04,Random Forest,6,8062.299943,0.0,notebooks/base_04-grupo4_RF.ipynb#cell-23
+base_04,Random Forest,144,9224.156152,0.0,notebooks/base_04-grupo4_RF.ipynb#cell-23
+base_04,Random Forest,288,9643.378512,0.0,notebooks/base_04-grupo4_RF.ipynb#cell-23
+base_04,XGBoost,1,9501.439053,0.0,notebooks/base_04-grupo4_XGBoost.ipynb#cell-10
+base_04,XGBoost,6,9563.897993,0.0,notebooks/base_04-grupo4_XGBoost.ipynb#cell-10
+base_04,XGBoost,144,11733.752783,0.0,notebooks/base_04-grupo4_XGBoost.ipynb#cell-10
+base_04,XGBoost,288,13177.584018,0.0,notebooks/base_04-grupo4_XGBoost.ipynb#cell-10
+base_05,Holt-Winters,1,0.23795982514644043,0.6256835351754289,results/predictions/base_05__holt_winters.csv
+base_05,Holt-Winters,4,12.12793416427957,0.016424842909033007,results/predictions/base_05__holt_winters.csv
+base_05,Holt-Winters,13,28.913368703180527,0.006733656852821045,results/predictions/base_05__holt_winters.csv
+base_05,Holt-Winters,26,54.791319410531244,0.0008060856052008296,results/predictions/base_05__holt_winters.csv
+base_05,Holt-Winters,52,82.03878102349307,0.004960240392714768,results/predictions/base_05__holt_winters.csv
+base_05,SARIMAX,1,123.98597802519328,8.484102929894088e-29,results/predictions/base_05__sarimax.csv
+base_05,SARIMAX,4,148.00264043823248,5.453858719116219e-31,results/predictions/base_05__sarimax.csv
+base_05,SARIMAX,13,168.88612079035255,3.10888057172148e-29,results/predictions/base_05__sarimax.csv
+base_05,SARIMAX,26,204.43505239963937,1.244714969731043e-29,results/predictions/base_05__sarimax.csv
+base_05,SARIMAX,52,241.03917829169887,3.931965714970061e-26,results/predictions/base_05__sarimax.csv
+base_05,Random Forest,1,0.658395,0.417127,notebooks/base_05-grupo5_RF_retorno.ipynb#cell-25
+base_05,Random Forest,4,18.473195,0.000997,notebooks/base_05-grupo5_RF_retorno.ipynb#cell-25
+base_05,Random Forest,13,38.789926,0.000216,notebooks/base_05-grupo5_RF_retorno.ipynb#cell-25
+base_05,Random Forest,26,56.417294,0.000498,notebooks/base_05-grupo5_RF_retorno.ipynb#cell-25
+base_05,XGBoost,1,0.146758,0.701653,notebooks/base_05-grupo5_XGBoost.ipynb#cell-10
+base_05,XGBoost,4,11.151468,0.024913,notebooks/base_05-grupo5_XGBoost.ipynb#cell-10
+base_05,XGBoost,13,28.143308,0.008642,notebooks/base_05-grupo5_XGBoost.ipynb#cell-10
+base_05,XGBoost,26,53.860554,0.001057,notebooks/base_05-grupo5_XGBoost.ipynb#cell-10
+base_05,XGBoost,52,80.159452,0.007324,notebooks/base_05-grupo5_XGBoost.ipynb#cell-10

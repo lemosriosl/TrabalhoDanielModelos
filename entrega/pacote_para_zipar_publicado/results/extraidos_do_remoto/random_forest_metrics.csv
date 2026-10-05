@@ -1,0 +1,6 @@
+base_id,modelo,mae,origens_avaliadas,notebook_remoto,commit_remoto
+base_01,random_forest,764.717551,,notebooks/base_01-grupo1_RF.ipynb,2b06f5b598b1686a820574051dad9ae19628da51
+base_02,random_forest,129.760961,,notebooks/base_02-grupo2_RF.ipynb,2b06f5b598b1686a820574051dad9ae19628da51
+base_03,random_forest,10.092369,,notebooks/base_03-grupo3_RF.ipynb,2b06f5b598b1686a820574051dad9ae19628da51
+base_04,random_forest,0.136593,,notebooks/base_04-grupo4_RF.ipynb,2b06f5b598b1686a820574051dad9ae19628da51
+base_05,random_forest,0.020517,586,notebooks/base_05-grupo5_RF_retorno.ipynb,2b06f5b598b1686a820574051dad9ae19628da51

@@ -1,0 +1,24 @@
+feature,grupo,disponibilidade,descricao,status,nota
+level_t,alvo_na_origem,conhecido em t,Nível do alvo observado na origem.,aprovado,
+Open_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Usada após o fechamento de t para prever t+1; horário intradiário pendente.
+High_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Conhecida só após o dia t; válida no cenário pós-fechamento.
+Low_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,Conhecida só após o dia t; válida no cenário pós-fechamento.
+Volume_t,estado_na_origem,conhecido em t,Valor observado na origem para prever o passo seguinte.,em_validacao,"Volume acumulado de t, disponível no fechamento."
+target_lag_1,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_2,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_3,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_7,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_14,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_lag_30,defasagem,somente passado,Defasagem positiva; exclui a observação da data-alvo.,derivada,
+target_mean_7,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_std_7,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_mean_14,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_std_14,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_mean_30,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_std_30,janela_deslocada,termina em t-1,Janela móvel deslocada para não incluir o valor previsto.,derivada,
+target_hour_sin,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_hour_cos,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_dow_sin,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_dow_cos,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_month_sin,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,
+target_month_cos,calendario,conhecido antecipadamente,Codificação cíclica da data-alvo.,derivada,

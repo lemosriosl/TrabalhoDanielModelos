@@ -1,0 +1,16 @@
+coluna,disponibilidade,atraso,feature,status,justificativa
+PM10,na_origem,0,PM10_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+SO2,na_origem,0,SO2_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+NO2,na_origem,0,NO2_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+CO,na_origem,0,CO_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+O3,na_origem,0,O3_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+TEMP,na_origem,0,TEMP_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+PRES,na_origem,0,PRES_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+DEWP,na_origem,0,DEWP_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+RAIN,na_origem,0,RAIN_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+WSPM,na_origem,0,WSPM_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+wd_sin,na_origem,0,wd_sin_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+wd_cos,na_origem,0,wd_cos_t,em_validacao,Simultânea ao alvo; usada só como estado de t para prever t+1.
+No,proibida,0,,excluido,Proibida no quadro modelável.
+station,proibida,0,,excluido,Proibida no quadro modelável.
+wd,proibida,0,,excluido,Proibida no quadro modelável.

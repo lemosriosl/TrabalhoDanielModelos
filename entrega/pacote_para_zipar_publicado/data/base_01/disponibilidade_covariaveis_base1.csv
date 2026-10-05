@@ -1,0 +1,6 @@
+coluna,disponibilidade,atraso,feature,status,justificativa
+Open,na_origem,0,Open_t,em_validacao,Usada após o fechamento de t para prever t+1; horário intradiário pendente.
+High,na_origem,0,High_t,em_validacao,Conhecida só após o dia t; válida no cenário pós-fechamento.
+Low,na_origem,0,Low_t,em_validacao,Conhecida só após o dia t; válida no cenário pós-fechamento.
+Volume,na_origem,0,Volume_t,em_validacao,"Volume acumulado de t, disponível no fechamento."
+Adj Close,proibida,0,,excluido,Proibida no quadro modelável.

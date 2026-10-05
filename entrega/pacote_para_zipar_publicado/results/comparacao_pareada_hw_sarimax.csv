@@ -1,0 +1,5 @@
+base_id,origens_pareadas,mae_hw_pareado,mae_sarimax_pareado,origens_hw_horizonte_1,origens_sarimax_horizonte_1,escopo
+base_01,851,812.049677198456,698.560125824588,851,851,exploratorio_dois_modelos_sem_ranking_final
+base_02,7584,253.85025658467669,574.0862835381646,8115,7584,exploratorio_dois_modelos_sem_ranking_final
+base_03,6758,14.15882880671125,10.358279577876184,6828,6771,exploratorio_dois_modelos_sem_ranking_final
+base_05,586,0.020077713230202143,0.029219290080755828,586,586,exploratorio_dois_modelos_sem_ranking_final
