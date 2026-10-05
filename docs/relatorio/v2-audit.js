@@ -4,6 +4,20 @@
   document.body.dataset.auditVersion='1';
   const chapter = number => document.querySelector(`[data-chapter="${number}"] .page-body`);
   const paragraph = text => { const p=document.createElement('p');p.textContent=text;return p; };
+  const number = (value,digits=6) => Number(value).toLocaleString('pt-BR',{minimumFractionDigits:digits,maximumFractionDigits:digits});
+  const gallery = (title,items,label) => {
+    const section=document.createElement('section');section.className='audit-gallery-section';
+    const heading=document.createElement('h3');heading.textContent=title;section.append(heading);
+    const grid=document.createElement('div');grid.className='audit-gallery';
+    items.forEach(item=>{
+      const figure=document.createElement('figure');figure.className='figure audit-figure';
+      const img=document.createElement('img');img.src=item.data;img.alt=`${label} - Base ${item.base}`;
+      const subset=(item.base===5 && (label.startsWith('Resíduos Holt-Winters')||label.startsWith('ACF Holt-Winters')||label.startsWith('Resíduos Random Forest')||label.startsWith('ACF Random Forest'))) ? ' Subconjunto de robustez com 523 cotações novas; não é o conjunto integral de 586 origens.' : '';
+      const caption=document.createElement('figcaption');caption.textContent=`Base ${item.base}: ${label}.${subset} Fonte: ${item.source}.`;
+      figure.append(img,caption);grid.append(figure);
+    });
+    section.append(grid);return section;
+  };
   const table = (caption, headings, rows) => {
     const wrap=document.createElement('div');wrap.className='table-wrap audit-table';
     const element=document.createElement('table');
@@ -70,8 +84,17 @@
   ]));
   results.append(note('Proveniência dos valores',[
     'XGBoost: results/metrics.csv versionado no repositório. Random Forest: results/extraidos_do_remoto/random_forest_metrics.csv, extraído das saídas dos notebooks remotos. SARIMAX: CSVs finais locais das Bases 1, 2, 3 e 5, com auditorias compactas versionadas. Holt-Winters: CSVs locais de previsões. Os CSVs completos locais são ignorados pelo Git; clonar o repositório não os recupera.',
-    'Os cinco notebooks SARIMAX do remoto possuem saídas de teste reduzido, não a avaliação final completa. Os 35 notebooks permaneceram idênticos ao remoto; células executadas e ausência de erro salvo não demonstram, por si só, igualdade de protocolo entre modelos.'
+    'Os cinco notebooks SARIMAX do remoto possuem saídas de teste reduzido, não a avaliação final completa. Os notebooks permaneceram idênticos ao remoto na auditoria anterior; células executadas e ausência de erro salvo não demonstram, por si só, igualdade de protocolo entre modelos.'
   ]));
+  results.append(note('O que é comparável sem novo treino',[
+    'A interseção exata de origem, instante-alvo e valor real permite apenas uma comparação exploratória entre Holt-Winters e SARIMAX nas Bases 1, 2, 3 e 5. Ela exclui horizontes SARIMAX incorretos e não autoriza ranking dos quatro modelos, vitórias ou posição média. Os dados foram gerados por código em results/comparacao_pareada_hw_sarimax.csv.'
+  ]));
+  results.append(table('MAE pareado exploratório - somente Holt-Winters e SARIMAX',
+    ['Base','Pares exatos','MAE HW no par','MAE SARIMAX no par'],
+    window.REPORT_V2_SNAPSHOT.paired.map(row=>[
+      row.base_id.slice(-2),Number(row.origens_pareadas).toLocaleString('pt-BR'),
+      number(row.mae_hw_pareado),number(row.mae_sarimax_pareado)
+    ])));
   const stl=chapter(5);
   stl.append(note('STL executada nas cinco bases',[
     'As decomposições e as medidas abaixo foram extraídas das saídas salvas dos notebooks exploratórios. Elas descrevem a série no treino e orientam a interpretação; não escolhem sozinhas o melhor modelo.'
@@ -126,7 +149,8 @@
     const [base,model]=key.split('/');
     const p=rows.map(row=>`${row.lag}: ${Number(row.p_valor)===0?'<1e-300':Number(row.p_valor).toExponential(2)}`).join(' · ');
     const rejected=rows.filter(row=>Number(row.p_valor)<0.05).map(row=>row.lag);
-    return [`${base.slice(-2)} / ${model}`,Number(individual.get(key)?.origens_horizonte_1||individual.get(key)?.origens).toLocaleString('pt-BR'),p,
+    const count=base==='base_05' && model==='Random Forest' ? '523 (cotações novas)' : Number(individual.get(key)?.origens_horizonte_1||individual.get(key)?.origens).toLocaleString('pt-BR');
+    return [`${base.slice(-2)} / ${model}`,count,p,
       rejected.length ? `Rejeita em ${rejected.join(', ')}` : 'Não rejeita nos lags testados'];
   });
   residuals.querySelector('.table-wrap').replaceWith(table('Ljung–Box dos resíduos fora da amostra (lag: p-valor)',
@@ -137,9 +161,17 @@
   residuals.append(note('Limite do SARIMAX',[
     'As células executadas de SARIMAX mostram diagnósticos do teste reduzido de quatro origens, descartados nesta tabela. O diagnóstico final das Bases 1, 2, 3 e 5 agora foi gerado por código a partir dos CSVs locais completos. A Base 4 permanece fora do escopo solicitado.'
   ]));
+  residuals.append(note('Figuras recuperadas dos notebooks executados',[
+    'Os painéis a seguir mostram resíduos ao longo do tempo e ACF de Holt-Winters e Random Forest. Os painéis XGBoost incluem observados versus previstos, ACF residual e Gain. Na Base 5, os gráficos de Holt-Winters e Random Forest são do subconjunto de robustez de 523 cotações novas, diferente do MAE principal de 586 origens. Figuras finais equivalentes do SARIMAX e séries temporais residuais completas do XGBoost não foram localizadas para todas as bases.'
+  ]));
+  residuals.append(gallery('Holt-Winters: resíduos por origem',window.REPORT_V2_SNAPSHOT.hw_residual_figures,'Resíduos Holt-Winters por origem'));
+  residuals.append(gallery('Holt-Winters: ACF residual',window.REPORT_V2_SNAPSHOT.hw_acf_figures,'ACF Holt-Winters'));
+  residuals.append(gallery('Random Forest: resíduos por origem',window.REPORT_V2_SNAPSHOT.rf_residual_figures,'Resíduos Random Forest por origem'));
+  residuals.append(gallery('Random Forest: ACF residual',window.REPORT_V2_SNAPSHOT.rf_acf_figures,'ACF Random Forest'));
+  residuals.append(gallery('XGBoost: previsão, ACF e Gain',window.REPORT_V2_SNAPSHOT.xgb_diagnostic_figures,'Painel XGBoost de previsão, ACF e Gain'));
   const importance=chapter(10);
   const oldImportanceFigure=importance.querySelector('.figure');
-  if(oldImportanceFigure)oldImportanceFigure.replaceWith(paragraph('As tabelas de importância estão nos notebooks; não foi exportada uma figura comparável para os quatro modelos e cinco bases. A tabela abaixo registra apenas os sinais verificáveis, sem alegar equivalência entre métodos.'));
+  if(oldImportanceFigure)oldImportanceFigure.replaceWith(paragraph('As figuras de importância Random Forest e os painéis Gain do XGBoost foram recuperados dos notebooks. Os métodos de importância diferem e não permitem comparação numérica direta nem interpretação causal.'));
   importance.append(table('Principais sinais do XGBoost nas execuções finais', ['Base', 'Features com maior Gain registrado', 'Leitura'], [
     ['01', 'target_std_7; target_lag_30; target_mean_30', 'Dependência de volatilidade e histórico; ganho marginal sobre persistência é fraco.'],
     ['02', 'target_lag_3; hora; target_lag_1', 'Rotina intradiária e dependência recente são dominantes.'],
@@ -150,6 +182,7 @@
   importance.append(note('Importância do Random Forest',[
     'Os cinco notebooks Random Forest executados calculam importância nativa. A documentação da Base 5 registra retorno corrente, volatilidade, dispersão histórica, lags de retorno e defasagens da Fed Funds entre as primeiras posições. Os valores completos por base precisam ser exportados de modo uniforme antes de uma tabela única; relevância preditiva não demonstra causalidade.'
   ]));
+  importance.append(gallery('Random Forest: importância nativa das features',window.REPORT_V2_SNAPSHOT.rf_importance_figures,'Importância nativa Random Forest'));
   const rfTable=Array.from(results.querySelectorAll('table')).find(element=>element.caption?.textContent.includes('Random Forest —'));
   if(rfTable){
     rfTable.caption.textContent='Random Forest — saídas executadas dos notebooks';
@@ -169,7 +202,7 @@
   resultNotes.forEach(el=>{if(el.textContent.includes('somente o cabeçalho')||el.textContent.includes('Consolidação pendente'))el.innerHTML='<strong>Consolidação incompleta</strong> Há 19 MAEs individuais, mas somente cinco linhas XGBoost no consolidado canônico e amostras diferentes nas Bases 1–4. Não há ranking homologado.';});
   const appendix=chapter(14);
   appendix.append(note('Achados reproduzíveis da auditoria',[
-    'As tabelas results/metricas_individuais_auditadas.csv e results/ljung_box_auditado.csv são geradas por código. Seus dados distinguem CSV final, saída de notebook e consolidado XGBoost. O SARIMAX da Base 4 não foi executado nesta atualização.'
+    'As tabelas results/metricas_individuais_auditadas.csv, results/ljung_box_auditado.csv e results/comparacao_pareada_hw_sarimax.csv são geradas por código. Seus dados distinguem CSV final, saída de notebook e consolidado XGBoost. O SARIMAX da Base 4 não foi executado nesta atualização.'
   ],window.REPORT_V2_SNAPSHOT.findings));
   const summary=chapter(1);
   summary.querySelectorAll('.panel').forEach(panel=>{
@@ -195,6 +228,9 @@
   protocol.append(note('Protocolo planejado versus execução observada',[
     'O projeto define horizonte de um passo, avanço temporal e intenção de origens comuns. A auditoria dos artefatos mostrou que esse último requisito não foi plenamente cumprido. Por isso, a análise quantitativa entre modelos é exploratória e deve ser lida junto com o número de origens de cada célula da matriz.'
   ]));
+  protocol.append(note('Justificativa e limite de conformidade',[
+    'A falta de tempo para reexecutar os notebooks explica por que a equipe apresenta resultados individuais, filtros de horizonte e uma comparação pareada parcial. Essa justificativa não transforma testes diferentes em uma avaliação comum nem substitui as exigências do enunciado: quatro modelos nas cinco bases, mesmas origens e observações, ranking por base, vitórias e posição média. A entrega parcial requer avaliação explícita do professor.'
+  ]));
   const conclusion=chapter(12);
   conclusion.append(note('Conclusão que os dados permitem',[
     'Os modelos produziram evidências individuais de previsão fora da amostra, mas a auditoria não sustenta uma classificação única das quatro famílias nas cinco bases. MAEs de séries diferentes têm unidades distintas e não devem ser somados ou promediados; MAEs da mesma base com origens diferentes não devem ser usados para proclamar um vencedor.',
@@ -214,12 +250,12 @@
     overview.querySelector('.finding-evidence .slot').dataset.pending='false';
   }
   fill(chapter(13), 'Padronizar referências completas e datas reais de acesso; não inventar datas de download', 'Referências de origem documentadas por base e por DOI quando disponível. Datas de download não comprovadas não foram fabricadas; confirmar antes da submissão final.');
-  fill(appendix, 'Anexar logs, parâmetros, contratos de teste, previsões e arquivos reproduzíveis', 'Arquivos de evidência: results/metricas_individuais_auditadas.csv, results/ljung_box_auditado.csv, results/achados_auditoria.json, results/metrics.csv, notebooks executados e CSVs locais completos de Holt-Winters e SARIMAX (exceto Base 4). A disponibilidade dos CSVs locais deve ser conferida no ambiente de entrega.');
+  fill(appendix, 'Anexar logs, parâmetros, contratos de teste, previsões e arquivos reproduzíveis', 'Arquivos de evidência: results/metricas_individuais_auditadas.csv, results/comparacao_pareada_hw_sarimax.csv, results/ljung_box_auditado.csv, results/achados_auditoria.json, results/metrics.csv e notebooks executados. Os CSVs completos de Holt-Winters/SARIMAX usados na auditoria são locais e ignorados pelo Git; o pacote contém resultados compactos, não esses CSVs completos.');
   const dailyTable=Array.from(appendix.querySelectorAll('table')).find(el=>el.caption?.textContent.includes('Registro diário individual'));
   if(dailyTable){dailyTable.tBodies[0].replaceChildren();dailyTable.after(paragraph('O registro diário não foi fornecido ao repositório; não é possível inferir autores, datas, carga ou complexidade de trabalho a partir dos commits. O grupo deve anexar a planilha externa real.'));}
   chapter(14).querySelectorAll('p').forEach(el=>{
     if(el.textContent.startsWith('Relatório v2 gerado após git pull'))
-      el.textContent=`Auditoria documental atualizada em 04/10/2026. Revisão Git consultada na geração: ${window.REPORT_V2_SNAPSHOT.commit}; os novos arquivos desta atualização não estão necessariamente incluídos nesse identificador. Foram usados os CSVs locais de previsão disponíveis. O SARIMAX da Base 4 não integra a comparação.`;
+      el.textContent=`Auditoria documental atualizada em 05/10/2026. Revisão Git consultada na geração: ${window.REPORT_V2_SNAPSHOT.commit}; os novos arquivos desta atualização não estão necessariamente incluídos nesse identificador. Foram usados os CSVs locais de previsão disponíveis. O SARIMAX da Base 4 não integra a comparação.`;
   });
   results.querySelectorAll('.subtle').forEach(el=>{
     if(el.textContent.includes('sincronizados em'))el.textContent='Origem documental: results/metrics.csv, projeto.yaml e docs/modelo_xgboost.md. O identificador Git do consolidado e os CSVs locais têm proveniências próprias; a auditoria distingue essas fontes.';

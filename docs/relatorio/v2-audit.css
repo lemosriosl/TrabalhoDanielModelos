@@ -6,7 +6,14 @@
   .audit-small{display:block;font-size:12px;color:#52657b;font-weight:400;margin-top:3px}
   .audit-matrix td{min-width:122px}
   .audit-mobile-hint{display:none;color:#52657b;font-size:14px}
+  .audit-gallery-section{margin:26px 0}
+  .audit-gallery-section h3{margin:0 0 12px}
+  .audit-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .audit-gallery .audit-figure{margin:0;padding:10px;border:1px solid #d9e1e8;background:#fff;break-inside:avoid}
+  .audit-gallery .audit-figure img{width:100%;height:auto;object-fit:contain}
+  .audit-gallery .audit-figure figcaption{font-size:11px;line-height:1.4}
   @media(max-width:700px){.audit-mobile-hint{display:block}}
+  @media(max-width:700px){.audit-gallery{grid-template-columns:1fr}}
   @media print{.audit-note{break-inside:avoid}}
   @media print{
     .page,.page:not(:first-child){break-before:auto!important;break-after:auto!important;min-height:0!important;display:block!important;overflow:visible!important}
