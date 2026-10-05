@@ -212,3 +212,11 @@
 **Motivo:** MAEs só são comparáveis dentro da mesma base e do mesmo alvo. O consolidado precisa carregar contexto suficiente para impedir comparações ambíguas e permitir rastreabilidade.
 
 **Efeito:** o arquivo começa apenas com o cabeçalho e será preenchido por `series_temporais.results.write_metrics` quando as execuções finais forem concluídas; valores não serão digitados manualmente.
+
+## 2026-10-04 - Aproveitamento documental de saídas executadas
+
+**Decisão:** incorporar no relatório v2 as saídas verificáveis já salvas nos notebooks — força de sazonalidade e tendência por STL, métricas individuais, diagnósticos de Ljung-Box e sinais de importância — identificando a origem e a limitação de cada evidência. Não preencher ranking, vitórias, posição média ou vencedor geral quando as quatro famílias não compartilham as mesmas origens de teste.
+
+**Motivo:** resultados executados não devem ficar ocultos apenas por ainda não integrarem o consolidado canônico. Ao mesmo tempo, transcrever MAEs de amostras temporais diferentes como um ranking violaria o protocolo do projeto.
+
+**Efeito:** o relatório passa a diferenciar resultados individuais auditados, diagnósticos disponíveis e comparações ainda não homologadas. A ausência da execução SARIMAX final da Base 4, a falta de contagens de origem do RF nas Bases 1–4 e o registro diário externo permanecem explícitos.
