@@ -291,15 +291,19 @@
   fill(chapter(13), 'Padronizar referências completas e datas reais de acesso; não inventar datas de download', 'Referências de origem documentadas por base e por DOI quando disponível. Datas de download não comprovadas não foram fabricadas; confirmar antes da submissão final.');
   fill(appendix, 'Anexar logs, parâmetros, contratos de teste, previsões e arquivos reproduzíveis', 'Arquivos de evidência: results/metricas_individuais_auditadas.csv, results/comparacao_pareada_hw_sarimax.csv, results/ljung_box_auditado.csv, results/figuras_sarimax/manifesto.csv, results/metrics.csv e notebooks executados. Os CSVs completos de Holt-Winters/SARIMAX usados na auditoria não estão todos no Git; o pacote contém resultados compactos e figuras geradas, não esses CSVs completos.');
   const dailyTable=Array.from(appendix.querySelectorAll('table')).find(el=>el.caption?.textContent.includes('Registro diário individual'));
-  if(dailyTable){dailyTable.tBodies[0].replaceChildren();dailyTable.after(paragraph('O acompanhamento de demandas foi fornecido pelo grupo em PDF externo em 05/10/2026. Sua revisão, eventual adequação ao formato diário do enunciado e inclusão no pacote serão tratadas separadamente com o professor; não se inferem dados adicionais a partir dos commits.'));}
+  if(dailyTable)dailyTable.replaceWith(paragraph('O acompanhamento de demandas fornecido pelo grupo em 05/10/2026 acompanha a entrega como registro_demandas.pdf. Ele informa responsáveis, datas, esforço, complexidade e status, mas não comprova uma linha de execução para cada dia. O grupo deve revisar essa adequação ao enunciado com o professor; não se inferem dados adicionais a partir dos commits.'));
+  appendix.querySelectorAll('p').forEach(el=>{
+    if(el.textContent.startsWith('A planilha operacional de demandas é mantida fora do repositório'))
+      el.textContent='A planilha operacional original é mantida pelo grupo fora do repositório. Uma cópia em PDF do acompanhamento recebido integra o pacote da entrega; sua adequação ao formato diário exigido ainda requer revisão humana.';
+  });
   appendix.querySelectorAll('tr').forEach(row=>{
     if(row.cells?.[0]?.textContent.trim()==='D15' && row.cells.length>1)
-      row.cells[1].textContent='AGENTS.md; acompanhamento de demandas do grupo fornecido externamente em 05/10/2026 (ainda não incluído no pacote)';
+      row.cells[1].textContent='projeto.yaml; registro_demandas.pdf (acompanhamento fornecido pelo grupo em 05/10/2026)';
   });
   document.querySelectorAll('td').forEach(cell=>{
     if(cell.textContent.includes('planilha operacional externa do grupo (não disponibilizada nesta atualização)'))
       cell.textContent=cell.textContent.replace('planilha operacional externa do grupo (não disponibilizada nesta atualização)',
-        'acompanhamento de demandas do grupo fornecido externamente em 05/10/2026 (ainda não incluído no pacote)');
+        'registro_demandas.pdf (acompanhamento fornecido pelo grupo em 05/10/2026)');
   });
   chapter(14).querySelectorAll('p').forEach(el=>{
     if(el.textContent.startsWith('Relatório v2 gerado após git pull'))

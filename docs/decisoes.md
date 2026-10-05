@@ -1,5 +1,11 @@
 # Decisões do projeto
 
+## 2026-10-05 - Pacote estrito conforme o enunciado
+
+**Decisão:** a pasta versionada `entrega/pacote_para_zipar_publicado/` conterá somente as categorias solicitadas na seção de entrega do enunciado: PDF e HTML do relatório, fonte do relatório, código da análise, cinco bases brutas com metadados necessários, resultados por MAE e registro de demandas fornecido pelo grupo. Arquivos de testes, documentação interna, versões antigas do relatório, notebooks auxiliares não usados e resultados descritivos posteriores ao relatório ficam no repositório, fora do pacote. O PDF de acompanhamento recebido em 05/10/2026 será copiado sem alterar seu conteúdo.
+
+**Limite:** o acompanhamento possui datas, responsáveis, esforço, complexidade e status, mas não comprova por si só uma linha de execução para cada dia nem substitui a validação humana. O SARIMAX rápido acrescentado no remoto após o relatório não será confundido com a avaliação extensa da Base 4; seu ranking descritivo não entra no arquivo consolidado do pacote. A simplificação da pasta não altera as ressalvas metodológicas nem produz o ZIP de envio.
+
 ## 2026-10-04 - Entrega v2 com resultados descritivos e limites de comparação
 
 **Decisão:** publicar no repositório o código gerador e o HTML v2 atualizado do site local, incluindo MAE e número de origens de cada execução disponível. Os valores são apresentados como resultados individuais, sem ranking ou vencedor geral: as Bases 1–4 têm conjuntos de teste diferentes, a Base 4 ainda não tem SARIMAX final, e a igualdade origem a origem dos quatro modelos da Base 5 não foi comprovada. O resultado SARIMAX parcial da Base 4 não recebe MAE na matriz.

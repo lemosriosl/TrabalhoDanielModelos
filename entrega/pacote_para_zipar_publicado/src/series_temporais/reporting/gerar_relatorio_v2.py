@@ -88,7 +88,12 @@ def gerar(raiz: Path) -> Path:
     if len(paired) != 4 or {row['base_id'] for row in paired} != {'base_01', 'base_02', 'base_03', 'base_05'}:
         raise ValueError('Esperadas quatro linhas na comparação exploratória HW/SARIMAX.')
     metrics.sort(key=lambda row: row['base_id'])
-    commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=raiz, text=True).strip()
+    try:
+        commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=raiz,
+                                         text=True, stderr=subprocess.DEVNULL).strip()
+    except (OSError, subprocess.CalledProcessError):
+        # A fonte do relatório também deve abrir fora de um checkout Git.
+        commit = 'pacote de entrega sem metadados Git'
     snapshot = json.dumps({'commit': commit, 'metrics': metrics, 'individual': individual,
                            'diagnostics': diagnostics, 'findings': findings, 'paired': paired,
                            'stl_figures': figuras_notebook(raiz, STL_FIGURES),
@@ -105,7 +110,10 @@ def gerar(raiz: Path) -> Path:
     html = html.replace('</body>', '<script>window.REPORT_V2_SNAPSHOT=' + snapshot + ';</script>\n<script>\n' + js + '\n</script>\n<script>\n' + audit_js + '\n</script>\n</body>', 1)
     html = html.replace('<title>Séries Temporais | Relatório técnico</title>', '<title>Séries Temporais | Relatório v2</title>', 1)
     html = html.replace("a.download='relatorio_series_temporais.html'", "a.download='relatorio_series_temporais_v2.html'", 1)
-    destino = raiz / 'entrega' / 'relatorio_v2.html'
+    # No checkout o relatório fica em entrega/; dentro do pacote extraído,
+    # o HTML e o PDF ficam na raiz para atender à estrutura de submissão.
+    destino = ((raiz / 'entrega' / 'relatorio_v2.html')
+               if (raiz / 'entrega').is_dir() else raiz / 'relatorio_v2.html')
     destino.write_text(html, encoding='utf-8')
     return destino
 
